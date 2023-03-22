@@ -11,7 +11,7 @@ before_script:
   - apt-get install -y nginx
   - service nginx start
   - apt update
-  - apt upgrade
+  - apt upgrade -y
   - apt-get install -y default-mysql-client
   - mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -e "CREATE USER 'singularity'@'%' IDENTIFIED BY 'R&4*h223b5yP';"
   - mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -e "CREATE DATABASE singularity;"
