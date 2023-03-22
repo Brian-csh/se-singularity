@@ -1,4 +1,4 @@
-image: php:8.0-fpm
+image: registry.secoder.net/tool/deployer
 
 variables:
   MYSQL_DATABASE: "singularity"
@@ -23,5 +23,6 @@ deploy:
     - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
     - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < singularity.sql
     - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "SHOW TABLES;"
+    - deployer dyno replace frontend $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG gitlab-ci-token $REGISTRY_PWD
   only:
     - master
