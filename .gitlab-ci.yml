@@ -19,11 +19,9 @@ before_script:
   - service nginx start
   - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
   - mysql --version
-  - service mysql start
-  - sleep 3
-  - mysql -h localhost -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE DATABASE singularity;"
-  - mysql -h localhost -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE USER 'singularity'@'%' IDENTIFIED BY 'R&4*h223b5yP';"
-  - mysql -h localhost -u ${DB_USER} -p"${DB_PASSWORD}" -e "GRANT ALL PRIVILEGES ON singularity.* TO 'singularity'@'%';"
+  - mysql -h mysql -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE DATABASE singularity;"
+  - mysql -h mysql -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE USER 'singularity'@'%' IDENTIFIED BY 'R&4*h223b5yP';"
+  - mysql -h mysql -u ${DB_USER} -p"${DB_PASSWORD}" -e "GRANT ALL PRIVILEGES ON singularity.* TO 'singularity'@'%';"
 
 
 deploy:
