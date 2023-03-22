@@ -18,7 +18,7 @@ before_script:
   - apt-get install -y nginx
   - service nginx start
   - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
-  - ls
+  - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < singularity.sql
 
 
 deploy:
