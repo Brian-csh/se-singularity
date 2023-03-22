@@ -19,6 +19,7 @@ before_script:
   - service nginx start
   - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
   - mysql --version
+  - sudo systemctl start mysql
   - sleep 3
   - mysql -h localhost -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE DATABASE singularity;"
   - mysql -h localhost -u ${DB_USER} -p"${DB_PASSWORD}" -e "CREATE USER 'singularity'@'%' IDENTIFIED BY 'R&4*h223b5yP';"
