@@ -13,18 +13,15 @@ services:
 stages:
   - deploy
 
-before_script:
-  - apt-get update
-  - apt-get install -y nginx
-  - service nginx start
-  - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
-  - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < singularity.sql
-  - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "SHOW TABLES;"
-
 
 deploy:
   stage: deploy
   script:
-    - deployer dyno replace frontend $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG gitlab-ci-token $REGISTRY_PWD
+    - apt-get update
+    - apt-get install -y nginx
+    - service nginx start
+    - apt-get update && apt-get install -y git curl libmcrypt-dev default-mysql-client
+    - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < singularity.sql
+    - mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "SHOW TABLES;"
   only:
     - master
