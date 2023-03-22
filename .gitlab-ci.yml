@@ -1,5 +1,12 @@
 image: php:8.0-fpm
 
+variables:
+  MYSQL_DATABASE: "singularity"
+  MYSQL_ROOT_PASSWORD: "dbpass"
+  MYSQL_USER: "singularity"
+  MYSQL_PASSWORD: "R&4*h223b5yP"
+  MYSQL_HOST: mysql
+
 services:
   - mysql:latest
 
