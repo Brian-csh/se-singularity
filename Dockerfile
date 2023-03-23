@@ -1,5 +1,5 @@
 # Use official PHP image as the base
-FROM php:7.4-fpm
+FROM php:7.2-fpm
 
 # Install necessary PHP extensions
 RUN docker-php-ext-install mysqli pdo pdo_mysql
