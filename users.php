@@ -75,14 +75,14 @@ include "includes/navbar.php";
 
                                 // Fetch role name
                                 $role_id = $row['role'];
-                                $role_name = mysqli_fetch_array($conn->query("SELECT name FROM role WHERE id = '$role_id'"))['name'];
+                                $role_name = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
 
 
 
                                 if ($entity_super == '1') {
-                                    $entity = '<span class="badge bg-primary text-white">' . $entity_name . '</span>';
+                                    $entity = '<span class="badge bg-warning text-white">' . $entity_name . '</span>';
                                 } else {
-                                    $entity = '<span class="badge bg-gold text-white">' . $entity_name . '</span>';
+                                    $entity = '<span class="badge bg-primary text-white">' . $entity_name . '</span>';
                                 }
                                 $role = '<span class="">' . $role_name .'</span>';
 
