@@ -26,8 +26,7 @@ if (isset($_POST['login_click'])) {
             if (password_verify($password, $row['password'])) {
                 // TODO: add role based session parameters
                 $_SESSION['admin'] = $row;
-                header("Location: users.php");
-              header("Location: index.php");
+                header("Location: index.php");
             } else $errors = "Wrong username or password";
         } else $errors = "Wrong username or password";
 
