@@ -14,7 +14,7 @@ COPY . /var/www/html/
 WORKDIR /var/www/html/
 
 # Copy Nginx configuration file
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx/default.conf /etc/nginx/conf.d
 
 # Copy supervisor configuration file
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -22,5 +22,3 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose port 80 for Nginx
 EXPOSE 80
 
-# Start supervisord to start Nginx and PHP-FPM
-CMD ["/usr/bin/supervisord"]
