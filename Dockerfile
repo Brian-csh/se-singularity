@@ -15,7 +15,7 @@ COPY . /var/www/html/
 WORKDIR /var/www/html/
 
 # Copy Nginx configuration file
-COPY nginx /etc/nginx/conf.d
+COPY nginx/default.conf /etc/nginx/conf.d/
 
 # Copy supervisor configuration file
 # COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
