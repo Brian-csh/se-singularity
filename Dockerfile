@@ -16,9 +16,6 @@ WORKDIR /var/www/html/
 # Copy Nginx configuration file
 COPY nginx/default.conf /etc/nginx/conf.d
 
-# Copy supervisor configuration file
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 # Expose port 80 for Nginx
 EXPOSE 80
 
