@@ -42,7 +42,7 @@ if (isset($_POST['login_click'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Log på - Dashboard</title>
+    <title>Log in - Dashboard</title>
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
@@ -77,7 +77,7 @@ if (isset($_POST['login_click'])) {
                                     </div>
                                     <!-- Form Group (login box)-->
                                     <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                        <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log på</button>
+                                        <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
                                     </div>
                                 </form>
                             </div>
