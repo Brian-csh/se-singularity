@@ -4,7 +4,7 @@ session_start();
 $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
-//require 'includes/db/connect.php';
+require 'includes/db/connect.php';
 
 $errors = "";
 $username = "";
