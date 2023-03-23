@@ -24,7 +24,7 @@ if (isset($_POST['login_click'])) {
 
         if ($row) {
             if (password_verify($password, $row['password'])) {
-              header("Location: users.php");
+              header("Location: index.php");
             } else $errors = "Wrong username or password";
         } else $errors = "Wrong username or password";
 

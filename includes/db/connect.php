@@ -1,6 +1,10 @@
 <?php
 
-$DB_Server = "singularity-db.Singularity.secoder.local";
+if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
+    $DB_Server = "localhost";
+} else {
+    $DB_Server = "singularity-db.Singularity.secoder.local";
+}
 $DB_Username = "singularity";
 $DB_Password = "R&4*h223b5yP";
 $DB_DBName = "singularity";
