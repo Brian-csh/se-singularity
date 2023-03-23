@@ -4,7 +4,7 @@ session_start();
 $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
-require 'includes/db/connect.php';
+//require 'includes/db/connect.php';
 
 $errors = "";
 $username = "";
@@ -17,6 +17,13 @@ if (isset($_POST['login_click'])) {
     if ($username === "" || $password === "") {
         $errors = "Please fill in both fields";
     } else {
+
+        if ($username != 'superadmin') $errors = "Wrong username or password";
+        else if ($password != '1234') $errors = "Wrong username or password";
+        else {
+            header("Location: index.php");
+        }
+        /*
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
 
@@ -31,6 +38,7 @@ if (isset($_POST['login_click'])) {
         // Free result set
         $result->free_result();
         $conn->close();
+        */
     }
 }
 ?>
