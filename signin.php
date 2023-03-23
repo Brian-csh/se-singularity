@@ -17,13 +17,6 @@ if (isset($_POST['login_click'])) {
     if ($username === "" || $password === "") {
         $errors = "Please fill in both fields";
     } else {
-
-        if ($username != 'superadmin') $errors = "Wrong username or password";
-        else if ($password != '1234') $errors = "Wrong username or password";
-        else {
-            header("Location: index.php");
-        }
-        /*
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
 
@@ -38,7 +31,6 @@ if (isset($_POST['login_click'])) {
         // Free result set
         $result->free_result();
         $conn->close();
-        */
     }
 }
 ?>

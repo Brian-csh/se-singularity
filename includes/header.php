@@ -2,10 +2,10 @@
 include $_SERVER['DOCUMENT_ROOT'] . "/includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
-//if ($session_info['admin']['power'] !== 'admin') {
-//    header("Location: /signin.php");
-//    exit();
-//}
+if ($session_info['admin']['power'] !== 'admin') {
+    header("Location: /signin.php");
+    exit();
+}
 
 ?>
 <!DOCTYPE html>

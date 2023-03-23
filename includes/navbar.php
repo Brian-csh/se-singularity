@@ -20,13 +20,13 @@
             <div class="sidenav-menu">
                 <div class="nav accordion" id="accordionSidenav">
                     <!-- Sidenav Menu Heading (Core)-->
-                    <div class="sidenav-menu-heading">Kerne</div>
-                    <a class="nav-link" href="/dashboard.php">
+                    <div class="sidenav-menu-heading">Main</div>
+                    <a class="nav-link" href="/index.php">
                         <div class="nav-link-icon"><i data-feather="activity"></i></div>
                         Dashboard
                     </a>
                     <!-- Sidenav Heading (Users)-->
-                    <div class="sidenav-menu-heading">Brugere</div>
+                    <div class="sidenav-menu-heading">Data</div>
                     <a class="nav-link" href="/users.php">
                         <div class="nav-link-icon"><i data-feather="user"></i></div>
                         Users
