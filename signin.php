@@ -10,7 +10,8 @@ $errors = "";
 $username = "";
 $password = "";
 
-if (isset($_POST['login_click'])) {
+// Handle normal login form submit
+if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
@@ -36,6 +37,19 @@ if (isset($_POST['login_click'])) {
         $conn->close();
     }
 }
+
+// Handle feishu login form submit
+if (isset($_POST['feishu-login_click'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    if ($username === "" || $password === "") {
+        $errors = "Please fill in both fields";
+    } else {
+        // TODO : Check if feishu account exists and password is correct
+        
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +102,7 @@ if (isset($_POST['login_click'])) {
                                         </div>
                                         <!-- Form Group (login box)-->
                                         <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                            <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                            <button type="submit" name="normal-login_click" class="btn btn-lg btn-primary" >Log in</button>
                                         </div>
                                     </form>
                                 </div>
@@ -107,7 +121,7 @@ if (isset($_POST['login_click'])) {
                                         </div>
                                         <!-- Form Group (login box)-->
                                         <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                            <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                            <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary" >Log in</button>
                                         </div>
                                     </form>
                                 </div>
