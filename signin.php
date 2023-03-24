@@ -23,11 +23,12 @@ if (isset($_POST['login_click'])) {
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
-            if (password_verify($password, $row['password'])) {
+            // TODO: use password_hash() for encryption? 
+            if ($password == $row['password']) {
                 // TODO: add role based session parameters
                 $_SESSION['admin'] = $row;
                 header("Location: index.php");
-            } else $errors = "Wrong username or password";
+            } else $errors = "Wrong password";
         } else $errors = "Wrong username or password";
 
         // Free result set
@@ -57,7 +58,7 @@ if (isset($_POST['login_click'])) {
             <div class="container-xl px-4">
                 <div class="row justify-content-center">
                     <div class="col-lg-5">
-                        <!-- Basic login form-->
+                        <!-- Login form-->
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
                             <div class="card-header justify-content-center"><h3 class="fw-bolder my-4">Log in</h3></div>
                             <div class="card-body">
@@ -65,23 +66,73 @@ if (isset($_POST['login_click'])) {
                                 if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                                 ?>
-                                <!-- Login form-->
-                                <form action="signin.php" method="post">
-                                    <!-- Form Group (email address)-->
-                                    <div class="mb-3">
-                                        <label class="small mb-1 text-light" for="inputUsername">Username</label>
-                                        <input class="form-control" id="inputUsername" type="text" placeholder="Enter name" name="username" value="<?=$username?>"/>
-                                    </div>
-                                    <!-- Form Group (password)-->
-                                    <div class="mb-3">
-                                        <label class="small mb-1 text-light" for="inputPassword">Password</label>
-                                        <input class="form-control" id="inputPassword" type="password" placeholder="Enter password" name="password" />
-                                    </div>
-                                    <!-- Form Group (login box)-->
-                                    <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                        <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
-                                    </div>
-                                </form>
+                                <!-- begin toggle switch -->
+                                <div>
+                                    <label for="login-toggle">Choose a login method:</label>
+                                    <input type="checkbox" id="toggle-login">
+                                    <span id="toggle-login-text" class= "small mb-1 text-light">Normal Login</span>
+                                </div>
+                                <!-- end toggle switch-->
+                                <!-- normal login form -->
+                                <div>
+                                    <form id="normal-login" action="signin.php" method="post">
+                                        <!-- Form Group (username)-->
+                                        <div class="mb-3">
+                                            <label class="small mb-1 text-light" for="inputUsername-normal">Username</label>
+                                            <input class="form-control" id="inputUsername-normal" type="text" placeholder="Enter username" name="username" value="<?=$username?>"/>
+                                        </div>
+                                        <!-- Form Group (password)-->
+                                        <div class="mb-3">
+                                            <label class="small mb-1 text-light" for="inputPassword-normal">Password</label>
+                                            <input class="form-control" id="inputPassword-normal" type="password" placeholder="Enter password" name="password" />
+                                        </div>
+                                        <!-- Form Group (login box)-->
+                                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
+                                            <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- end normal login form -->
+                                <!-- feishu login form -->
+                                <div>
+                                    <form id="feishu-login" action="sigin.php" method="post">
+                                        <div class="mb-3">
+                                            <label class="small mb-1 text-light" for="inputUsername-feishu">Username for 飞书</label>
+                                            <input class="form-control" id="inputUsername-feishu" type="text" placeholder="Enter username for 飞书 account" name="username-feishu" value="<?=$username_feishu?>"/>
+                                        </div>
+                                        <!-- Form Group (password)-->
+                                        <div class="mb-3">
+                                            <label class="small mb-1 text-light" for="inputPassword-feishu">Password for 飞书</label>
+                                            <input class="form-control" id="inputPassword-feishu" type="password" placeholder="Enter password for 飞书 account" name="password-feishu" />
+                                        </div>
+                                        <!-- Form Group (login box)-->
+                                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
+                                            <button type="submit" name="login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--end feishu login form -->
+                                <!-- JavaScript to toggle the login forms -->
+                                <script>
+                                    const loginToggle = document.getElementById('toggle-login');
+                                    const loginToggleText = document.getElementById('toggle-login-text');
+                                    const normalLoginForm = document.getElementById('normal-login');
+                                    const feishuLoginForm = document.getElementById('feishu-login');
+                                    normalLoginForm.style.display = "block";
+                                    feishuLoginForm.style.display = "none";
+
+                                    loginToggle.addEventListener("change",()=>{
+                                        if(loginToggle.checked){
+                                            loginToggleText.textContent="Use 飞书 account to login";
+                                            normalLoginForm.style.display = "none";
+                                            feishuLoginForm.style.display = "block";
+                                        }else{
+                                            loginToggleText.textContent="Normal Login";
+                                            normalLoginForm.style.display = "block";
+                                            feishuLoginForm.style.display = "none";
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
