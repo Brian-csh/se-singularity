@@ -93,12 +93,12 @@ if (isset($_POST['feishu-login_click'])) {
                                 if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                                 ?>
-                                <!-- begin toggle switch -->
+                                <!-- begin switch button-->
                                 <div class="row">
                                     <label type="text" class="col-6 btn text-center" onclick="showNormalLoginForms()" id="normal-login-label">Log in with Singularity</label>
                                     <label type="text" class="col-6 btn text-center" onclick="showFeishuLoginForms()" id="feishu-login-label">Log in with 飞书</label>
                                 </div>
-                                <!-- end toggle switch-->
+                                <!-- end switch button-->
                                 <!-- normal login form -->
                                 <div>
                                     <form id="normal-login" action="signin.php" method="post">
@@ -138,7 +138,7 @@ if (isset($_POST['feishu-login_click'])) {
                                     </form>
                                 </div>
                                 <!--end feishu login form -->
-                                <!-- JavaScript to toggle the login forms -->
+                                <!-- JavaScript to show/unshow the login forms -->
                                 <script>
                                 document.getElementById("normal-login").style.display = "block";
                                 document.getElementById("feishu-login").style.display = "none";
