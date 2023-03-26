@@ -31,6 +31,11 @@
                         <div class="nav-link-icon"><i data-feather="user"></i></div>
                         Users
                     </a>
+                    <!-- Sidenav Heading (Entities)-->
+                    <a class="nav-link" href="entities.php">
+                        <div class="nav-link-icon"><i data-feather="home"></i></div>
+                        Entities
+                    </a>
 
 
 

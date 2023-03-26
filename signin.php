@@ -49,6 +49,19 @@ if (isset($_POST['feishu-login_click'])) {
     }
 }
 
+
+// Handle feishu login form submit
+if (isset($_POST['feishu-login_click'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    if ($username === "" || $password === "") {
+        $errors = "Please fill in both fields";
+    } else {
+        // TODO : Check if feishu account exists and password is correct
+        
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,6 +84,7 @@ if (isset($_POST['feishu-login_click'])) {
             <div class="container-xl px-4">
                 <div class="row justify-content-center">
                     <div class="col-lg-5">
+                        <!-- Login form-->
                         <!-- Login form-->
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
                             <div class="card-header justify-content-center"><h3 class="fw-bolder my-4">Log in</h3></div>
