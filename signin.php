@@ -20,7 +20,6 @@ if (isset($_POST['normal-login_click'])) {
     } else {
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
-
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
