@@ -84,8 +84,6 @@ if (isset($_POST['feishu-login_click'])) {
             <div class="container-xl px-4">
                 <div class="row justify-content-center">
                     <div class="col-lg-5">
-                        <!-- Login form-->
-                        <!-- Login form-->
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
                             <div class="card-header justify-content-center"><h3 class="fw-bolder my-4">Log in</h3></div>
                             <div class="card-body">
@@ -99,50 +97,51 @@ if (isset($_POST['feishu-login_click'])) {
                                     <label type="text" class="col-6 btn text-center" onclick="showFeishuLoginForms()" id="feishu-login-label">Log in with 飞书</label>
                                 </div>
                                 <!-- end switch button-->
-                                <!-- normal login form -->
-                                <div>
-                                    <form id="normal-login" action="signin.php" method="post">
-                                        <!-- Form Group (username)-->
-                                        <div class="mb-3">
-                                            <label class="small mb-1 text-light" for="inputUsername-normal">Username</label>
-                                            <input class="form-control" id="inputUsername-normal" type="text" placeholder="Enter username" name="username" value="<?=$username?>"/>
-                                        </div>
-                                        <!-- Form Group (password)-->
-                                        <div class="mb-3">
-                                            <label class="small mb-1 text-light" for="inputPassword-normal">Password</label>
-                                            <input class="form-control" id="inputPassword-normal" type="password" placeholder="Enter password" name="password" />
-                                        </div>
-                                        <!-- Form Group (login box)-->
-                                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                            <button type="submit" name="normal-login_click" class="btn btn-lg btn-primary" >Log in</button>
-                                        </div>
-                                    </form>
+                                <!-- Begin Login form container -->
+                                <div style = "overflow-x: auto; white-space: nowrap; overflow: hidden;">
+                                    <!-- normal login form -->
+                                    <div style="display: inline-block;  width:100%;">
+                                        <form id="normal-login" action="signin.php" method="post" style="height: 300px">
+                                            <!-- Form Group (username)-->
+                                            <div class="mb-3">
+                                                <label class="small mb-1 text-light" for="inputUsername-normal">Username</label>
+                                                <input class="form-control" id="inputUsername-normal" type="text" placeholder="Enter username" name="username" value="<?=$username?>"/>
+                                            </div>
+                                            <!-- Form Group (password)-->
+                                            <div class="mb-3">
+                                                <label class="small mb-1 text-light" for="inputPassword-normal">Password</label>
+                                                <input class="form-control" id="inputPassword-normal" type="password" placeholder="Enter password" name="password" />
+                                            </div>
+                                            <!-- Form Group (login box)-->
+                                            <div class="d-flex align-items-center justify-content-center mt-3 mb-0">
+                                                <button type="submit" name="normal-login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- end normal login form -->
+                                    <!-- feishu login form -->
+                                    <div style="display: inline-block; width: 100%;" >
+                                        <form id="feishu-login" action="sigin.php" method="post" style="height: 300px">
+                                            <div class="mb-3">
+                                                <label class="small mb-1 text-light" for="inputUsername-feishu">Username for 飞书</label>
+                                                <input class="form-control" id="inputUsername-feishu" type="text" placeholder="Enter username for 飞书 account" name="username-feishu" value="<?=$username_feishu?>"/>
+                                            </div>
+                                            <!-- Form Group (password)-->
+                                            <div class="mb-3">
+                                                <label class="small mb-1 text-light" for="inputPassword-feishu">Password for 飞书</label>
+                                                <input class="form-control" id="inputPassword-feishu" type="password" placeholder="Enter password for 飞书 account" name="password-feishu" />
+                                            </div>
+                                            <!-- Form Group (login box)-->
+                                            <div class="d-flex align-items-center justify-content-center mt-3 mb-0">
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!--end feishu login form -->
                                 </div>
-                                <!-- end normal login form -->
-                                <!-- feishu login form -->
-                                <div>
-                                    <form id="feishu-login" action="sigin.php" method="post">
-                                        <div class="mb-3">
-                                            <label class="small mb-1 text-light" for="inputUsername-feishu">Username for 飞书</label>
-                                            <input class="form-control" id="inputUsername-feishu" type="text" placeholder="Enter username for 飞书 account" name="username-feishu" value="<?=$username_feishu?>"/>
-                                        </div>
-                                        <!-- Form Group (password)-->
-                                        <div class="mb-3">
-                                            <label class="small mb-1 text-light" for="inputPassword-feishu">Password for 飞书</label>
-                                            <input class="form-control" id="inputPassword-feishu" type="password" placeholder="Enter password for 飞书 account" name="password-feishu" />
-                                        </div>
-                                        <!-- Form Group (login box)-->
-                                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-                                            <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary" >Log in</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <!--end feishu login form -->
+                                <!-- End Login form container -->
                                 <!-- JavaScript to show/unshow the login forms -->
                                 <script>
-                                document.getElementById("normal-login").style.display = "block";
-                                document.getElementById("feishu-login").style.display = "none";
-                                document.getElementById("normal-login-label").classList.add("active");
 
                                 function showNormalLoginForms() {
                                     document.getElementById("normal-login").style.display = "block";
