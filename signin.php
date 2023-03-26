@@ -20,7 +20,6 @@ if (isset($_POST['normal-login_click'])) {
     } else {
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
-
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
@@ -81,10 +80,9 @@ if (isset($_POST['feishu-login_click'])) {
                                 ' . $errors . '</div>'
                                 ?>
                                 <!-- begin toggle switch -->
-                                <div>
-                                    <label for="login-toggle">Choose a login method:</label>
-                                    <input type="checkbox" id="toggle-login">
-                                    <span id="toggle-login-text" class= "small mb-1 text-light">Normal Login</span>
+                                <div class="row">
+                                    <label type="text" class="col-6 btn text-center" onclick="showNormalLoginForms()" id="normal-login-label">Log in with Singularity</label>
+                                    <label type="text" class="col-6 btn text-center" onclick="showFeishuLoginForms()" id="feishu-login-label">Log in with 飞书</label>
                                 </div>
                                 <!-- end toggle switch-->
                                 <!-- normal login form -->
@@ -128,24 +126,25 @@ if (isset($_POST['feishu-login_click'])) {
                                 <!--end feishu login form -->
                                 <!-- JavaScript to toggle the login forms -->
                                 <script>
-                                    const loginToggle = document.getElementById('toggle-login');
-                                    const loginToggleText = document.getElementById('toggle-login-text');
-                                    const normalLoginForm = document.getElementById('normal-login');
-                                    const feishuLoginForm = document.getElementById('feishu-login');
-                                    normalLoginForm.style.display = "block";
-                                    feishuLoginForm.style.display = "none";
+                                document.getElementById("normal-login").style.display = "block";
+                                document.getElementById("feishu-login").style.display = "none";
+                                document.getElementById("normal-login-label").classList.add("active");
 
-                                    loginToggle.addEventListener("change",()=>{
-                                        if(loginToggle.checked){
-                                            loginToggleText.textContent="Use 飞书 account to login";
-                                            normalLoginForm.style.display = "none";
-                                            feishuLoginForm.style.display = "block";
-                                        }else{
-                                            loginToggleText.textContent="Normal Login";
-                                            normalLoginForm.style.display = "block";
-                                            feishuLoginForm.style.display = "none";
-                                        }
-                                    });
+                                function showNormalLoginForms() {
+                                    document.getElementById("normal-login").style.display = "block";
+                                    document.getElementById("feishu-login").style.display = "none";
+                                    document.getElementById("normal-login-label").classList.add("active");
+                                    document.getElementById("feishu-login-label").classList.remove("active");
+                                    document.getElementById("normal-login").scrollIntoView({behavior: "smooth"});
+                                }
+
+                                function showFeishuLoginForms() {
+                                    document.getElementById("normal-login").style.display = "none";
+                                    document.getElementById("feishu-login").style.display = "block";
+                                    document.getElementById("normal-login-label").classList.remove("active");
+                                    document.getElementById("feishu-login-label").classList.add("active");
+                                    document.getElementById("feishu-login").scrollIntoView({behavior: "smooth"});
+                                }
                                 </script>
                             </div>
                         </div>
