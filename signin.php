@@ -23,8 +23,7 @@ if (isset($_POST['normal-login_click'])) {
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
-            // TODO: use password_hash() for encryption? 
-            if ($password == $row['password']) {
+            if (password_verify($password, $row['password'])) {
                 // TODO: add role based session parameters
                 $_SESSION['admin'] = $row;
                 header("Location: index.php");
