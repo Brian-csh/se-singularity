@@ -41,25 +41,23 @@ if ($session_info['admin']['role'] != '1') {
         </li>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
-            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal"><img class="img-fluid" src="/assets/img/demo/user-placeholder.svg" /></a>
-            <div class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownUserImage">
-                <h6 class="dropdown-header d-flex align-items-center">
-                    <img class="dropdown-user-img" src="/assets/img/illustrations/profiles/profile-2.png" />
-                    <div class="dropdown-user-details">
-                        <div class="dropdown-user-details-name"><?=$session_info?></div>
-                        <div class="dropdown-user-details-email">Administrator</div>
-                    </div>
-                </h6>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#!">
-                    <div class="dropdown-item-icon"><i data-feather="user-plus"></i></div>
-                    Add Moderator
-                </a>
-                <a class="dropdown-item" href="/logout.php">
-                    <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
-                    Log ud
-                </a>
-            </div>
+            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" aria-expanded="false" onclick="toggleDropdownMenu()">
+                <img class="img-fluid" src="/assets/img/demo/user-placeholder.svg" />
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
+                <li><a class="dropdown-item" href="/settings.php">Settings</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+            </ul>
+            <script>
+            function toggleDropdownMenu() {
+                var dropdownMenu = document.getElementById("userDropdownMenu");
+                if (dropdownMenu.style.display === "block") {
+                    dropdownMenu.style.display = "none";
+                } else {
+                dropdownMenu.style.display = "block";
+                }
+            }
+            </script>
         </li>
     </ul>
 </nav>
