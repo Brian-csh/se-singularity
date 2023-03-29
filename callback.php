@@ -2,7 +2,7 @@
 
 $feishu_app_id = "cli_a4a8e931cd79900e";
 $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
-$singularity_redirect = "http://localhost/singularity-eam/callback.php"; // "https://singularity-eam-singularity.app.secoder.net/callback.php";
+$singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/callback.php"; // "http://localhost/singularity-eam/callback.php"; // 
 $feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
 
 $url_components = parse_url($_SERVER['REQUEST_URI']);
