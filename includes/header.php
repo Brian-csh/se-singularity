@@ -33,7 +33,12 @@ if ($session_info['admin']['role'] != '1') {
 
     <!-- Navbar Items-->
     <ul class="navbar-nav align-items-center ms-auto">
-
+        <!-- Feishu Binding -->
+        <li>
+            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarFeishuBindImage" role="button" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
+                <img class="img-fluid" src="/assets/img/feishu_logo.png" />
+            </a>
+        </li>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
             <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal"><img class="img-fluid" src="/assets/img/demo/user-placeholder.svg" /></a>
@@ -68,7 +73,28 @@ if ($session_info['admin']['role'] != '1') {
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">Are you sure you want to log out?</div>
-            <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Clode</button><a href="/logout.php" class="btn btn-danger" >Log out</a></div>
+            <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button><a href="/logout.php" class="btn btn-danger" >Log out</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- Feishu Bind Modal -->
+<div class="modal fade" id="feishuBindModal" tabindex="-1" role="dialog" aria-labelledby="feishuBindTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feishuBindTitle">Feishu Binding</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bind this account to a Feishu account?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <a href="/includes/feishu/bind.php" class="btn btn-danger" >
+                    Bind to Feishu
+                </a>
+            </div>
         </div>
     </div>
 </div>
