@@ -10,6 +10,18 @@ $errors = "";
 $username = "";
 $password = "";
 
+// TODO: find a better and more secure way to store API credentials
+// TODO: conditional - local vs deployment for redirect
+$feishu_app_id = "cli_a4a8e931cd79900e";
+$feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
+$singularity_redirect = "http://localhost/singularity-eam/callback.php"; // "https://singularity-eam-singularity.app.secoder.net/callback.php";
+$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
+
+function redirect($url) {
+    header('Location: '.$url);
+    die();
+}
+
 // Handle normal login form submit
 if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];
@@ -38,27 +50,7 @@ if (isset($_POST['normal-login_click'])) {
 
 // Handle feishu login form submit
 if (isset($_POST['feishu-login_click'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    if ($username === "" || $password === "") {
-        $errors = "Please fill in both fields";
-    } else {
-        // TODO : Check if feishu account exists and password is correct
-        
-    }
-}
-
-
-// Handle feishu login form submit
-if (isset($_POST['feishu-login_click'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    if ($username === "" || $password === "") {
-        $errors = "Please fill in both fields";
-    } else {
-        // TODO : Check if feishu account exists and password is correct
-        
-    }
+    redirect($feishu_redirect);
 }
 
 ?>
@@ -120,19 +112,10 @@ if (isset($_POST['feishu-login_click'])) {
                                     <!-- end normal login form -->
                                     <!-- feishu login form -->
                                     <div style="display: inline-block; width: 100%;" >
-                                        <form id="feishu-login" action="sigin.php" method="post" style="height: 300px">
-                                            <div class="mb-3">
-                                                <label class="small mb-1 text-light" for="inputUsername-feishu">Username for 飞书</label>
-                                                <input class="form-control" id="inputUsername-feishu" type="text" placeholder="Enter username for 飞书 account" name="username-feishu" value="<?=$username_feishu?>"/>
-                                            </div>
-                                            <!-- Form Group (password)-->
-                                            <div class="mb-3">
-                                                <label class="small mb-1 text-light" for="inputPassword-feishu">Password for 飞书</label>
-                                                <input class="form-control" id="inputPassword-feishu" type="password" placeholder="Enter password for 飞书 account" name="password-feishu" />
-                                            </div>
+                                        <form id="feishu-login" action="signin.php" method="post">
                                             <!-- Form Group (login box)-->
                                             <div class="d-flex align-items-center justify-content-center mt-3 mb-0">
-                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary" >Log in</button>
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary" >Login with 飞书</button>
                                             </div>
                                         </form>
                                     </div>
