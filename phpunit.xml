@@ -4,4 +4,9 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
+  <coverage processUncoveredFiles="true" driver="pcov">
+    <include>
+      <directory suffix=".php">.</directory>
+    </include>
+  </coverage>
 </phpunit>
