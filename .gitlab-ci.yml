@@ -24,7 +24,7 @@ unit-test:
   before_script:
     - apt-get update -yqq
     - apt-get install git -yqq
-    - curl --location --output /usr/local/bin/phpunit "https://phar.phpunit.de/phpunit.phar"
+    - curl --location --output /usr/local/bin/phpunit "https://phar.phpunit.de/phpunit-8.phar"
     - chmod +x /usr/local/bin/phpunit
     - docker-php-ext-install mysqli pdo pdo_mysql
   script:
