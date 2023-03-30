@@ -3,7 +3,7 @@ class DatabaseTest extends \PHPUnit\Framework\TestCase
 {
     public function testConnect()
     {
-        $database = new api\config\Database;
+        $database = new Database();
         $this->assertEquals(null, $database->connect());
     }
 }
