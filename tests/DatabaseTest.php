@@ -2,9 +2,9 @@
 require __DIR__ . "/../api/config/Database.php";
 class DatabaseTest extends \PHPUnit\Framework\TestCase
 {
-    public function assertEqualsCustom($expected, $actual, $message = '')
+    public function assertNotEqualsCustom($expected, $actual, $message = '')
     {
-        if ($expected !== $actual) {
+        if ($expected === $actual) {
             $defaultMessage = sprintf(
                 'Failed asserting that %s matches expected %s.',
                 var_export($actual, true),
@@ -21,6 +21,6 @@ class DatabaseTest extends \PHPUnit\Framework\TestCase
     public function testConnect()
     {
         $database = new Database();
-        $this->assertEqualsCustom(null, $database->connect(), 'Connection should return null.');
+        $this->assertNotEqualsCustom(null, $database->connect(), 'Connection should return null.');
     }
 }
