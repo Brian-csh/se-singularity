@@ -1,5 +1,6 @@
 <?php
-use ..\api\config\Database;
+require __DIR__ . "/../api/config/Database.php";
+use api\config\Database;
 class DatabaseTest extends \PHPUnit\Framework\TestCase
 {
     public function testConnect()

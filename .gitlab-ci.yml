@@ -28,7 +28,7 @@ unit-test:
     - chmod +x /usr/local/bin/phpunit
     - docker-php-ext-install mysqli pdo pdo_mysql
   script:
-    - phpunit tests
+    - phpunit tests --coverage-clover=coverage.xml
   after_script:
     - SUFFIX=$RANDOM
     - curl "http://api.secoder.net/static/sonar-scanner.tar.gz" -s -o "/tmp/sonar-$SUFFIX.tar.gz"
