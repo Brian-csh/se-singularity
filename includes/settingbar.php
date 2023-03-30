@@ -38,7 +38,7 @@
                         <div class="nav-link-icon"><i data-feather="user"></i></div>
                         Login & Security
                     </a>
-
+                    
                 </div>
             </div>
             <!-- Sidenav Footer-->
@@ -54,7 +54,6 @@
     <script>
         let path = window.location.pathname;
         let page = path.split("/").pop();
-
         if (page === "settings.php" || page === '') {
             document.getElementsByClassName("nav-link")[0].classList.add("active");
         } else if ((new URL(document.location)).searchParams.get('only_coaches')) {
@@ -62,6 +61,6 @@
         } else if ((new URL(document.location)).searchParams.get('salto_fail')) {
             document.querySelectorAll("a[href='/" + page +"?salto_fail=true'")[0].classList.add("active");
         } else {
-        document.querySelectorAll("a[href='/" + page +"']")[0].classList.add("active");
+            document.querySelectorAll("a[href='/" + page +"']")[0].classList.add("active");
         }
     </script>

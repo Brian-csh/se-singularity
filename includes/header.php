@@ -63,6 +63,7 @@ if ($session_info['admin']['role'] != '1') {
                 </a>
             </div>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
+                <li><a class="dropdown-item" href="/profile.php">Profile</a></li>
                 <li><a class="dropdown-item" href="/settings.php">Settings</a></li>
                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
             </ul>
