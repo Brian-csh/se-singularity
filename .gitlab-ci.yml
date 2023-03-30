@@ -17,14 +17,23 @@ build:
     - deployer build
   only:
     - master
-test:
+
+unit-test:
+  image: php:7.2-apache
   stage: test
+  before_script:
+    - apt-get update -yqq
+    - apt-get install git -yqq
+    - curl --location --output /usr/local/bin/phpunit "https://phar.phpunit.de/phpunit.phar"
+    - chmod +x /usr/local/bin/phpunit
+    - docker-php-ext-install mysqli pdo pdo_mysql
   script:
+    - phpunit tests
+  after_script:
     - SUFFIX=$RANDOM
     - curl "http://api.secoder.net/static/sonar-scanner.tar.gz" -s -o "/tmp/sonar-$SUFFIX.tar.gz"
     - tar -xf "/tmp/sonar-$SUFFIX.tar.gz" -C /opt
     - /opt/sonar-scanner/bin/sonar-scanner
-
 
 deploy:
   stage: deploy
