@@ -4,7 +4,7 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
-  <coverage processUncoveredFiles="true" driver="pcov">
+  <coverage>
     <include>
       <directory suffix=".php">.</directory>
     </include>
