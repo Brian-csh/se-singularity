@@ -20,7 +20,9 @@ include "includes/settingbar.php";
                         <label for="profile_pic">Profile Picture</label>
                         <br>
                         <img src="https://via.placeholder.com/150" id="profile_pic_preview" alt="Profile Picture" width="150" height="150">
-                        <input type="file" id="profile_pic" name="profile_pic" class="form-control-file mt-3">
+                        <br>
+                        <label style="font-size: 12px; padding: 10px 10px;" for="profile_pic" class="btn btn-primary mt-2">Upload profile picture</label>
+                        <input type="file" id="profile_pic" name="profile_pic" class="form-control-file mt-3" accept = "image/*" style="display:none;">
                     </div>
                     <div class="form-group">
                         <label for="full_name">Full Name</label>
