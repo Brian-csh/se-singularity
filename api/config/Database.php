@@ -2,17 +2,23 @@
 class Database {
     // DB Parameters
     private $host;
-    private $db_name = 'singularity';
-    private $username = 'singularity';
-    private $password = 'R&4*h223b5yP';
+    private $db_name;
+    private $username;
+    private $password;
     private $conn;
 
     // Constructor
     public function __construct() {
         if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
             $this->host = 'localhost';
+            $this->db_name = 'singularity';
+            $this->username = 'root';
+            $this->password = '';
         } else {
             $this->host = 'singularity-db.Singularity.secoder.local';
+            $this->db_name = 'singularity';
+            $this->username = 'singularity';
+            $this->password = 'R&4*h223b5yP';
         }
     }
 
