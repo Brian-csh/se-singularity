@@ -1,13 +1,23 @@
 <?php
 
+if(isset($_GET['mode'])) {
+    $mode = $_GET['mode'];
+    if($mode == "bind" || $mode == "signin"){
+        $modeURL = "?mode=".$mode;
+    }
+}
+
 $feishu_app_id = "cli_a4a8e931cd79900e";
 $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
-$singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/callback.php"; // "http://localhost/singularity-eam/callback.php"; // 
-$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
+if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
+    $singularity_redirect = "http://localhost/singularity-eam/feishu_callback.php".$modeURL;
+}
+else {
+    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php";
+}
 
 $url_components = parse_url($_SERVER['REQUEST_URI']);
 parse_str($url_components['query'], $params);
-echo ' Code '. $params['code'];
 
 $url = "https://passport.feishu.cn/suite/passport/oauth/token";
 $myvars = 'grant_type=authorization_code'.'&client_id=' . $feishu_app_id.'&client_secret=' . $feishu_app_secret . '&code=' . $params['code'] . '&redirect_uri=' . $singularity_redirect;
@@ -21,8 +31,7 @@ curl_setopt( $ch, CURLOPT_HEADER, 0);
 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
 $response = curl_exec( $ch );
-
-echo ' Response ' . $response;
+var_dump($response);
 
 $arr = json_decode($response, false);
 
@@ -38,11 +47,22 @@ if(isset($arr->access_token)){
     curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt( $ch, CURLOPT_HTTPHEADER, $header);
     $user_info = curl_exec( $ch );
-    echo ' User Info ' . $user_info;
+    var_dump($user_info);
+
+    if($mode == "bind") {
+        # set feishu user id in the database
+    }
+    else if($mode == "signin") {
+        # create new user, update values, set feishu user id
+    }
+
+    // include 'users.php';
 }
 else{
-    echo ' Failed to get User Info ';
+    $user_info = NULL;
+    echo "no access token";
 }
 
 curl_close($ch);
+
 ?>

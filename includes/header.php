@@ -7,6 +7,13 @@ if ($session_info['admin']['role'] != '1') {
     exit();
 }
 
+// TODO: find a better and more secure way to store API credentials
+// TODO: conditional - local vs deployment for redirect
+$feishu_app_id = "cli_a4a8e931cd79900e";
+$feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
+$singularity_redirect = "http://localhost/singularity-eam/callback.php"; // "https://singularity-eam-singularity.app.secoder.net/callback.php";
+$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,7 +98,7 @@ if ($session_info['admin']['role'] != '1') {
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
                     Cancel
                 </button>
-                <a href="/includes/feishu/bind.php" class="btn btn-danger" >
+                <a href="bind.php"  class="btn btn-danger" >
                     Bind to Feishu
                 </a>
             </div>
