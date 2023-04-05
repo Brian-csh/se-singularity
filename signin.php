@@ -16,6 +16,12 @@ if (isset($_POST['feishu-login_click'])) {
     include 'feishu_redirect.php';
 }
 
+// Handle feishu bind
+if (isset($_POST['feishu-bind-click'])) {
+    $mode = "bind";
+    include 'feishu_redirect.php';
+}
+
 // Handle normal login form submit
 if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];

@@ -1,4 +1,7 @@
 <?php
+require 'includes/db/connect.php';
+
+session_start();
 
 if(isset($_GET['mode'])) {
     $mode = $_GET['mode'];
@@ -31,7 +34,7 @@ curl_setopt( $ch, CURLOPT_HEADER, 0);
 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
 $response = curl_exec( $ch );
-var_dump($response);
+// var_dump($response);
 
 $arr = json_decode($response, false);
 
@@ -46,17 +49,26 @@ if(isset($arr->access_token)){
     curl_setopt($ch, CURLOPT_URL, $info_url);
     curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt( $ch, CURLOPT_HTTPHEADER, $header);
-    $user_info = curl_exec( $ch );
-    var_dump($user_info);
+    $user_info_str = curl_exec( $ch );
+    $user_info = json_decode($user_info_str, true);
 
+    // set feishu user id in the database
     if($mode == "bind") {
-        # set feishu user id in the database
+        $session_user_id = $_SESSION['admin']['id'];
+        $sub_id = $user_info["sub"];
+        // Construct the SQL update statement
+        $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
+
+        // Execute the SQL statement
+        mysqli_query($conn, $sql);
     }
     else if($mode == "signin") {
-        # create new user, update values, set feishu user id
+        // if sub is already in the database, log in as that user
+        
+        // else, create new user, update values, set feishu user id
     }
-
-    // include 'users.php';
+    header('Location: index.php');
+    die();
 }
 else{
     $user_info = NULL;

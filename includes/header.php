@@ -2,17 +2,11 @@
 include $_SERVER['DOCUMENT_ROOT'] . "/includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
-if ($session_info['admin']['role'] != '1') {
-    header("Location: /signin.php");
-    exit();
-}
+// if ($session_info['admin']['role'] != '1') {
+//     header("Location: /signin.php");
+//     exit();
+// }
 
-// TODO: find a better and more secure way to store API credentials
-// TODO: conditional - local vs deployment for redirect
-$feishu_app_id = "cli_a4a8e931cd79900e";
-$feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
-$singularity_redirect = "http://localhost/singularity-eam/callback.php"; // "https://singularity-eam-singularity.app.secoder.net/callback.php";
-$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
 
 ?>
 <!DOCTYPE html>
@@ -98,9 +92,11 @@ $feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?cl
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
                     Cancel
                 </button>
-                <a href="bind.php"  class="btn btn-danger" >
-                    Bind to Feishu
-                </a>
+                <form id="feishu-bind" action="signin.php" method="post">
+                    <button type="submit" name="feishu-bind-click" class="btn btn-primary" >
+                        Bind
+                    </button>
+                </form>
             </div>
         </div>
     </div>
