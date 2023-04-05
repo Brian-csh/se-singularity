@@ -29,7 +29,7 @@ unit-test:
     - docker-php-ext-install mysqli pdo pdo_mysql
     - pecl install pcov && docker-php-ext-enable pcov
   script:
-    - phpunit --configuration phpunit.xml --coverage-xml=coverage.xml --log-junit=execution-result.xml
+    - phpunit --configuration phpunit.xml --coverage-clover=coverage.xml --log-junit=execution-result.xml
   after_script:
     - SUFFIX=$RANDOM
     - curl "http://api.secoder.net/static/sonar-scanner.tar.gz" -s -o "/tmp/sonar-$SUFFIX.tar.gz"
