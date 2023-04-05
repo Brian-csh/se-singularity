@@ -4,7 +4,7 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
-$sql = "SELECT * FROM logs ORDER BY id DESC";
+$sql = "SELECT * FROM log ORDER BY id DESC";
 
 ?>
 
@@ -29,7 +29,7 @@ $sql = "SELECT * FROM logs ORDER BY id DESC";
             <div class="card">
                 <div class="card-body">
                     <div id="tablePreloader">
-                        <p class="text-white p-3">Loading...</p>
+                        <p class="text-white p-3">Loading...</p >
                     </div>
                     <table id="datatablesSimple" style="display: none">
                         <thead>
@@ -54,12 +54,12 @@ $sql = "SELECT * FROM logs ORDER BY id DESC";
                             while ($row = $result->fetch_assoc()) {
                                 $date = gmdate("Y.m.d \ | H:i:s", $row["date"]);
                                 $log_id = $row["id"];
-                                $english = $row["log"];
+                                $text = $row["text"];
 
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
-                                <td class='text-white'>$english</td>
+                                <td class='text-white'>$text</td>
                                 </tr>";
                             }
                         }

@@ -36,10 +36,11 @@
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
                     </a>
-
-
-
-
+                    <!-- Sidenav Heading (Entities)-->
+                    <a class="nav-link" href="Logs.php">
+                        <div class="nav-link-icon"><i data-feather="log-in"></i></div>
+                        Logs
+                    </a>
                 </div>
             </div>
             <!-- Sidenav Footer-->
