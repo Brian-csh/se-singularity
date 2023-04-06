@@ -17,7 +17,7 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="user"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">+ Opret ny bruger</a>
+                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">Add user</a>
                         </div>
                     </div>
                 </div>
