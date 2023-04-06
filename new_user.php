@@ -7,23 +7,20 @@ $active = 'Create User';
 
 
 /* Functions */
-// Insert info
 if (isset($_POST['submit_changes'])) {
 
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
+    $name = $_POST['name'];
     $date_created = time();
     $role_id = $_POST['role'];
     $entity = $_POST['entity'];
     $department = $_POST['department'];
-    if (isset($_POST['entity_head'])) {
+    if (isset($_POST['entity_head'])) { //is entity super
         $entity_head = $_POST['entity_head'];
-    } else {
+    } else { //not entity super
         $entity_head = 0;
     }
     $password = $_POST['password'];
     $reenter_password = $_POST['reenter_password'];
-    $name = $last_name.$first_name;
     $entity_id;
     $department_id;
 
@@ -156,30 +153,26 @@ if (isset($_POST['submit_changes'])) {
                             <form method="post" action="new_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (first name)-->
+                                    <!-- Form Group (name)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputFirstName">First Name</label>
-                                        <input required class="form-control" id="inputFirstName" type="text" value="" name="first_name">
+                                        <label class="small mb-1" for="inputName">Name</label>
+                                        <input required class="form-control" id="inputName" type="text" value="" name="name">
                                     </div>
-                                    <!-- Form Group (last name)-->
+                                    <!-- Form Group (entity)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputLastName">Last Name</label>
-                                        <input required class="form-control" id="inputLastName" type="text" value="" name="last_name">
-                                    </div>
-                                </div>
-                                <!-- Form Row        -->
-                                <div class="row gx-3 mb-3">
-                                    <!-- Form Group (entity, department, role)-->
-                                    <div class="col-md-4">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
                                         <input class="form-control" required id="inputEntity" type="text" value="" name="entity">
                                     </div>
 
-                                    <div class="col-md-4">
+                                </div>
+                                <!-- Form Row        -->
+                                <div class="row gx-3 mb-3">
+                                    <!-- Form Group (entity, department, role)--> 
+                                    <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
                                         <input class="form-control" id="inputDepartment" type="text" value="" name="department">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
                                         <select class="form-control" id="inputRole" name="role">
                                             <option value="1" selected>superadmin</option>
