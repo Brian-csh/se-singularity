@@ -7,7 +7,6 @@ $active = 'Create User';
 $errors = "";
 
 
-/* Functions */
 if (isset($_POST['submit_changes'])) {
 
     $name = $_POST['name'];
@@ -31,7 +30,6 @@ if (isset($_POST['submit_changes'])) {
 
     if (strcmp($password, $reenter_password) != 0) {
         $valid_password = false;
-        // header('Location: new_user.php?insert_error');
     }
 
     //verify that entity exists
@@ -43,11 +41,9 @@ if (isset($_POST['submit_changes'])) {
             $entity_id = $entity_data['id'];
         } else {
             $valid_entity = false;
-            // header('Location: new_user.php?insert_error');
         }
     } else {
         $valid_entity = false;
-        // header('Location: new_user.php?insert_error');
     }
 
     //verify that department exists
@@ -59,18 +55,16 @@ if (isset($_POST['submit_changes'])) {
             $department_id = $department_data['id'];
         } else {
             $valid_department = false;
-            // header('Location: new_user.php?insert_error');
         }
     } else {
         $valid_department = false;
-        // header('Location: new_user.php?insert_error');
     }
 
     if ($valid_department and $valid_entity and $valid_password) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
         VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
         if ($conn->query($sql)) {
-            header('Location: user.php?id=' . $conn->insert_id);
+            header('Location: users.php');
         } else {
             header('Location: new_user.php?insert_error');
         }
@@ -187,7 +181,7 @@ if (isset($_POST['submit_changes'])) {
                                 </div>
                                 <!-- Form Row        -->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (entity, department, role)--> 
+                                    <!-- Form Group (department, role)--> 
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
                                         <input class="form-control" id="inputDepartment" type="text" value="" name="department">
