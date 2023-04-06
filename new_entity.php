@@ -11,9 +11,7 @@ $active = 'Create User';
 if (isset($_POST['submit_changes'])) {
     $id = $_POST['id'];
     $name = $_POST['Entityname'];
-    $status = 1;
-
-    if ($_POST['migration'] == 'migration') $status = 2;
+    
     $sql = "INSERT INTO entity (id, name) VALUES
     ('$id', '$name')";
 

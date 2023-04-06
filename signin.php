@@ -26,6 +26,10 @@ function redirect($url) {
 if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $time_now = time();
+    $text = "test logs";
+    // TODO : specify type after log_type table is done
+    //$type = ;
 
     if ($username === "" || $password === "") {
         $errors = "Please fill in both fields";
@@ -38,6 +42,14 @@ if (isset($_POST['normal-login_click'])) {
             if (password_verify($password, $row['password'])) {
                 // TODO: add role based session parameters
                 $_SESSION['admin'] = $row;
+                // TODO: add log_type 
+                $sql = "INSERT INTO log (date, text) VALUES 
+                ('$time_now','$text')";
+                if( $conn->query($sql)){
+                    echo "Records inserted successfully.";
+                } else{
+                    echo "ERROR: Could not able to execute $sql. " . $conn->error;
+                }
                 header("Location: index.php");
             } else $errors = "Wrong password";
         } else $errors = "Wrong username or password";
