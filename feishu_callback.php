@@ -51,19 +51,22 @@ if(isset($arr->access_token)){
     curl_setopt( $ch, CURLOPT_HTTPHEADER, $header);
     $user_info_str = curl_exec( $ch );
     $user_info = json_decode($user_info_str, true);
+    
+    $sub_id = $user_info["sub"];
 
     // set feishu user id in the database
     if($mode == "bind") {
         $session_user_id = $_SESSION['admin']['id'];
         echo $session_user_id;
-        $sub_id = $user_info["sub"];
 
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
         // Execute the SQL statement
         mysqli_query($conn, $sql);
-        $conn->close();
+            
+        header('Location: index.php');
+        die();
     }
 
     else if($mode == "signin") {
@@ -73,18 +76,59 @@ if(isset($arr->access_token)){
         $stmt->execute();
         $stmt->bind_result($count);
         $stmt->fetch();
+        $stmt->free_result();
         if ($count > 0) {
             // if sub is already in the database, log in as that user
+            $stmt = $conn->prepare('SELECT * FROM user WHERE feishu_id = ?');
+            $stmt->bind_param('s', $sub_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->free_result();
+            $conn->close();
+
             $_SESSION['admin'] = $row;
+            header('Location: index.php');
+            die();
         } else {
             // feishu_id does not exist in the database, create new user
+            // TODO: prevent SQL injections
+            $name = $user_info["name"];
+            $date_created = time();
+             // TODO: Change role_id to normal user (4?) once we have roles ready.
+             // or maybe assign to limbo user 5? to indicate user hasn't been assigned 
+             // an entity and department yet
+            $role_id = 1;
+            $entity = "";
+            $department = "";
+            $entity_head = 0;
+            $entity_id = 1; // TODO: we need to a Limbo entity or an entity that corresponds to nothing
+            $department_id = 1;
+            // TODO: update password checker in normal sign in
+            $password = NULL; // is this going to work?
+            
+            $conn->next_result();
+
+            $sql = "INSERT INTO user (date_created, name, feishu_id, password, entity, department, entity_super, role) 
+            VALUES ('$date_created', '$name', '$sub_id', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
+            if ($conn->query($sql)) {
+                // update sessions
+                $last_inserted_id = mysqli_insert_id($conn);
+                $result = $conn->query("SELECT * FROM user WHERE id=$last_inserted_id");
+                $row = $result->fetch_assoc();
+                $_SESSION['admin'] = $row;
+                header('Location: user.php?id=' . $conn->insert_id);
+                die();
+            } else {
+                header('Location: new_user.php?insert_error');
+            }
+
+            // TODO error handling
         }
         // close the statement
         $stmt->close();
-        $conn->close();
     }
-    header('Location: index.php');
-    die();
+    $conn->close();
 }
 else{
     $user_info = NULL;
