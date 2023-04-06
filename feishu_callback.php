@@ -52,12 +52,12 @@ if(isset($arr->access_token)){
     $user_info_str = curl_exec( $ch );
     $user_info = json_decode($user_info_str, true);
 
-    $session_user_id = $_SESSION['admin']['id'];
-    echo $session_user_id;
-    $sub_id = $user_info["sub"];
-
     // set feishu user id in the database
     if($mode == "bind") {
+        $session_user_id = $_SESSION['admin']['id'];
+        echo $session_user_id;
+        $sub_id = $user_info["sub"];
+
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
@@ -68,7 +68,6 @@ if(isset($arr->access_token)){
 
     else if($mode == "signin") {
         // if mode is signin, check if user already exists
-
         $stmt = $conn->prepare('SELECT COUNT(*) as count FROM user WHERE feishu_id = ?');
         $stmt->bind_param('s', $sub_id);
         $stmt->execute();
@@ -80,7 +79,6 @@ if(isset($arr->access_token)){
         } else {
             // feishu_id does not exist in the database, create new user
         }
-
         // close the statement
         $stmt->close();
         $conn->close();
