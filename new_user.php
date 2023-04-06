@@ -10,23 +10,61 @@ $active = 'Create User';
 // Insert info
 if (isset($_POST['submit_changes'])) {
 
-    $time_now = time();
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $role = $_POST['role'];
-    $gender = $_POST['gender'];
-    $birthday = gmdate("d-m-Y", strtotime($_POST['birthday']));
-    $city = $_POST['city'];
-    $zipcode = $_POST['zipcode'];
-    $user_token = bin2hex(random_bytes(32));
+    $date_created = time();
+    $role_id = $_POST['role'];
+    $entity = $_POST['entity'];
+    $department = $_POST['department'];
+    if (isset($_POST['entity_head'])) {
+        $entity_head = $_POST['entity_head'];
+    } else {
+        $entity_head = 0;
+    }
+    $password = $_POST['password'];
+    $reenter_password = $_POST['reenter_password'];
+    $name = $last_name.$first_name;
+    $entity_id;
+    $department_id;
 
-    $status = 1;
-    if ($_POST['migration'] == 'migration') $status = 2;
+    if (strcmp($password, $reenter_password) != 0) {
+        echo 'Re-entered password not the same as password';
+        header('Location: new_user.php?insert_error');
+    }
 
-    $sql = "INSERT INTO users (date, phone, first_name, last_name, birthday, email, gender, role, city, zipcode, user_token, status) 
-    VALUES ('$time_now', '$phone', '$first_name', '$last_name',  '$birthday', '$email', '$gender', '$role', '$city', '$zipcode', '$user_token', '$status')";
+    //verify that entity exists
+    $sql_entity = "select * from entity where name = '$entity' limit 1";
+    $result = mysqli_query($conn, $sql_entity);
+    if ($result) {
+        if (mysqli_num_rows($result) > 0) {
+            $entity_data = mysqli_fetch_assoc($result);
+            $entity_id = $entity_data['id'];
+        } else {
+            header('Location: new_user.php?insert_error');
+        }
+    } else {
+        header('Location: new_user.php?insert_error');
+    }
+
+    //verify that department exists
+    $sql_department = "select * from department where name = '$department' limit 1";
+    $result = mysqli_query($conn, $sql_department);
+    if ($result) {
+        if (mysqli_num_rows($result) > 0) {
+            $department_data = mysqli_fetch_assoc($result);
+            $department_id = $department_data['id'];
+        } else {
+            header('Location: new_user.php?insert_error');
+        }
+    } else {
+        header('Location: new_user.php?insert_error');
+    }
+
+    // $status = 1;
+    // if ($_POST['migration'] == 'migration') $status = 2;
+
+    $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
+    VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
     if ($conn->query($sql)) {
         header('Location: user.php?id=' . $conn->insert_id);
     } else {
@@ -159,7 +197,21 @@ if (isset($_POST['submit_changes'])) {
 
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputEntityHead">Entity Head</label>
-                                        <input required id="inputEntityHead" type="checkbox">
+                                        <input id="inputEntityHead" type="checkbox" name="entity_head" value="1">
+                                    </div>
+                                </div>
+                                <!-- Form Row -->
+                                <div class="row gx-3 mb-4">
+                                    <!-- Form Group -->
+                                    <!-- password-->
+
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputPassword">Password</label>
+                                        <input class="form-control" id="inputPassword" type="password" value="" name="password">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputReenterPassword">Re-enter Password</label>
+                                        <input class="form-control" id="inputReenterPassword" type="password" value="" name="reenter_password">
                                     </div>
                                 </div>
 
