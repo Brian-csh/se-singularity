@@ -27,6 +27,7 @@ if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $time_now = time();
+    $type = "login";
     $text = "test logs";
     // TODO : specify type after log_type table is done
     //$type = ;
@@ -43,8 +44,8 @@ if (isset($_POST['normal-login_click'])) {
                 // TODO: add role based session parameters
                 $_SESSION['admin'] = $row;
                 // TODO: add log_type 
-                $sql = "INSERT INTO log (date, text) VALUES 
-                ('$time_now','$text')";
+                $sql = "INSERT INTO log (date, text, log_type) VALUES 
+                ('$time_now','$text','$type')";
                 if( $conn->query($sql)){
                     echo "Records inserted successfully.";
                 } else{

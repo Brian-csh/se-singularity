@@ -36,12 +36,14 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                         <tr>
                             <th>Date</th>
                             <th>Log</th>
+                            <th>Type</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
                             <th>Date</th>
                             <th>Log</th>
+                            <th>Type</th>
                         </tr>
                         </tfoot>
                         <tbody>
@@ -55,11 +57,13 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                 $date = gmdate("Y.m.d \ | H:i:s", $row["date"]);
                                 $log_id = $row["id"];
                                 $text = $row["text"];
+                                $type = $row["log_type"];
 
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
                                 <td class='text-white'>$text</td>
+                                <td class='text-white'>$type</td>
                                 </tr>";
                             }
                         }

@@ -22,9 +22,6 @@ if (isset($_POST['submit_changes'])) {
     $zipcode = $_POST['zipcode'];
     $user_token = bin2hex(random_bytes(32));
 
-    $status = 1;
-    if ($_POST['migration'] == 'migration') $status = 2;
-
     $sql = "INSERT INTO user (date, phone, first_name, last_name, birthday, email, gender, role, city, zipcode, user_token, status) 
     VALUES ('$time_now', '$phone', '$first_name', '$last_name',  '$birthday', '$email', '$gender', '$role', '$city', '$zipcode', '$user_token', '$status')";
     if ($conn->query($sql)) {
