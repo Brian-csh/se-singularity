@@ -4,6 +4,7 @@ session_start();
 $session_info = $_SESSION;
 
 $active = 'Create User';
+$errors = "";
 
 
 /* Functions */
@@ -24,9 +25,13 @@ if (isset($_POST['submit_changes'])) {
     $entity_id;
     $department_id;
 
+    $valid_entity = true;
+    $valid_department = true;
+    $valid_password = true;
+
     if (strcmp($password, $reenter_password) != 0) {
-        echo 'Re-entered password not the same as password';
-        header('Location: new_user.php?insert_error');
+        $valid_password = false;
+        // header('Location: new_user.php?insert_error');
     }
 
     //verify that entity exists
@@ -37,10 +42,12 @@ if (isset($_POST['submit_changes'])) {
             $entity_data = mysqli_fetch_assoc($result);
             $entity_id = $entity_data['id'];
         } else {
-            header('Location: new_user.php?insert_error');
+            $valid_entity = false;
+            // header('Location: new_user.php?insert_error');
         }
     } else {
-        header('Location: new_user.php?insert_error');
+        $valid_entity = false;
+        // header('Location: new_user.php?insert_error');
     }
 
     //verify that department exists
@@ -51,21 +58,30 @@ if (isset($_POST['submit_changes'])) {
             $department_data = mysqli_fetch_assoc($result);
             $department_id = $department_data['id'];
         } else {
+            $valid_department = false;
+            // header('Location: new_user.php?insert_error');
+        }
+    } else {
+        $valid_department = false;
+        // header('Location: new_user.php?insert_error');
+    }
+
+    if ($valid_department and $valid_entity and $valid_password) {
+        $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
+        VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
+        if ($conn->query($sql)) {
+            header('Location: user.php?id=' . $conn->insert_id);
+        } else {
             header('Location: new_user.php?insert_error');
         }
     } else {
-        header('Location: new_user.php?insert_error');
-    }
-
-    // $status = 1;
-    // if ($_POST['migration'] == 'migration') $status = 2;
-
-    $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-    VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
-    if ($conn->query($sql)) {
-        header('Location: user.php?id=' . $conn->insert_id);
-    } else {
-        header('Location: new_user.php?insert_error');
+        $errors = "";
+        if (!$valid_password)
+            $errors .= "Re-entered password does not match with password. ";
+        if (!$valid_entity)
+            $errors .= "Invalid entity. ";
+        if (!$valid_department)
+            $errors .= "Invalid department. ";
     }
 }
 ?>
@@ -150,6 +166,10 @@ if (isset($_POST['submit_changes'])) {
                     <div class="card mb-4">
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
+                            <?php
+                                if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
+                                ' . $errors . '</div>'
+                            ?>
                             <form method="post" action="new_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
