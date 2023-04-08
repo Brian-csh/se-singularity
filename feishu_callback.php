@@ -59,6 +59,9 @@ if(isset($arr->access_token)){
     // feishu id
     $sub_id = $user_info["sub"];
 
+    
+    echo $mode." ".$session_user_id." ".$sub_id;
+
     // set feishu user id in the database
     if($mode == "bind") {
         // Update sessions
