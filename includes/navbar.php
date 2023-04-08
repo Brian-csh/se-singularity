@@ -36,10 +36,6 @@
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
                     </a>
-
-
-
-
                 </div>
             </div>
             <!-- Sidenav Footer-->
@@ -55,7 +51,6 @@
     <script>
         let path = window.location.pathname;
         let page = path.split("/").pop();
-
         if (page === "index.php" || page === '') {
             document.getElementsByClassName("nav-link")[0].classList.add("active");
         } else if ((new URL(document.location)).searchParams.get('only_coaches')) {
