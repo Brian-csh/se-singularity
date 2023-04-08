@@ -41,7 +41,6 @@ $response = curl_exec( $ch );
 
 $arr = json_decode($response, false);
 
-var_dump($arr);
 // if succesful in getting the access token, request for user information
 if(isset($arr->access_token)){
     $header = array();
@@ -65,8 +64,6 @@ if(isset($arr->access_token)){
         // Update sessions
         $session_user_id = $_SESSION['admin']['id'];
 
-        echo $session_user_id." ".$sub_id;
-
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
@@ -74,8 +71,8 @@ if(isset($arr->access_token)){
         mysqli_query($conn, $sql);
         
         // Redirect
-        // header('Location: index.php');
-        // exit();
+        header('Location: index.php');
+        exit();
     }
 
     else if($mode == "signin") {
@@ -97,12 +94,12 @@ if(isset($arr->access_token)){
             $conn->close();
 
             $_SESSION['admin'] = $row;
-            // header('Location: index.php');
-            // exit();
+            header('Location: index.php');
+            exit();
         } else {
             // If feishu_id does not exist, cannot sign in.
-            // header('Location: signin.php?signin='.urlencode("403"));
-            // die();
+            header('Location: signin.php?signin='.urlencode("403"));
+            die();
         }
         // close the statement
         $stmt->close();
@@ -111,8 +108,8 @@ if(isset($arr->access_token)){
 }
 else{
     $user_info = NULL;
-    // header('Location: signin.php?signin='.urlencode("403"));
-    // die();
+    header('Location: signin.php?signin='.urlencode("403"));
+    die();
 }
 
 curl_close($ch);
