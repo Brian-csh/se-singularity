@@ -96,12 +96,12 @@ if(isset($arr->access_token)){
             $conn->close();
 
             $_SESSION['admin'] = $row;
-            header('Location: index.php');
-            exit();
+            // header('Location: index.php');
+            // exit();
         } else {
             // If feishu_id does not exist, cannot sign in.
-            header('Location: signin.php?signin='.urlencode("403"));
-            die();
+            // header('Location: signin.php?signin='.urlencode("403"));
+            // die();
         }
         // close the statement
         $stmt->close();
@@ -110,8 +110,8 @@ if(isset($arr->access_token)){
 }
 else{
     $user_info = NULL;
-    header('Location: signin.php?signin='.urlencode("403"));
-    die();
+    // header('Location: signin.php?signin='.urlencode("403"));
+    // die();
 }
 
 curl_close($ch);
