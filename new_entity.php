@@ -9,28 +9,18 @@ $active = 'Create User';
 /* Functions */
 // Insert info
 if (isset($_POST['submit_changes'])) {
-
-    $time_now = time();
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $role = $_POST['role'];
-    $gender = $_POST['gender'];
-    $birthday = gmdate("d-m-Y", strtotime($_POST['birthday']));
-    $city = $_POST['city'];
-    $zipcode = $_POST['zipcode'];
-    $user_token = bin2hex(random_bytes(32));
-
+    // $id = $_POST['id'];
+    $name = $_POST['Entityname'];
     $status = 1;
-    if ($_POST['migration'] == 'migration') $status = 2;
 
-    $sql = "INSERT INTO user (date, phone, first_name, last_name, birthday, email, gender, role, city, zipcode, user_token, status) 
-    VALUES ('$time_now', '$phone', '$first_name', '$last_name',  '$birthday', '$email', '$gender', '$role', '$city', '$zipcode', '$user_token', '$status')";
+    if ($_POST['migration'] == 'migration') $status = 2;
+    $sql = "INSERT INTO entity (name) VALUES
+    ('$name')";
+
     if ($conn->query($sql)) {
-        header('Location: user.php?id=' . $conn->insert_id);
+        header('Location: entities.php?id=' . $conn->insert_id);
     } else {
-        header('Location: new_user.php?insert_error');
+        header('Location: new_entity.php?insert_error');
     }
 }
 ?>
@@ -115,56 +105,18 @@ if (isset($_POST['submit_changes'])) {
                     <div class="card mb-4">
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
-                            <form method="post" action="new_user.php">
+                            <form method="post" action="new_entity.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (first name)-->
+                                    <!-- Form Group (EntityName)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputFirstName">First Name</label>
-                                        <input required class="form-control" id="inputFirstName" type="text" value="" name="first_name">
-                                    </div>
-                                    <!-- Form Group (last name)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputLastName">Last Name</label>
-                                        <input required class="form-control" id="inputLastName" type="text" value="" name="last_name">
-                                    </div>
-                                </div>
-                                <!-- Form Row        -->
-                                <div class="row gx-3 mb-3">
-                                    <!-- Form Group (entity, department, role)-->
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <input class="form-control" required id="inputEntity" type="text" value="" name="entity">
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <input class="form-control" id="inputDepartment" type="text" value="" name="department">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputRole">Role</label>
-                                        <select class="form-control" id="inputRole" name="role">
-                                            <option value="1" selected>superadmin</option>
-                                            <option value="2">admin</option>
-                                            <option value="3">resource manager</option>
-                                            <option value="4">user</option>
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <!-- Form Row -->
-                                <div class="row gx-3 mb-4">
-                                    <!-- Form Group -->
-                                    <!-- entity super, checkbox-->
-
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputEntityHead">Entity Head</label>
-                                        <input required id="inputEntityHead" type="checkbox">
+                                        <label class="small mb-1" for="inputEntityName">Name</label>
+                                        <input required class="form-control" id="inputEntityName" type="text" value="" name="Entityname">
                                     </div>
                                 </div>
 
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new user</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new Entity</button>
                             </form>
                         </div>
                     </div>
