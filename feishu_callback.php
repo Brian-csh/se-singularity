@@ -19,7 +19,7 @@ if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhos
     $singularity_redirect = "http://localhost/singularity-eam/feishu_callback.php".$modeURL;
 }
 else {
-    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php";
+    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php".$modeURL;
 }
 
 $url_components = parse_url($_SERVER['REQUEST_URI']);
