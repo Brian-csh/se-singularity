@@ -111,7 +111,7 @@ if ($session_info['admin']['role'] != '1') {
                     Cancel
                 </button>
                 <form id="feishu-bind" action="signin.php" method="post">
-                    <button type="submit" name="feishu-bind-click" class="btn btn-primary" >
+                    <button type="submit" name="feishu-bind-click" class="btn btn-primary" style = "background:green; border:none">
                         Bind
                     </button>
                 </form>
