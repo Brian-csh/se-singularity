@@ -34,6 +34,31 @@ include "includes/header.php";
                     <?php 
                         echo "<h1>$entity_name</h1>";
 
+                        $sql_entity = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
+                        $result = $conn->query($sql_entity);
+
+                        if ($result) {
+                            if (mysqli_num_rows($result) > 0) {
+                                $entity_data = mysqli_fetch_assoc($result);
+                                $date_created = $entity_data['date_created'];
+                            } else {
+                                $date_created = "N/A";
+                            }
+                        }
+                        
+                        echo "<h4>Date Created: $date_created</h4>";
+
+                        $sql_user = "SELECT * FROM user WHERE (id = '$entity_id' AND entity_super = 1) LIMIT 1";
+                        $result = $conn->query($sql_user);
+
+                        if ($result) {
+                            if (mysqli_num_rows($result) > 0) {
+                                $user_data = mysqli_fetch_assoc($result);
+                                echo "<h4>Entity Head: $user_data </h2>";
+                            }
+                        }
+                        
+
                     ?> 
                 </div>
                 <div class="card-body">
