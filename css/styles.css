@@ -5302,7 +5302,7 @@ textarea.form-control-lg {
   color: #69707a;
   text-align: left;
   list-style: none;
-  background-color: #fff;
+  background-color: var(--bs-gray-900);
   background-clip: padding-box;
   border: 1px solid #242424;
   border-radius: 0.35rem;
@@ -5503,21 +5503,21 @@ textarea.form-control-lg {
   padding: 0.25rem 1rem;
   clear: both;
   font-weight: 400;
-  color: #212832;
+  color: #ffffff;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;
   border: 0;
 }
 .dropdown-item:hover, .dropdown-item:focus {
-  color: #1e242d;
+  color: #ffffff;
   text-decoration: none;
-  background-color: #242424;
+  background-color: #79277a;
 }
 .dropdown-item.active, .dropdown-item:active {
   color: #fff;
   text-decoration: none;
-  background-color: #0061f2;
+  background-color: #79277a;
 }
 .dropdown-item.disabled, .dropdown-item:disabled {
   color: #a7aeb8;

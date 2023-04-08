@@ -34,15 +34,11 @@ if ($session_info['admin']['role'] != '1') {
 
     <!-- Navbar Items-->
     <ul class="navbar-nav align-items-center ms-auto">
-        <!-- Feishu Binding -->
-        <li>
-            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarFeishuBindImage" role="button" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
-                <img class="img-fluid" src="/assets/img/feishu_logo.png" />
-            </a>
-        </li>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
-            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" data-bs-toggle="modal" data-bs-target="#logoutModal"><img class="img-fluid" src="/assets/img/demo/user-placeholder.svg" /></a>
+            <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" aria-expanded="false" onclick="toggleDropdownMenu()">
+                <img class="img-fluid" src="/assets/img/demo/user-placeholder.svg" />
+            </a>
             <div class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up" aria-labelledby="navbarDropdownUserImage">
                 <h6 class="dropdown-header d-flex align-items-center">
                     <img class="dropdown-user-img" src="/assets/img/illustrations/profiles/profile-2.png" />
@@ -61,6 +57,28 @@ if ($session_info['admin']['role'] != '1') {
                     Log ud
                 </a>
             </div>
+            <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
+                <li><a class="dropdown-item" href="/profile.php">Profile</a></li>
+                <li><a class="dropdown-item" href="/settings.php">Settings</a></li>
+                <li>
+                    <!-- Feishu Binding -->
+                    <!-- TODO: Disappear this item after binding with 飞书 -->
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
+                        Bind to 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
+                    </a>
+                </li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+            </ul>
+            <script>
+            function toggleDropdownMenu() {
+                var dropdownMenu = document.getElementById("userDropdownMenu");
+                if (dropdownMenu.style.display === "block") {
+                    dropdownMenu.style.display = "none";
+                } else {
+                dropdownMenu.style.display = "block";
+                }
+            }
+            </script>
         </li>
     </ul>
 </nav>
