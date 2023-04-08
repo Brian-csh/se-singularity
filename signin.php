@@ -10,16 +10,24 @@ $errors = "";
 $username = "";
 $password = "";
 
-// TODO: find a better and more secure way to store API credentials
-// TODO: conditional - local vs deployment for redirect
-$feishu_app_id = "cli_a4a8e931cd79900e";
-$feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
-$singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/callback.php"; // "http://localhost/singularity-eam/callback.php";
-$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
+// Handle feishu login form submit
+if (isset($_POST['feishu-login_click'])) {
+    $mode = "signin";
+    include 'feishu_redirect.php';
+}
 
-function redirect($url) {
-    header('Location: '.$url);
-    die();
+// Handle feishu failed logins
+if(isset($_GET['signin'])) {
+    $signin_status = $_GET['signin'];
+    if ($signin_status == "403") {
+        $errors = "Unable to login with Feishu. User does not exist.";
+    }
+}
+
+// Handle feishu bind
+if (isset($_POST['feishu-bind-click'])) {
+    $mode = "bind";
+    include 'feishu_redirect.php';
 }
 
 // Handle normal login form submit
@@ -46,11 +54,6 @@ if (isset($_POST['normal-login_click'])) {
         $result->free_result();
         $conn->close();
     }
-}
-
-// Handle feishu login form submit
-if (isset($_POST['feishu-login_click'])) {
-    redirect($feishu_redirect);
 }
 
 ?>
