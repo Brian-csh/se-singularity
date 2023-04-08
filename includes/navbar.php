@@ -32,14 +32,19 @@
                         Users
                     </a>
                     <!-- Sidenav Heading (Entities)-->
-                    <a class="nav-link" href="entities.php">
+                    <a class="nav-link" href="/entities.php">
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
                     </a>
                     <!-- Sidenav Heading (Entities)-->
-                    <a class="nav-link" href="Logs.php">
+                    <a class="nav-link" href="/logs.php">
                         <div class="nav-link-icon"><i data-feather="log-in"></i></div>
                         Logs
+                    </a>
+                    <!-- Sidenav Heading (Assets)-->
+                    <a class="nav-link" href="/assets.php">
+                        <div class="nav-link-icon"><i data-feather="package"></i></div>
+                        Assets
                     </a>
                 </div>
             </div>
@@ -56,7 +61,6 @@
     <script>
         let path = window.location.pathname;
         let page = path.split("/").pop();
-
         if (page === "index.php" || page === '') {
             document.getElementsByClassName("nav-link")[0].classList.add("active");
         } else if ((new URL(document.location)).searchParams.get('only_coaches')) {

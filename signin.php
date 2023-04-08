@@ -10,16 +10,24 @@ $errors = "";
 $username = "";
 $password = "";
 
-// TODO: find a better and more secure way to store API credentials
-// TODO: conditional - local vs deployment for redirect
-$feishu_app_id = "cli_a4a8e931cd79900e";
-$feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
-$singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/callback.php"; // "http://localhost/singularity-eam/callback.php";
-$feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
+// Handle feishu login form submit
+if (isset($_POST['feishu-login_click'])) {
+    $mode = "signin";
+    include 'feishu_redirect.php';
+}
 
-function redirect($url) {
-    header('Location: '.$url);
-    die();
+// Handle feishu failed logins
+if(isset($_GET['signin'])) {
+    $signin_status = $_GET['signin'];
+    if ($signin_status == "403") {
+        $errors = "Unable to login with Feishu. User does not exist.";
+    }
+}
+
+// Handle feishu bind
+if (isset($_POST['feishu-bind-click'])) {
+    $mode = "bind";
+    include 'feishu_redirect.php';
 }
 
 // Handle normal login form submit
@@ -61,11 +69,6 @@ if (isset($_POST['normal-login_click'])) {
     }
 }
 
-// Handle feishu login form submit
-if (isset($_POST['feishu-login_click'])) {
-    redirect($feishu_redirect);
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,17 +98,9 @@ if (isset($_POST['feishu-login_click'])) {
                                 if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                                 ?>
-                                <!-- begin switch button-->
-                                <div class="row">
-                                    <label type="text" class="col-6 btn text-center text-light" onclick="showNormalLoginForms()" id="normal-login-label">Log in with Singularity</label>
-                                    <label type="text" class="col-6 btn text-center" onclick="showFeishuLoginForms()" id="feishu-login-label">Log in with 飞书</label>
-                                </div>
-                                <!-- end switch button-->
                                 <!-- Begin Login form container -->
-                                <div style = "overflow-x: auto; white-space: nowrap; overflow: hidden;">
-                                    <!-- normal login form -->
-                                    <div style="display: inline-block;  width:100%;">
-                                        <form id="normal-login" action="signin.php" method="post" style="height: 300px">
+                                    <!-- BEGIN normal login form -->
+                                        <form id="normal-login" action="signin.php" method="post">
                                             <!-- Form Group (username)-->
                                             <div class="mb-3">
                                                 <label class="small mb-1 text-light" for="inputUsername-normal">Username</label>
@@ -121,40 +116,20 @@ if (isset($_POST['feishu-login_click'])) {
                                                 <button type="submit" name="normal-login_click" class="btn btn-lg btn-primary" >Log in</button>
                                             </div>
                                         </form>
-                                    </div>
-                                    <!-- end normal login form -->
-                                    <!-- feishu login form -->
-                                    <div style="display: inline-block; width: 100%;" >
+                                    <!-- END normal login form -->
+                                    <hr class="mt-5" style="height: 3px; color: white;">
+                                    <!-- BEGIN feishu login form -->
+                                    <div>
                                         <form id="feishu-login" action="signin.php" method="post">
                                             <!-- Form Group (login box)-->
-                                            <div class="d-flex align-items-center justify-content-center mt-3 mb-0">
-
-                                                <button type="submit" name="feishu-login_click" class="btn btn-lg text-light" >Scan code or click to login with 飞书</button>
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg text-light" >Login with 飞书</button>
                                             </div>
                                         </form>
                                     </div>
-                                    <!--end feishu login form -->
+                                    <!--END feishu login form -->
                                 </div>
                                 <!-- End Login form container -->
-                                <!-- JavaScript to show/unshow the login forms -->
-                                <script>
-
-                                function showNormalLoginForms() {
-                                    document.getElementById("normal-login").style.display = "block";
-                                    document.getElementById("feishu-login").style.display = "none";
-                                    document.getElementById("normal-login-label").classList.add("text-light");
-                                    document.getElementById("feishu-login-label").classList.remove("text-light");
-                                    document.getElementById("normal-login").scrollIntoView({behavior: "smooth"});
-                                }
-
-                                function showFeishuLoginForms() {
-                                    document.getElementById("normal-login").style.display = "none";
-                                    document.getElementById("feishu-login").style.display = "block";
-                                    document.getElementById("normal-login-label").classList.remove("text-light");
-                                    document.getElementById("feishu-login-label").classList.add("text-light");
-                                    document.getElementById("feishu-login").scrollIntoView({behavior: "smooth"});
-                                }
-                                </script>
                             </div>
                         </div>
                     </div>

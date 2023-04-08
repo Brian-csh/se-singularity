@@ -7,6 +7,7 @@ $session_info = $_SESSION;
 //     exit();
 // }
 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,9 +110,11 @@ $session_info = $_SESSION;
                 <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
                     Cancel
                 </button>
-                <a href="/includes/feishu/bind.php" class="btn btn-danger" >
-                    Bind to Feishu
-                </a>
+                <form id="feishu-bind" action="signin.php" method="post">
+                    <button type="submit" name="feishu-bind-click" class="btn btn-primary" style = "background:green; border:none">
+                        Bind
+                    </button>
+                </form>
             </div>
         </div>
     </div>
