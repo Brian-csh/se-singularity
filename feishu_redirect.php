@@ -6,7 +6,7 @@ if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhos
     $singularity_redirect = "http://localhost/singularity-eam/feishu_callback.php?mode=".$mode;
 }
 else {
-    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php".$mode;
+    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php?mode=".$mode;
 }
 $feishu_redirect = "https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=".$feishu_app_id."&redirect_uri=".$singularity_redirect."&response_type=code&state=";
 
