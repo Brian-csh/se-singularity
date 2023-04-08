@@ -64,6 +64,8 @@ if(isset($arr->access_token)){
         // Update sessions
         $session_user_id = $_SESSION['admin']['id'];
 
+        echo $session_user_id." ".$sub_id;
+
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
