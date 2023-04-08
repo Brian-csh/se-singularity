@@ -1,10 +1,15 @@
 <?php
-$sql = "SELECT * FROM entity ORDER BY id DESC";
-$active = "Entities";
+if (isset($_GET['id'])) {
+    $entity_id = $_GET['id'];
+}
+if (isset($_GET['name'])) {
+    $entity_name = $_GET['name'];
+}
 
+$active = $entity_name;
 include "includes/header.php";
-include "includes/navbar.php";
 ?>
+
 
 <div id="layoutSidenav_content">
     <main>
@@ -17,7 +22,6 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="new_entity.php" class="btn btn-primary btn-xs float-end">+ Opret ny bruger</a>
                         </div>
                     </div>
                 </div>
@@ -26,6 +30,12 @@ include "includes/navbar.php";
         <!-- Main page content-->
         <div class="container-fluid px-4">
             <div class="card">
+                <div class="class-header" style='padding:25px'>
+                    <?php 
+                        echo "<h1>$entity_name</h1>";
+
+                    ?> 
+                </div>
                 <div class="card-body">
                     <div id="tablePreloader">
                         <p class="text-white p-3">Loading...</p>
@@ -35,37 +45,36 @@ include "includes/navbar.php";
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>Parent</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>Parent</th>
                         </tr>
                         </tfoot>
                         <tbody>
                         <?php
 
+                        // select all the departments for the entity
+                        $sql_department = "SELECT * FROM department WHERE id = '$entity_id'";
+                        $result = $conn->query($sql_department);
 
-                        $result = $conn->query($sql);
+                        if ($result) {
+                            if (mysqli_num_rows($result) > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    $department_id = $row['id'];
+                                    $department_name = $row['name'];
+                                    $department_parent = $row['parent'];
 
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $entity_id = $row['id'];
-                                $name = $row['name'];
-
-                                echo "<tr data-id='$entity_id' ><td>$entity_id</td><td><a class='text-primary' href='entity.php?id=$entity_id&name=$name'>" . $name . "</a></td>
-                                        <td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"entity.php?id=".$row['id']."\">
-                                        <i data-feather=\"edit\"></i>
-                                        </a>
-                  
-                                        
-                                        " ."</td></tr>";
+                                    echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td><td>$department_parent</td></tr>";
+                                }
+                            } else {
+                                header('Location: entity.php');
                             }
                         }
-
-
                         ?>
                         </tbody>
                     </table>
