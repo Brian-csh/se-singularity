@@ -19,7 +19,7 @@ if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhos
     $singularity_redirect = "http://localhost/singularity-eam/feishu_callback.php".$modeURL;
 }
 else {
-    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php";
+    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php".$modeURL;
 }
 
 $url_components = parse_url($_SERVER['REQUEST_URI']);
@@ -41,6 +41,7 @@ $response = curl_exec( $ch );
 
 $arr = json_decode($response, false);
 
+var_dump($arr);
 // if succesful in getting the access token, request for user information
 if(isset($arr->access_token)){
     $header = array();
@@ -58,9 +59,6 @@ if(isset($arr->access_token)){
     
     // feishu id
     $sub_id = $user_info["sub"];
-
-    
-    echo $mode." ".$session_user_id." ".$sub_id;
 
     // set feishu user id in the database
     if($mode == "bind") {
