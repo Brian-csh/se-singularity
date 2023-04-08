@@ -71,8 +71,8 @@ if(isset($arr->access_token)){
         mysqli_query($conn, $sql);
         
         // Redirect
-        header('Location: index.php');
-        exit();
+        // header('Location: index.php');
+        // exit();
     }
 
     else if($mode == "signin") {
