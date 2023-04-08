@@ -3,7 +3,7 @@ class Database {
     // DB Parameters
     private $host;
     private $db_name = 'singularity';
-    private $username = 'singularity';
+    private $username = 'root';
     private $password = 'R&4*h223b5yP';
     private $conn;
 
@@ -13,6 +13,9 @@ class Database {
             $this->host = 'localhost';
         } else {
             $this->host = 'singularity-db.Singularity.secoder.local';
+            $this->db_name = 'singularity';
+            $this->username = 'singularity';
+            $this->password = 'R&4*h223b5yP';
         }
     }
 
