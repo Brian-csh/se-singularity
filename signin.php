@@ -16,6 +16,14 @@ if (isset($_POST['feishu-login_click'])) {
     include 'feishu_redirect.php';
 }
 
+// Handle feishu failed logins
+if(isset($_GET['signin'])) {
+    $signin_status = $_GET['signin'];
+    if ($signin_status == "403") {
+        $errors = "Unable to login with Feishu. User does not exist.";
+    }
+}
+
 // Handle feishu bind
 if (isset($_POST['feishu-bind-click'])) {
     $mode = "bind";
