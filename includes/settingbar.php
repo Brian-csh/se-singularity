@@ -21,21 +21,21 @@
                 <div class="nav accordion" id="accordionSidenav">
                     <div class="sidenav-menu-heading">General</div>
                     <a class="nav-link" href="/account_settings.php">
-                        <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                        <div class="nav-link-icon"><i data-feather="settings"></i></div>
                         Account Settings
                     </a>
 
                     <a class="nav-link" href="/notification_settings.php">
-                        <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                        <div class="nav-link-icon"><i data-feather="bell"></i></div>
                         Notifications
                     </a>
                     <a class="nav-link" href="/interface_settings.php">
-                        <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                        <div class="nav-link-icon"><i data-feather="grid"></i></div>
                         Interface
                     </a>
                     <div class="sidenav-menu-heading">Advanced</div>
                     <a class="nav-link" href="/login_and_security_settings.php">
-                        <div class="nav-link-icon"><i data-feather="user"></i></div>
+                        <div class="nav-link-icon"><i data-feather="lock"></i></div>
                         Login & Security
                     </a>
                     
