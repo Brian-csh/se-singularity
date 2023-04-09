@@ -1,6 +1,5 @@
 {
     "require": {
-      "workerman/workerman": "^4.0",
       "ext-pdo": "*",
       "ext-curl": "*",
       "ext-mysqli": "*"
