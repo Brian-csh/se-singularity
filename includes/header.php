@@ -58,8 +58,8 @@ $session_info = $_SESSION['user'];
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item" href="/profile.php">Profile</a></li>
-                <li><a class="dropdown-item" href="/settings.php">Settings</a></li>
+                <li><a class="dropdown-item dropdown-settings-header" href="/profile.php">Profile</a></li>
+                <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
                     <!-- TODO: Disappear this item after binding with 飞书 -->
