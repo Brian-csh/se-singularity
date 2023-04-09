@@ -51,9 +51,9 @@
             <!-- Sidenav Footer-->
             <div class="sidenav-footer">
                 <div class="sidenav-footer-content">
-                    <div class="sidenav-footer-subtitle">Logget ind som:</div>
+                    <div class="sidenav-footer-subtitle">Logged in as:</div>
                     <div class="sidenav-footer-title"><?= /** @var array $session_info */
-                        $session_info['admin']['username']?></div>
+                        $session_info['name']?></div>
                 </div>
             </div>
         </nav>
