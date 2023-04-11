@@ -1,137 +1,69 @@
 <?php
 include "includes/db/connect.php";
 
-function getEntity($id, $conn) {
-    $sql_entity = "SELECT * FROM entity WHERE id = '$id' LIMIT 1";
-    $result = mysqli_query($conn, $sql_entity);
-    if ($result) {
-        if (mysqli_num_rows($result) > 0) {
-            return mysqli_fetch_assoc($result);
-        }
-    }
-    return null;
+//return a mysqli_result corresponding to the entity with @param int $id
+function getEntityName($id, $conn) {
+    $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
+    return mysqli_fetch_array($conn->query($sql_entity))['name'];
 }
 
-function getDepartment($id, $conn) {
-    $sql_department = "SELECT * FROM department WHERE id = '$id' LIMIT 1";
-    $result = mysqli_query($conn, $sql_department);
-    if ($result) {
-        if (mysqli_num_rows($result) > 0) {
-            return mysqli_fetch_assoc($result);
-        }
-    }
-    return null;
+//return a mysqli_result corresponding to the department with @param int $id
+function getDepartmentName($id, $conn) {
+    $sql_department = "SELECT name FROM department WHERE id = '$id'";
+    return mysqli_fetch_array($conn->query($sql_department))['name'];
 }
+
 session_start();
 $session_info = $_SESSION;
 
 $active = 'Edit User';
 $errors = "";
 
-//initalize the form
-//let user know which ones to modify?
+//set up inital value of the form the form
 if (isset($_GET['id'])) {
-    $current_id = $_GET['id'];
-    $sql = "SELECT * from user WHERE id = '$current_id' limit 1";
+    $user_id = $_GET['id'];
+    $sql = "SELECT * from user WHERE id = '$user_id' limit 1";
     $result = mysqli_query($conn, $sql);
     if ($result) {
         if (mysqli_num_rows($result) > 0) {
             $current_user_data = mysqli_fetch_assoc($result);
-            $last_modified = $current_user_data['date_created']; //convert format
+            $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
             $password = $current_user_data['password'];
-            $entity_data = getEntity($current_user_data['entity'], $conn);
-            if ($entity_data != null) {
-                $entity = $entity_data['name'];
-            } else { //error
-                $entity = "N/A";
-            }
-            $department_data = getDepartment($current_user_data['department'], $conn);
-            if ($department_data != null) {
-                $department = $department_data['name'];
-            } else {
-                $department = "N/A";
-            }
+            $entity = getEntityName($current_user_data['entity'], $conn);
+            $department = getDepartmentName($current_user_data['department'], $conn);
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
         }
     }
+} else {
+    header('Location: users.php');
 }
 
-//3 post changes
-//update password
-//update role
-//lock
-
+//post requests
 if (isset($_POST['submit_changes'])) {
-
-    $name = $_POST['name'];
-    $date_created = time();
     $role_id = $_POST['role'];
-    $entity = $_POST['entity'];
-    $department = $_POST['department'];
-    if (isset($_POST['entity_head'])) { //is entity super
-        $entity_head = $_POST['entity_head'];
-    } else { //not entity super
-        $entity_head = 0;
-    }
     $password = $_POST['password'];
     $reenter_password = $_POST['reenter_password'];
-    $entity_id;
-    $department_id;
+    $locked = ($_POST['lock_account']) ? 1 : 0;
 
-    $valid_entity = true;
-    $valid_department = true;
     $valid_password = true;
 
     if (strcmp($password, $reenter_password) != 0) {
         $valid_password = false;
     }
 
-    //verify that entity exists
-    $sql_entity = "select * from entity where name = '$entity' limit 1";
-    $result = mysqli_query($conn, $sql_entity);
-    if ($result) {
-        if (mysqli_num_rows($result) > 0) {
-            $entity_data = mysqli_fetch_assoc($result);
-            $entity_id = $entity_data['id'];
-        } else {
-            $valid_entity = false;
-        }
-    } else {
-        $valid_entity = false;
-    }
-
-    //verify that department exists
-    $sql_department = "select * from department where name = '$department' limit 1";
-    $result = mysqli_query($conn, $sql_department);
-    if ($result) {
-        if (mysqli_num_rows($result) > 0) {
-            $department_data = mysqli_fetch_assoc($result);
-            $department_id = $department_data['id'];
-        } else {
-            $valid_department = false;
-        }
-    } else {
-        $valid_department = false;
-    }
-
-    if ($valid_department and $valid_entity and $valid_password) {
-        $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-        VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
+    if ($valid_password) {
+        $sql = "UPDATE user SET password = '$password', role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
         if ($conn->query($sql)) {
             header('Location: users.php');
         } else {
-            header('Location: new_user.php?insert_error');
+            header('Location: edit_user.php?insert_error');
         }
     } else {
         $errors = "";
         if (!$valid_password)
             $errors .= "Re-entered password does not match with password. ";
-        if (!$valid_entity)
-            $errors .= "Invalid entity. ";
-        if (!$valid_department)
-            $errors .= "Invalid department. ";
     }
 }
 ?>
@@ -220,18 +152,19 @@ if (isset($_POST['submit_changes'])) {
                                 if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                             ?>
+                            <?php echo  "<p style=\"color: gray;\">date joined: ".$last_modified."</p>"?>
                             <form method="post" action="new_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
-                                        <input disabled class="form-control" required id="inputName" type="text" value=<?php echo $name?> name="name">
+                                        <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name?>" name="name">
                                     </div>
                                     <!-- Form Group (entity)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <input disabled class="form-control" required id="inputEntity" type="text" value=<?php echo $entity?> name="entity">
+                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity?>" name="entity">
                                     </div>
 
                                 </div>
@@ -240,7 +173,7 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- Form Group (department, role)--> 
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <input disabled class="form-control" id="inputDepartment" type="text" value=<?php echo $department?> name="department">
+                                        <input disabled class="form-control" id="inputDepartment" type="text" value="<?php echo $department?>" name="department">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
