@@ -153,7 +153,7 @@ if (isset($_POST['submit_changes'])) {
                                 ' . $errors . '</div>'
                             ?>
                             <?php echo  "<p style=\"color: gray;\">date joined: ".$last_modified."</p>"?>
-                            <form method="post" action="new_user.php">
+                            <form method="post" action="edit_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
