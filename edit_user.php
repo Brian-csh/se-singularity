@@ -39,6 +39,7 @@ if (isset($_GET['id'])) {
             $current_user_data = mysqli_fetch_assoc($result);
             $last_modified = $current_user_data['date_created']; //convert format
             $name = $current_user_data['name'];
+            $password = $current_user_data['password'];
             $entity_data = getEntity($current_user_data['entity'], $conn);
             if ($entity_data != null) {
                 $entity = $entity_data['name'];
@@ -258,8 +259,8 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- entity super, checkbox-->
 
                                     <div class="col-md-4">
-                                        <label class="small mb-1" for="retainPassword">Retain current password</label>
-                                        <input id="retainPassword" type="checkbox" name="retain_password" value="0">
+                                        <label class="small mb-1" for="inputLockAccount">Lock Account</label>
+                                        <input id="inputLockAccount" type="checkbox" name="lock_account">
                                     </div>
                                 </div>
                                 <!-- Form Row -->
@@ -269,11 +270,11 @@ if (isset($_POST['submit_changes'])) {
 
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPassword">Password</label>
-                                        <input class="form-control" id="inputPassword" type="password" value="" name="password">
+                                        <input class="form-control" id="inputPassword" type="password" value=<?php echo $password?> name="password">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputReenterPassword">Re-enter Password</label>
-                                        <input class="form-control" id="inputReenterPassword" type="password" value="" name="reenter_password">
+                                        <input class="form-control" id="inputReenterPassword" type="password" value=<?php echo $password?> name="reenter_password">
                                     </div>
                                 </div>
 
