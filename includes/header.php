@@ -1,7 +1,7 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/includes/db/connect.php";
 session_start();
-$session_info = $_SESSION['user'];
+$session_info = $_SESSION;
 // if ($session_info['admin']['role'] != '1') {
 //     header("Location: /signin.php");
 //     exit();

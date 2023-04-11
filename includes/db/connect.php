@@ -10,6 +10,8 @@ if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhos
     $DB_Password = "R&4*h223b5yP";
 }
 
+// $DB_Username = "singularity";
+// $DB_Password = "R&4*h223b5yP";
 $DB_DBName = "singularity";
 
 $conn = new mysqli($DB_Server, $DB_Username, $DB_Password, $DB_DBName);
