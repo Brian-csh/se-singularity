@@ -17,7 +17,6 @@ session_start();
 $session_info = $_SESSION;
 
 $active = 'Edit User';
-$errors = "";
 
 //set up inital value of the form the form
 if (isset($_GET['id'])) {
@@ -40,32 +39,6 @@ if (isset($_GET['id'])) {
     header('Location: users.php');
 }
 
-//post requests
-if (isset($_POST['submit_changes'])) {
-    $role_id = $_POST['role'];
-    $password = $_POST['password'];
-    $reenter_password = $_POST['reenter_password'];
-    $locked = ($_POST['lock_account']) ? 1 : 0;
-
-    $valid_password = true;
-
-    if (strcmp($password, $reenter_password) != 0) {
-        $valid_password = false;
-    }
-
-    if ($valid_password) {
-        $sql = "UPDATE user SET password = '$password', role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
-        if ($conn->query($sql)) {
-            header('Location: users.php');
-        } else {
-            header('Location: edit_user.php?insert_error');
-        }
-    } else {
-        $errors = "";
-        if (!$valid_password)
-            $errors .= "Re-entered password does not match with password. ";
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -149,11 +122,10 @@ if (isset($_POST['submit_changes'])) {
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
                             <?php
-                                if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
-                                ' . $errors . '</div>'
+                                if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
                             <?php echo  "<p style=\"color: gray;\">date joined: ".$last_modified."</p>"?>
-                            <form method="post" action="edit_user.php">
+                            <form method="post" action="update_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
@@ -211,6 +183,7 @@ if (isset($_POST['submit_changes'])) {
                                     </div>
                                 </div>
 
+                                <input type="hidden" name="id" value="<?php echo $user_id?>">
                                 <!-- Save changes button-->
                                 <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Update</button>
                             </form>
