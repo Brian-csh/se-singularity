@@ -39,7 +39,7 @@ include "includes/navbar.php";
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <th>Eescription</th>
+                            <th>Description</th>
                             <th>Position</th>
                             <th>Expiration Date</th>
                         </tr>

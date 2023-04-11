@@ -5,6 +5,7 @@ $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
 require 'includes/db/connect.php';
+include('functions.php');
 
 $errors = "";
 $username = "";
@@ -34,11 +35,6 @@ if (isset($_POST['feishu-bind-click'])) {
 if (isset($_POST['normal-login_click'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $time_now = time();
-    $type = "login";
-    $text = "test logs";
-    // TODO : specify type after log_type table is done
-    //$type = ;
 
     if ($username === "" || $password === "") {
         $errors = "Please fill in both fields";
@@ -46,21 +42,19 @@ if (isset($_POST['normal-login_click'])) {
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
         $row = $result -> fetch_array(MYSQLI_ASSOC);
-
+        
         if ($row) {
-            if (password_verify($password, $row['password'])) {
-                // TODO: add role based session parameters
-                $_SESSION['admin'] = $row;
-                // TODO: add log_type 
-                $sql = "INSERT INTO log (date, text, log_type) VALUES 
-                ('$time_now','$text','$type')";
-                if( $conn->query($sql)){
-                    echo "Records inserted successfully.";
-                } else{
-                    echo "ERROR: Could not able to execute $sql. " . $conn->error;
-                }
-                header("Location: index.php");
-            } else $errors = "Wrong password";
+            /* CHECK whether user is locked*/
+            if($row['locked']) {
+                $errors = "User is locked. Please contact your administrator.";
+            } else {
+                if (password_verify($password, $row['password'])) {
+                    // TODO: add role based session parameters
+                    $_SESSION['admin'] = $row;
+                    insert_log($conn,$row,$username);
+                    header("Location: index.php");
+                } else $errors = "Wrong password";
+            }   
         } else $errors = "Wrong username or password";
 
         // Free result set
@@ -123,7 +117,7 @@ if (isset($_POST['normal-login_click'])) {
                                         <form id="feishu-login" action="signin.php" method="post">
                                             <!-- Form Group (login box)-->
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <button type="submit" name="feishu-login_click" class="btn btn-lg text-light" >Login with 飞书</button>
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary text-light" >Login with 飞书</button>
                                             </div>
                                         </form>
                                     </div>

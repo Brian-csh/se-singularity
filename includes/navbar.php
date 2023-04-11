@@ -38,7 +38,7 @@
                     </a>
                     <!-- Sidenav Heading (Entities)-->
                     <a class="nav-link" href="/logs.php">
-                        <div class="nav-link-icon"><i data-feather="log-in"></i></div>
+                        <div class="nav-link-icon"><i data-feather="list"></i></div>
                         Logs
                     </a>
                     <!-- Sidenav Heading (Assets)-->

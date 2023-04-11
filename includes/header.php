@@ -58,16 +58,15 @@ $session_info = $_SESSION;
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item" href="/profile.php">Profile</a></li>
                 <li><a class="dropdown-item" href="/settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
                     <!-- TODO: Disappear this item after binding with 飞书 -->
-                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal" style="cursor : pointer;">
                         Bind to 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
                     </a>
                 </li>
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+                <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor : pointer;">Logout</a></li>
             </ul>
             <script>
             function toggleDropdownMenu() {
