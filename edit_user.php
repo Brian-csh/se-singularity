@@ -1,13 +1,13 @@
 <?php
 include "includes/db/connect.php";
 
-//return a mysqli_result corresponding to the entity with @param int $id
+//return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn) {
     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
     return mysqli_fetch_array($conn->query($sql_entity))['name'];
 }
 
-//return a mysqli_result corresponding to the department with @param int $id
+//return the name of the department corresponding to @param int $id
 function getDepartmentName($id, $conn) {
     $sql_department = "SELECT name FROM department WHERE id = '$id'";
     return mysqli_fetch_array($conn->query($sql_department))['name'];
@@ -18,7 +18,7 @@ $session_info = $_SESSION;
 
 $active = 'Edit User';
 
-//set up inital value of the form the form
+//set up inital value of the form
 if (isset($_GET['id'])) {
     $user_id = $_GET['id'];
     $sql = "SELECT * from user WHERE id = '$user_id' limit 1";
@@ -28,7 +28,6 @@ if (isset($_GET['id'])) {
             $current_user_data = mysqli_fetch_assoc($result);
             $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
-            $password = $current_user_data['password'];
             $entity = getEntityName($current_user_data['entity'], $conn);
             $department = getDepartmentName($current_user_data['department'], $conn);
             $entity_super = $current_user_data['entity_super'];
@@ -174,12 +173,8 @@ if (isset($_GET['id'])) {
                                     <!-- password-->
 
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputPassword">Password</label>
-                                        <input class="form-control" id="inputPassword" type="password" value=<?php echo $password?> name="password">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputReenterPassword">Re-enter Password</label>
-                                        <input class="form-control" id="inputReenterPassword" type="password" value=<?php echo $password?> name="reenter_password">
+                                        <label class="small mb-1" for="inputPassword">New Password</label>
+                                        <input class="form-control" id="inputPassword" type="password" name="password">
                                     </div>
                                 </div>
 
