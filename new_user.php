@@ -21,6 +21,7 @@ if (isset($_POST['submit_changes'])) {
     }
     $password = $_POST['password'];
     $reenter_password = $_POST['reenter_password'];
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $entity_id;
     $department_id;
 
@@ -62,7 +63,7 @@ if (isset($_POST['submit_changes'])) {
 
     if ($valid_department and $valid_entity and $valid_password) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-        VALUES ('$date_created', '$name', '$password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
+        VALUES ('$date_created', '$name', '$hashed_password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
         if ($conn->query($sql)) {
             header('Location: users.php');
         } else {
