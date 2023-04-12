@@ -75,7 +75,7 @@ include "includes/navbar.php";
 
                                 // Fetch role name
                                 $role_id = $row['role'];
-                                $role_name = mysqli_fetch_array($conn->query("SELECT role FROM roles WHERE id = '$role_id'"))['role'];
+                                $role_name = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
 
 
 
