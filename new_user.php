@@ -23,15 +23,13 @@ if (isset($_POST['submit_changes'])) {
     $reenter_password = $_POST['reenter_password'];
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $valid_entity = true;
-    $valid_department = true;
-    $valid_password = true;
+    $password_confirmed = true;
 
-    if ($password !== $hashed_password) {
-        $valid_password = false;
+    if (strcmp($password, $reenter_password) != 0) {
+        $password_confirmed = false;
     }
 
-    if ($valid_password) {
+    if ($password_confirmed) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
         VALUES ('$date_created', '$name', '$hashed_password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
         if ($conn->query($sql)) {
