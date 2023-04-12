@@ -32,6 +32,7 @@ if (isset($_GET['id'])) {
             $department = getDepartmentName($current_user_data['department'], $conn);
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
+            $locked = $current_user_data['locked'];
         }
     }
 } else {
@@ -164,7 +165,7 @@ if (isset($_GET['id'])) {
 
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputLockAccount">Lock Account</label>
-                                        <input id="inputLockAccount" type="checkbox" name="lock_account">
+                                        <input id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($locked) ? "checked" : "" ?>>
                                     </div>
                                 </div>
                                 <!-- Form Row -->
