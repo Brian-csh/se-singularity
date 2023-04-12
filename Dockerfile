@@ -14,9 +14,8 @@ WORKDIR /var/www/html/
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install dependencies
-COPY composer.json ./
+COPY composer.json composer.lock ./
 RUN composer install --no-scripts --no-autoloader
-RUN composer dump-autoload --optimize
 
 # Expose port 80 for Apache
 EXPOSE 80
