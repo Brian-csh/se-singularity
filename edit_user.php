@@ -1,46 +1,43 @@
 <?php
 include "includes/db/connect.php";
+
+//return the name of the entity corresponding to @param int $id
+function getEntityName($id, $conn) {
+    $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
+    return mysqli_fetch_array($conn->query($sql_entity))['name'];
+}
+
+//return the name of the department corresponding to @param int $id
+function getDepartmentName($id, $conn) {
+    $sql_department = "SELECT name FROM department WHERE id = '$id'";
+    return mysqli_fetch_array($conn->query($sql_department))['name'];
+}
+
 session_start();
 $session_info = $_SESSION;
 
-$active = 'Create User';
-$errors = "";
+$active = 'Edit User';
 
-
-if (isset($_POST['submit_changes'])) {
-
-    $name = $_POST['name'];
-    $date_created = time();
-    $role_id = $_POST['role'];
-    $entity_id = $_POST['entity'];
-    $department_id = $_POST['department'];
-    if (isset($_POST['entity_head'])) { //is entity super
-        $entity_head = $_POST['entity_head'];
-    } else { //not entity super
-        $entity_head = 0;
-    }
-    $password = $_POST['password'];
-    $reenter_password = $_POST['reenter_password'];
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-    $password_confirmed = true;
-
-    if (strcmp($password, $reenter_password) != 0) {
-        $password_confirmed = false;
-    }
-
-    if ($password_confirmed) {
-        $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-        VALUES ('$date_created', '$name', '$hashed_password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
-        if ($conn->query($sql)) {
-            header('Location: users.php');
-        } else {
-            header('Location: new_user.php?insert_error');
+//set up inital value of the form
+if (isset($_GET['id'])) {
+    $user_id = $_GET['id'];
+    $sql = "SELECT * from user WHERE id = '$user_id' limit 1";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        if (mysqli_num_rows($result) > 0) {
+            $current_user_data = mysqli_fetch_assoc($result);
+            $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
+            $name = $current_user_data['name'];
+            $entity = getEntityName($current_user_data['entity'], $conn);
+            $department = getDepartmentName($current_user_data['department'], $conn);
+            $entity_super = $current_user_data['entity_super'];
+            $current_role = $current_user_data['role'];
         }
-    } else {
-        $errors .= "Re-entered password does not match with password. ";
     }
+} else {
+    header('Location: users.php');
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -124,33 +121,21 @@ if (isset($_POST['submit_changes'])) {
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
                             <?php
-                                if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
-                                ' . $errors . '</div>'
+                                if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
-                            <form method="post" action="new_user.php">
+                            <?php echo  "<p style=\"color: gray;\">date joined: ".$last_modified."</p>"?>
+                            <form method="post" action="update_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
-                                        <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Username">
+                                        <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name?>" name="name">
                                     </div>
                                     <!-- Form Group (entity)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments()">
-                                            <option value="">Select an Entity</option>
-
-                                            <?php
-                                            $results = $conn->query("SELECT id, name FROM entity");
-                                            while ($row = $results->fetch_assoc()) {
-                                                unset($id, $name);
-                                                $id = $row['id'];
-                                                $name = $row['name'];
-                                                echo '<option value="' . $id . '">' . $name . '</option>';
-                                            }
-                                            ?>
-                                        </select>
+                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity?>" name="entity">
                                     </div>
 
                                 </div>
@@ -159,17 +144,15 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- Form Group (department, role)--> 
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select a Department</option>
-                                        </select>
+                                        <input disabled class="form-control" id="inputDepartment" type="text" value="<?php echo $department?>" name="department">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
-                                        <select class="form-control" id="inputRole" name="role">
-                                            <option value="1" selected>superadmin</option>
-                                            <option value="2">admin</option>
-                                            <option value="3">resource manager</option>
-                                            <option value="4">user</option>
+                                        <select class="form-control" id="inputRole" name="role" value=<?php echo $current_role?>>
+                                            <option value="1" <?php echo ($current_role == 1) ? "selected" : "null"?>>superadmin</option>
+                                            <option value="2" <?php echo ($current_role == 2) ? "selected" : "null"?>>admin</option>
+                                            <option value="3" <?php echo ($current_role == 3) ? "selected" : "null"?>>resource manager</option>
+                                            <option value="4" <?php echo ($current_role == 4) ? "selected" : "null"?>>user</option>
                                         </select>
 
                                     </div>
@@ -180,8 +163,8 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- entity super, checkbox-->
 
                                     <div class="col-md-4">
-                                        <label class="small mb-1" for="inputEntityHead">Entity Head</label>
-                                        <input id="inputEntityHead" type="checkbox" name="entity_head" value="1">
+                                        <label class="small mb-1" for="inputLockAccount">Lock Account</label>
+                                        <input id="inputLockAccount" type="checkbox" name="lock_account">
                                     </div>
                                 </div>
                                 <!-- Form Row -->
@@ -190,17 +173,14 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- password-->
 
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputPassword">Password</label>
-                                        <input class="form-control" id="inputPassword" type="password" value="" name="password" placeholder="Enter Password">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputReenterPassword">Re-enter Password</label>
-                                        <input class="form-control" id="inputReenterPassword" type="password" value="" name="reenter_password" placeholder="Confirm Password">
+                                        <label class="small mb-1" for="inputPassword">New Password</label>
+                                        <input class="form-control" id="inputPassword" type="password" name="password">
                                     </div>
                                 </div>
 
+                                <input type="hidden" name="id" value="<?php echo $user_id?>">
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new user</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Update</button>
                             </form>
                         </div>
                     </div>
@@ -218,65 +198,6 @@ if (isset($_POST['submit_changes'])) {
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
-
-    <script>
-        function updateDepartments() {
-            let entityId = $('#inputEntity').val();
-
-            $.ajax({
-                url: 'includes/scripts/ajax.php',
-                method: 'POST',
-                data: {
-                    request: 'get_departments',
-                    entity_id: entityId
-                },
-                dataType: 'json',
-                success: function (departments) {
-                    var departmentSelect = $('#inputDepartment');
-                    departmentSelect.empty();
-
-                    // Add the default "Select a Department" option
-                    departmentSelect.append($('<option>', {
-                        value: "",
-                        text: "Select a Department"
-                    }));
-
-                    // Create a map to store parent departments and their subdepartments
-                    var departmentMap = {};
-
-                    // Separate parent and subdepartments
-                    departments.forEach(function (department) {
-                        if (department.parent === null) {
-                            departmentMap[department.id] = {
-                                name: department.name,
-                                subdepartments: []
-                            };
-                        } else {
-                            departmentMap[department.parent].subdepartments.push(department);
-                        }
-                    });
-
-                    // Add parent departments and their subdepartments to the select element
-                    for (var parentId in departmentMap) {
-                        // Add parent department
-                        departmentSelect.append($('<option>', {
-                            value: parentId,
-                            text: departmentMap[parentId].name
-                        }));
-
-                        // Add subdepartments with indentation
-                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                            departmentSelect.append($('<option>', {
-                                value: subdepartment.id,
-                                text: "— " + subdepartment.name // Indentation using an em dash (—)
-                            }));
-                        });
-                    }
-                },
-            });
-        }
-    </script>
-
 </div>
 
 </html>

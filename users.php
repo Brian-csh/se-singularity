@@ -17,7 +17,7 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="user"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">+ Opret ny bruger</a>
+                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">add</a>
                         </div>
                     </div>
                 </div>
@@ -88,9 +88,9 @@ include "includes/navbar.php";
 
 
 
-                                echo "<tr data-id='$user_id' ><td>$user_id</td><td>$date</td><td><a class='text-primary' href='user.php?id=$user_id'>" . $name . "</a></td><td>$entity</td>
+                                echo "<tr data-id='$user_id' ><td>$user_id</td><td>$date</td><td><a class='text-primary' href='edit_user.php?id=$user_id'>" . $name . "</a></td><td>$entity</td>
                             <td>$department_name</td><td>$role</td><td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"user.php?id=".$row['id']."\">
+                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_user.php?id=".$row['id']."\">
                                         <i data-feather=\"edit\"></i>
                                         </a>
                   
