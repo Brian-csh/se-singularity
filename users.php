@@ -17,7 +17,7 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="user"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">Add user</a>
+                            <a href="new_user.php" class="btn btn-primary btn-xs float-end">+ Opret ny bruger</a>
                         </div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ include "includes/navbar.php";
                                         <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"user.php?id=".$row['id']."\">
                                         <i data-feather=\"edit\"></i>
                                         </a>
-                
+                  
                                         
                                         " ."</td></tr>";
                             }
