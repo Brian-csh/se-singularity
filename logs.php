@@ -4,7 +4,7 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
-$sql = "SELECT * FROM log ORDER BY id DESC";
+$sql = "SELECT * FROM logs ORDER BY id DESC";
 
 ?>
 
@@ -29,7 +29,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
             <div class="card">
                 <div class="card-body">
                     <div id="tablePreloader">
-                        <p class="text-white p-3">Loading...</p >
+                        <p class="text-white p-3">Loading...</p>
                     </div>
                     <table id="datatablesSimple" style="display: none">
                         <thead>

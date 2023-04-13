@@ -4,24 +4,18 @@ FROM php:7.2-apache
 # Install necessary PHP extensions
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Install Nginx and supervisor
-RUN apt-get update && apt-get install -y nginx
-# \ supervisor
-
 # Copy the application files into the container
 COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html/
 
-# Copy Nginx configuration file
-# COPY nginx/default.conf /etc/nginx/conf.d/
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy supervisor configuration file
-# COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Install dependencies
+COPY composer.json composer.lock ./
+RUN composer install --no-scripts --no-autoloader
 
-# Expose port 80 for Nginx
+# Expose port 80 for Apache
 EXPOSE 80
-
-# Start supervisord to start Nginx and PHP-FPM
-# CMD ["/usr/bin/supervisord"]
