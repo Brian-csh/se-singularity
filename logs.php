@@ -4,7 +4,7 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
-$sql = "SELECT * FROM logs ORDER BY id DESC";
+$sql = "SELECT * FROM log ORDER BY id DESC";
 
 ?>
 

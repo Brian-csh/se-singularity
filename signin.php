@@ -51,7 +51,7 @@ if (isset($_POST['normal-login_click'])) {
                 if (password_verify($password, $row['password'])) {
                     // TODO: add role based session parameters
                     $_SESSION['admin'] = $row;
-                    insert_log($conn,$row,$username);
+                    insert_log($conn,$row,$username,1);
                     header("Location: index.php");
                 } else $errors = "Wrong password";
             }   
