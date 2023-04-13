@@ -32,28 +32,18 @@
                         Users
                     </a>
                     <!-- Sidenav Heading (Entities)-->
-                    <a class="nav-link" href="/entities.php">
+                    <a class="nav-link" href="entities.php">
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
-                    </a>
-                    <!-- Sidenav Heading (Entities)-->
-                    <a class="nav-link" href="/logs.php">
-                        <div class="nav-link-icon"><i data-feather="log-in"></i></div>
-                        Logs
-                    </a>
-                    <!-- Sidenav Heading (Assets)-->
-                    <a class="nav-link" href="/assets.php">
-                        <div class="nav-link-icon"><i data-feather="package"></i></div>
-                        Assets
                     </a>
                 </div>
             </div>
             <!-- Sidenav Footer-->
             <div class="sidenav-footer">
                 <div class="sidenav-footer-content">
-                    <div class="sidenav-footer-subtitle">Logged in as:</div>
+                    <div class="sidenav-footer-subtitle">Logget ind som:</div>
                     <div class="sidenav-footer-title"><?= /** @var array $session_info */
-                        $session_info['name']?></div>
+                        $session_info['admin']['username']?></div>
                 </div>
             </div>
         </nav>
@@ -61,13 +51,16 @@
     <script>
         let path = window.location.pathname;
         let page = path.split("/").pop();
+
         if (page === "index.php" || page === '') {
             document.getElementsByClassName("nav-link")[0].classList.add("active");
-        } else if ((new URL(document.location)).searchParams.get('only_coaches')) {
-            document.querySelectorAll("a[href='/" + page +"?only_coaches=true'")[0].classList.add("active");
-        } else if ((new URL(document.location)).searchParams.get('salto_fail')) {
-            document.querySelectorAll("a[href='/" + page +"?salto_fail=true'")[0].classList.add("active");
         } else {
-        document.querySelectorAll("a[href='/" + page +"']")[0].classList.add("active");
+            let links = document.querySelectorAll("a[href='/" + page +"']");
+
+            // Toggle the class only if it's in the
+            if (links.length > 0 && !links[0].classList.contains("dropdown-settings-header")) {
+                links[0].classList.add("active");
+            }
+
         }
     </script>
