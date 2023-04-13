@@ -43,13 +43,18 @@ if (isset($_POST['normal-login_click'])) {
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
-            if (password_verify($password, $row['password'])) {
+            if ($row['locked']) {
+                $errors = "Account is locked";
+            } else if (password_verify($password, $row['password'])) {
+                // TODO: add role based session parameters
                 $_SESSION['user']['id'] = $row['id'];
                 $_SESSION['user']['name'] = $row['name'];
                 $_SESSION['user']['role'] = $row['role'];
                 $_SESSION['user']['feishu_id'] = $row['feishu_id'];
                 $_SESSION['user']['entity'] = $row['entity'];
                 $_SESSION['user']['department'] = $row['department'];
+
+
                 header("Location: index.php");
             } else $errors = "Wrong password";
         } else $errors = "Wrong username or password";
