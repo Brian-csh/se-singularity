@@ -44,7 +44,6 @@ if (isset($_POST['normal-login_click'])) {
 
         if ($row) {
             if (password_verify($password, $row['password'])) {
-                // TODO: add role based session parameters
                 $_SESSION['user']['id'] = $row['id'];
                 $_SESSION['user']['name'] = $row['name'];
                 $_SESSION['user']['role'] = $row['role'];
