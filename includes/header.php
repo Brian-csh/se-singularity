@@ -1,8 +1,8 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/includes/db/connect.php";
 session_start();
-$session_info = $_SESSION;
-if ($session_info['admin']['role'] != '1') {
+$session_info = $_SESSION['user'];
+if (!isset($session_info['role'])) {
    header("Location: /signin.php");
    exit();
 }
