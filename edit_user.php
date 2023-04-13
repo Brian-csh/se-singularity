@@ -14,7 +14,7 @@ function getDepartmentName($id, $conn) {
 }
 
 session_start();
-$session_info = $_SESSION;
+$session_info = $_SESSION['user'];
 
 $active = 'Edit User';
 
@@ -159,15 +159,18 @@ if (isset($_GET['id'])) {
                                     </div>
                                 </div>
                                 <!-- Form Row -->
-                                <div class="row gx-3 mb-4">
-                                    <!-- Form Group -->
-                                    <!-- entity super, checkbox-->
+                                <?php 
+                                if ($user_id != $session_info['id'])
+                                    echo "<div class=\"row gx-3 mb-4\">
+                                        <!-- Form Group -->
+                                        <!-- entity super, checkbox-->
 
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputLockAccount">Lock Account</label>
-                                        <input id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($locked) ? "checked" : "" ?>>
-                                    </div>
-                                </div>
+                                        <div class=\"col-md-4\">
+                                            <label class=\"small mb-1\" for=\"inputLockAccount\">Lock Account</label>
+                                            <input id=\"inputLockAccount\" type=\"checkbox\" name=\"lock_account\" <?php echo ($locked) ? \"checked\" : \"\" ?>>
+                                        </div>
+                                    </div>"
+                                ?>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
