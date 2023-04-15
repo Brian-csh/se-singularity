@@ -17,7 +17,7 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="new_entity.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
+                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                         </div>
                     </div>
