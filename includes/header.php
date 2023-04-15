@@ -23,6 +23,18 @@ if(isset($_SESSION['feishu_bind']) && $_SESSION['feishu_bind']) {
     $feishu_binded = true;
 }
 
+// Handle feishu failed logins
+if(isset($_GET['bind_err'])) {
+    $signin_status = $_GET['bind_err'];
+    if ($signin_status == "403") {
+        $errors = "Unable to bind with Feishu. User already exists.";
+        // TODO: Frontend for error
+        echo '<script language="javascript">';
+        echo 'alert("Error: '.$errors.'")';
+        echo '</script>';
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

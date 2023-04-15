@@ -61,6 +61,18 @@ if(isset($arr->access_token)){
 
     // set feishu user id in the database
     if($mode == "bind") {
+        // check if feishu account is already binded
+        $stmt = $conn->prepare('SELECT COUNT(*) as count FROM user WHERE feishu_id = ?');
+        $stmt->bind_param('s', $sub_id);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->free_result();
+        $stmt->close();
+        if ($count > 0) {
+            header('Location: ../index.php?bind_err='.urlencode("403"));
+            die();
+        }
         // Update sessions
         $session_user_id = $_SESSION['user']['id'];
         $_SESSION['feishu_bind'] = true;
