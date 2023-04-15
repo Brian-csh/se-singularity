@@ -17,8 +17,13 @@ if (isset($_POST['submit_changes'])) {
     $entity_id = $_POST['entity_id'];
     $entity_name = $_POST['entity_name'];
 
-    $sql = "INSERT INTO department (name, entity, parent)
-    VALUES ('$name', '$entity_id', '$parent')";
+    if ($parent === "") {
+        $sql = "INSERT INTO department (name, entity, parent) 
+                VALUES ('$name', '$entity_id', NULL)";
+    } else {
+        $sql = "INSERT INTO department (name, entity, parent)
+        VALUES ('$name', '$entity_id', '$parent')";
+    }
     if ($conn->query($sql)) {
         header('Location: entity.php?id='.$entity_id.'&name='.$entity_name);
     } else {
@@ -136,7 +141,7 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- Form Group (department, role)--> 
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Parent Department</label>
-                                        <select class="form-control" id="inputDepartment" name="parent" required>
+                                        <select class="form-control" id="inputDepartment" name="parent">
                                             <option value="">N/A</option>
                                             <?php
                                             $results = $conn->query("SELECT id, name FROM department where entity='$entity_id'");
