@@ -13,7 +13,7 @@ $password = "";
 // Handle feishu login form submit
 if (isset($_POST['feishu-login_click'])) {
     $mode = "signin";
-    include 'feishu_redirect.php';
+    include 'includes/feishu_redirect.php';
 }
 
 // Handle feishu failed logins
@@ -27,7 +27,7 @@ if(isset($_GET['signin'])) {
 // Handle feishu bind
 if (isset($_POST['feishu-bind-click'])) {
     $mode = "bind";
-    include 'feishu_redirect.php';
+    include 'includes/feishu_redirect.php';
 }
 
 // Handle normal login form submit
