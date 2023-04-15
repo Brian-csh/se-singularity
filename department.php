@@ -1,4 +1,5 @@
 <?php
+include "includes/db/connect.php";
 if (isset($_GET['id'])) {
     $department_id = $_GET['id'];
 }
@@ -8,8 +9,21 @@ if (isset($_GET['name'])) {
 
 if (isset($_POST['edit_details'])) {
     //update the name and parent
-}
+    $department_id = $_POST['department_id'];
+    $updated_department_name = $_POST['department_name'];
+    $updated_department_parent = $_POST['parent'];
 
+    if ($updated_department_parent === "") {
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = NULL WHERE id = '$department_id'";
+    } else {
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$department_id'";
+    }
+    if ($conn->query($sql)) {
+        header('Location: department.php?id='.$department_id.'&name='.$updated_department_name);
+    } else {
+        header('Location: department.php?id='.$department_id.'&name='.$updated_department_name.'&insert_error');
+    }
+}
 $active = $department_name;
 include "includes/header.php";
 ?>
@@ -130,9 +144,9 @@ include "includes/header.php";
                     <div class="modal-body">
 
                         <div class="mb-3">
-                            <label for="categoryUpdateName">Department Name</label>
-                            <input class="form-control" id="categoryUpdateName" type="text" name="category_name" <?php echo "placeholder=\"$department_name\"" ?> required>
-                            <label for="categoryUpdateParent">Parent Department Name</label>
+                            <label for="departmentUpdateName">Department Name</label>
+                            <input class="form-control" id="departmentUpdateName" type="text" name="department_name" <?php echo "value=\"$department_name\"" ?> required>
+                            <label for="departmentUpdateParent">Parent Department Name</label>
                             <select class="form-control" id="inputDepartment" name="parent">
                                 <option value="">N/A</option>
                                 <?php
@@ -149,6 +163,7 @@ include "includes/header.php";
 
 
                     </div>
+                    <input type="hidden" name="department_id" value="<?php echo $department_id?>">
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
