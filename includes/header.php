@@ -58,7 +58,6 @@ if (!isset($session_info['role'])) {
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item dropdown-settings-header" href="/profile.php">Profile</a></li>
                 <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->

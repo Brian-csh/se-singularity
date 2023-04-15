@@ -5,7 +5,7 @@ $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
 require 'includes/db/connect.php';
-
+include 'functions.php';
 $errors = "";
 $username = "";
 $password = "";
@@ -54,6 +54,8 @@ if (isset($_POST['normal-login_click'])) {
                 $_SESSION['user']['entity'] = $row['entity'];
                 $_SESSION['user']['department'] = $row['department'];
 
+                // Insert log
+                insert_log($conn,$row,$username,1);
 
                 header("Location: index.php");
             } else $errors = "Wrong password";

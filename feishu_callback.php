@@ -90,6 +90,11 @@ if(isset($arr->access_token)){
             $stmt->execute();
             $result = $stmt->get_result();
             $row = $result->fetch_assoc();
+
+            // Insert Log
+            // $username = $row['username'];
+            // insert_log($conn,$row,$username,4);
+            
             $stmt->free_result();
             $conn->close();
 
