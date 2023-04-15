@@ -1,12 +1,13 @@
 <?php
 if (isset($_GET['id'])) {
-    $entity_id = $_GET['id'];
+    $department_id = $_GET['id'];
 }
 if (isset($_GET['name'])) {
-    $entity_name = $_GET['name'];
+    $department_name = $_GET['name'];
 }
 
-$active = $entity_name;
+//should we check if department really exists
+$active = $department_name;
 include "includes/header.php";
 ?>
 
@@ -19,36 +20,10 @@ include "includes/header.php";
                     <div class="row align-items-center justify-content-between">
                         <div class="col-auto mt-4">
                             <h1 class="page-header-title">
-                                <div class="page-header-icon"><i data-feather="home"></i></div>
-                                <?php echo $entity_name ?>
+                                <div class="page-header-icon"><i data-feather="box"></i></div>
+                                <?php echo $department_name ?>
                             </h1>
                             <div class="page-header-subtitle">
-                                <?php
-                                $sql_entity = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
-                                $result = $conn->query($sql_entity);
-
-                                if ($result) {
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $entity_data = mysqli_fetch_assoc($result);
-                                        $date_created = $entity_data['date_created'];
-                                    } else {
-                                        $date_created = "N/A";
-                                    }
-                                }
-
-                                echo "Date Created: $date_created<br>";
-
-                                $sql_user = "SELECT * FROM user WHERE (id = '$entity_id' AND entity_super = 1) LIMIT 1";
-                                $result = $conn->query($sql_user);
-
-
-                                if ($result) {
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $user_data = mysqli_fetch_assoc($result);
-                                        echo "Entity Head: $user_data <br>";
-                                    }
-                                }
-                                ?>
                             </div>
                         </div>
                     </div>
@@ -63,9 +38,8 @@ include "includes/header.php";
                         <div class="col-auto mb-3 d-inline w-100">
                             <h1 class="page-header-title text-white d-inline">
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
-                                Departments
+                                Sub-departments
                             </h1>
-                            <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end">+ Add</a>
                         </div>
                     </div>
                 </div>
@@ -82,21 +56,19 @@ include "includes/header.php";
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
-                                <th>Parent</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
-                                <th>Parent</th>
                             </tr>
                         </tfoot>
                         <tbody>
                             <?php
 
                             // select all the departments for the entity
-                            $sql_department = "SELECT * FROM department WHERE entity = '$entity_id' ORDER BY id DESC";
+                            $sql_department = "SELECT * FROM department WHERE parent = '$department_id' ORDER BY id DESC";
                             $result = $conn->query($sql_department);
 
                             if ($result) {
@@ -104,15 +76,8 @@ include "includes/header.php";
                                     while ($row = $result->fetch_assoc()) {
                                         $department_id = $row['id'];
                                         $department_name = $row['name'];
-                                        $department_parent = $row['parent'];
-
-                                        $sql_parent_name = "SELECT name FROM department WHERE id = '$department_parent' LIMIT 1";
-                                        $parent_name_result = $conn->query($sql_parent_name);
-                                        $parent_assoc = $parent_name_result->fetch_assoc();
-                                        $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
-
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='department.php?id=$department_id&name=$department_name'>$department_name</a></td><td>$parent_name</td></tr>";
+                                        
+                                        echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td></tr>";
                                     }
                                 }
                             }
