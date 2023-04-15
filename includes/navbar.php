@@ -40,7 +40,6 @@
                         <div class="nav-link-icon"><i data-feather="log-in"></i></div>
                         Logs
                     </a>
-
                     <!-- Sidenav Heading (Assets)-->
                     <a class="nav-link" href="assets.php">
                         <div class="nav-link-icon"><i data-feather="package"></i></div>

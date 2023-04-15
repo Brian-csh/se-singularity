@@ -33,13 +33,3 @@ function insert_log($conn,$row,$username,$id)
     }
 }
 ?>
-
-    $sql = "INSERT INTO log (date, text,log_type) VALUES 
-    ('$time_now','$text','$type')";
-    if( $conn->query($sql)){
-        echo "Record inserted successfully.";
-    } else{
-        echo "ERROR: Could not able to execute $sql. " . $conn->error;
-    }
-}
-?>
