@@ -54,7 +54,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $date = gmdate("Y.m.d \ | H:i:s", $row["date"]);
+                                $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
                                 $log_id = $row["id"];
                                 $text = $row["text"];
                                 $type = $row["log_type"];

@@ -41,7 +41,7 @@ if (isset($_POST['normal-login_click'])) {
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
         $row = $result -> fetch_array(MYSQLI_ASSOC);
-
+        
         if ($row) {
             if (isset($row['locked']) && $row['locked']) {
                 $errors = "Account is locked";
@@ -121,7 +121,7 @@ if (isset($_POST['normal-login_click'])) {
                                         <form id="feishu-login" action="signin.php" method="post">
                                             <!-- Form Group (login box)-->
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <button type="submit" name="feishu-login_click" class="btn btn-lg text-light" >Login with 飞书</button>
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary text-light" >Login with 飞书</button>
                                             </div>
                                         </form>
                                     </div>

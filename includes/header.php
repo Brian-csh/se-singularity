@@ -62,11 +62,11 @@ if (!isset($session_info['role'])) {
                 <li>
                     <!-- Feishu Binding -->
                     <!-- TODO: Disappear this item after binding with 飞书 -->
-                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal" style="cursor : pointer;">
                         Bind to 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
                     </a>
                 </li>
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+                <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor : pointer;">Logout</a></li>
             </ul>
             <script>
             function toggleDropdownMenu() {
