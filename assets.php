@@ -4,6 +4,40 @@ $active = "Assets";
 
 include "includes/header.php";
 include "includes/navbar.php";
+
+/*
+Parent: class
+Item Asset: 0
+Value Asset: 1
+*/
+
+if (isset($_POST['add_class'])) {
+
+    $name = $_POST['class_name'];
+    if($_POST['class_type'] == "ItemAsset") {
+        $class_type = 0;
+    }
+    else if($_POST['class_type'] == "ValueAsset") {
+        $class_type = 1;
+    }
+    else {
+        $class_type = -1;
+    }
+    if (isset($_POST['class_parent']) && $_POST['class_parent']) {
+        $parent = $_POST['class_parent'];
+        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type) 
+        VALUES ('$name', '$parent', '$class_type')";
+    } else {
+        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type) 
+        VALUES ('$name', NULL, '$class_type')";
+    }
+    if ($conn->query($sql_add_class)) {
+        // TODO: create a popup for success
+    } else {
+        echo "Pain in my assholes.";
+    }
+}
+
 ?>
 
 <div id="layoutSidenav_content">
@@ -111,22 +145,47 @@ include "includes/navbar.php";
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset CLass</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset Class</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="assets.php" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
 
                         <div class="mb-3">
-                            <label for="categoryAddName">Category Name</label>
-                            <input class="form-control" id="categoryAddName" type="text" name="category_name" placeholder="Laptops" required>
+                            <label for="classAddName">Class Name *</label>
+                            <input class="form-control" id="classAddName" type="text" name="class_name" placeholder="Furniture" required>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="classAddType">Class Type *</label><br>
+                            <input type="radio" id="classItemType" name="class_type" value="ItemAsset" checked>
+                            <label for="classItemType">Item Asset</label>
+                            <input type="radio" id="classValueType" name="class_type" value="ValueAsset">
+                            <label for="classValueType">Value Asset</label><br>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="classAddName">Parent Class<label>
+                                <select class="form-control ms-2" id="inputParentClass" name="class_parent">
+                                    <option value="">Select a Parent Class</option>
+                                        <?php
+                                            $results = $conn->query("SELECT id, name FROM asset_class");
+                                            while ($row = $results->fetch_assoc()) {
+                                                if ($row['name']) {
+                                                    unset($id, $parent);
+                                                    $id = $row['id'];
+                                                    $parent = $row['name'];
+                                                    echo '<option value="' . $id . '">' . $parent . '</option>';
+                                                }
+                                            }
+                                            ?>
+                                </select>
+                        </div>
 
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="add_category">Submit</button>
+                        <button class="btn btn-success" type="submit" name="add_class">Submit</button>
                     </div>
                 </form>
             </div>
@@ -142,4 +201,4 @@ include "includes/navbar.php";
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <?php
     include "includes/footer.php";
-    ?>
+    ?> 
