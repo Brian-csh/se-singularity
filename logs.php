@@ -4,7 +4,7 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
-$sql = "SELECT * FROM logs ORDER BY id DESC";
+$sql = "SELECT * FROM log ORDER BY id DESC";
 
 ?>
 
@@ -29,19 +29,21 @@ $sql = "SELECT * FROM logs ORDER BY id DESC";
             <div class="card">
                 <div class="card-body">
                     <div id="tablePreloader">
-                        <p class="text-white p-3">Loading...</p>
+                        <p class="text-white p-3">Loading...</p >
                     </div>
                     <table id="datatablesSimple" style="display: none">
                         <thead>
                         <tr>
                             <th>Date</th>
                             <th>Log</th>
+                            <th>Type</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
                             <th>Date</th>
                             <th>Log</th>
+                            <th>Type</th>
                         </tr>
                         </tfoot>
                         <tbody>
@@ -52,14 +54,16 @@ $sql = "SELECT * FROM logs ORDER BY id DESC";
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $date = gmdate("Y.m.d \ | H:i:s", $row["date"]);
+                                $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
                                 $log_id = $row["id"];
-                                $english = $row["log"];
+                                $text = $row["text"];
+                                $type = $row["log_type"];
 
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
-                                <td class='text-white'>$english</td>
+                                <td class='text-white'>$text</td>
+                                <td class='text-white'>$type</td>
                                 </tr>";
                             }
                         }

@@ -85,7 +85,6 @@ if(isset($_GET['bind_err'])) {
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item dropdown-settings-header" href="/profile.php">Profile</a></li>
                 <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
@@ -99,7 +98,7 @@ if(isset($_GET['bind_err'])) {
                         </a>
                     <?php endif;?>
                 </li>
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+                <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor : pointer;">Logout</a></li>
             </ul>
             <script>
             function toggleDropdownMenu() {
