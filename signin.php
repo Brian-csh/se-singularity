@@ -43,7 +43,7 @@ if (isset($_POST['normal-login_click'])) {
         $row = $result -> fetch_array(MYSQLI_ASSOC);
 
         if ($row) {
-            if ($row['locked']) {
+            if (isset($row['locked']) && $row['locked']) {
                 $errors = "Account is locked";
             } else if (password_verify($password, $row['password'])) {
                 // TODO: add role based session parameters
