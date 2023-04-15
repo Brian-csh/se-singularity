@@ -6,6 +6,10 @@ if (isset($_GET['name'])) {
     $department_name = $_GET['name'];
 }
 
+if (isset($_POST['edit_details'])) {
+    //update the name and parent
+}
+
 $active = $department_name;
 include "includes/header.php";
 ?>
@@ -27,11 +31,12 @@ include "includes/header.php";
                                 //get parent department
                                 $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
                                 $result = $conn->query($sql);
-                                
+
                                 if ($result) {
                                     if (mysqli_num_rows($result) > 0) {
                                         $row = $result->fetch_assoc();
                                         $department_parent = isset($row['parent']) ? $row['parent'] : -1;
+                                        $entity_id = $row['entity'];
                                     }
                                 } else {
                                     echo "error: cannot find department";
@@ -42,7 +47,7 @@ include "includes/header.php";
                                     $parent_name_result = $conn->query($sql_parent_name);
                                     $parent_assoc = $parent_name_result->fetch_assoc();
                                     $parent_name = $parent_assoc['name'];
-                                    echo "Parent Department: ".$parent_name;
+                                    echo "Parent Department: " . $parent_name;
                                 }
                                 ?>
                             </div>
@@ -61,6 +66,7 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">Edit</a>
                         </div>
                     </div>
                 </div>
@@ -112,6 +118,45 @@ include "includes/header.php";
 
 
 
+    <!-- Add Class Modal -->
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset CLass</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="department.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="categoryUpdateName">Department Name</label>
+                            <input class="form-control" id="categoryUpdateName" type="text" name="category_name" <?php echo "placeholder=\"$department_name\"" ?> required>
+                            <label for="categoryUpdateParent">Parent Department Name</label>
+                            <select class="form-control" id="inputDepartment" name="parent">
+                                <option value="">N/A</option>
+                                <?php
+                                $results = $conn->query("SELECT id, name FROM department where entity='$entity_id'");
+                                while ($row = $results->fetch_assoc()) {
+                                    unset($id, $name);
+                                    $id = $row['id'];
+                                    $name = $row['name'];
+                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
