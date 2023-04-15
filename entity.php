@@ -96,7 +96,7 @@ include "includes/header.php";
                             <?php
 
                             // select all the departments for the entity
-                            $sql_department = "SELECT * FROM department WHERE id = '$entity_id'";
+                            $sql_department = "SELECT * FROM department WHERE entity = '$entity_id' ORDER BY id DESC";
                             $result = $conn->query($sql_department);
 
                             if ($result) {
