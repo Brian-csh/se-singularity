@@ -106,7 +106,12 @@ include "includes/header.php";
                                         $department_name = $row['name'];
                                         $department_parent = $row['parent'];
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td><td>$department_parent</td></tr>";
+                                        $sql_parent_name = "SELECT name FROM department WHERE id = '$department_parent' LIMIT 1";
+                                        $parent_name_result = $conn->query($sql_parent_name);
+                                        $parent_assoc = $parent_name_result->fetch_assoc();
+                                        $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
+
+                                        echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }
