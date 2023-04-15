@@ -17,8 +17,8 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?=$active?>
                             </h1>
-                            <button type="button" class="btn btn-secondary btn-xs float-end ms-2">+ Add Class</button>
-                            <a href="new_entity.php" class="btn btn-primary btn-xs float-end">+ Add Asset</a>
+                            <a href="new_entity.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@ include "includes/navbar.php";
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <th>Eescription</th>
+                            <th>Description</th>
                             <th>Position</th>
                             <th>Expiration Date</th>
                         </tr>
@@ -105,6 +105,33 @@ include "includes/navbar.php";
         </div>
     </main>
 
+
+    <!-- Add Class Modal -->
+    <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset CLass</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="assets.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="categoryAddName">Category Name</label>
+                            <input class="form-control" id="categoryAddName" type="text" name="category_name" placeholder="Laptops" required>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="add_category">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
 
