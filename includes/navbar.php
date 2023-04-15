@@ -32,12 +32,12 @@
                         Users
                     </a>
                     <!-- Sidenav Heading (Entities)-->
-                    <a class="nav-link" href="entities.php">
+                    <a class="nav-link" href="/entities.php">
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
                     </a>
                     <!-- Sidenav Heading (Assets)-->
-                    <a class="nav-link" href="assets.php">
+                    <a class="nav-link" href="/assets.php">
                         <div class="nav-link-icon"><i data-feather="package"></i></div>
                         Assets
                     </a>
@@ -62,6 +62,7 @@
         } else {
             let links = document.querySelectorAll("a[href='/" + page +"']");
 
+            console.log(links)
             // Toggle the class only if it's in the
             if (links.length > 0 && !links[0].classList.contains("dropdown-settings-header")) {
                 links[0].classList.add("active");
