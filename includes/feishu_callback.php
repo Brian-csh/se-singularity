@@ -67,15 +67,6 @@ if(isset($arr->access_token)){
         $stmt->execute();
         $stmt->bind_result($count);
         $stmt->fetch();
-
-        /* -------------------------------------------- */
-        // Insert Log (Bind Feishu Account)
-        $query = "SELECT * FROM user WHERE id = '$session_user_id'";
-        $result = $conn->query($query);
-        $row = $result -> fetch_array(MYSQLI_ASSOC);
-        insert_log($conn,$row,$_SESSION['user']['name'],5);
-        /* -------------------------------------------- */
-
         $stmt->free_result();
         $stmt->close();
         if ($count > 0) {
