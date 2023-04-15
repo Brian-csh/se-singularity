@@ -67,6 +67,15 @@ if(isset($arr->access_token)){
         $stmt->execute();
         $stmt->bind_result($count);
         $stmt->fetch();
+
+        /* -------------------------------------------- */
+        // Insert Log (Bind Feishu Account)
+        $query = "SELECT * FROM user WHERE id = '$session_user_id'";
+        $result = $conn->query($query);
+        $row = $result -> fetch_array(MYSQLI_ASSOC);
+        insert_log($conn,$row,$_SESSION['user']['name'],5);
+        /* -------------------------------------------- */
+
         $stmt->free_result();
         $stmt->close();
         if ($count > 0) {
@@ -80,7 +89,11 @@ if(isset($arr->access_token)){
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
-        insert_log($conn,);
+        // Insert Log (Bind Feishu Account)
+        $query = "SELECT * FROM user WHERE id = '$session_user_id'";
+        $result = $conn->query($query);
+        $row = $result -> fetch_array(MYSQLI_ASSOC);
+        insert_log($conn,$row,$_SESSION['user']['name'],5);
 
         // Execute the SQL statement
         mysqli_query($conn, $sql);
@@ -107,7 +120,7 @@ if(isset($arr->access_token)){
             $row = $result->fetch_assoc();
             $stmt->free_result();
 
-            //Insert Log
+            //Insert Log (Log in with Feishu)
             $username = $row['name'];
             insert_log($conn,$row,$username,4);
 
