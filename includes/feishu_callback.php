@@ -62,7 +62,8 @@ if(isset($arr->access_token)){
     // set feishu user id in the database
     if($mode == "bind") {
         // Update sessions
-        $session_user_id = $_SESSION['admin']['id'];
+        $session_user_id = $_SESSION['user']['id'];
+        $_SESSION['feishu_bind'] = true;
 
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";

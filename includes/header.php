@@ -7,6 +7,21 @@ if (!isset($session_info['role'])) {
    exit();
 }
 
+$session_user_id = $session_info['id'];
+
+$feishu_binded;
+$feishu_binded = isset($session_info['feishu_id']);
+// Handle feishu unbind
+if (isset($_POST['feishu-unbind-click'])) {
+    $feishu_binded = false;
+    $_SESSION['feishu_bind'] = false;
+    $sql = "UPDATE user SET feishu_id = NULL WHERE id = '$session_user_id'";
+    mysqli_query($conn, $sql);
+}
+
+if(isset($_SESSION['feishu_bind']) && $_SESSION['feishu_bind']) {
+    $feishu_binded = true;
+}
 
 ?>
 <!DOCTYPE html>
@@ -62,10 +77,15 @@ if (!isset($session_info['role'])) {
                 <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
-                    <!-- TODO: Disappear this item after binding with 飞书 -->
-                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
-                        Bind to 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
-                    </a>
+                    <?php if(!$feishu_binded):?>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuBindModal">
+                            Bind to 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
+                        </a>
+                    <?php else:?>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#feishuUnbindModal">
+                            Unbind from 飞书<img class="img-fluid" width = "16" height= "16" alt="image description" src="/assets/img/feishu_logo.png" />
+                        </a>
+                    <?php endif;?>
                 </li>
                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
             </ul>
@@ -113,6 +133,29 @@ if (!isset($session_info['role'])) {
                 <form id="feishu-bind" action="signin.php" method="post">
                     <button type="submit" name="feishu-bind-click" class="btn btn-primary" style = "background:green; border:none">
                         Bind
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feishu Unbind Modal -->
+<div class="modal fade" id="feishuUnbindModal" tabindex="-1" role="dialog" aria-labelledby="feishuUnbindTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feishuUnbindTitle">Unbind Feishu</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Unbind this account from Feishu?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <form id="feishu-unbind" method="post">
+                    <button type="submit" name="feishu-unbind-click" class="btn btn-primary" style = "background:green; border:none">
+                        Unbind
                     </button>
                 </form>
             </div>
