@@ -6,7 +6,6 @@ if (isset($_GET['name'])) {
     $department_name = $_GET['name'];
 }
 
-//should we check if department really exists
 $active = $department_name;
 include "includes/header.php";
 ?>
@@ -24,6 +23,28 @@ include "includes/header.php";
                                 <?php echo $department_name ?>
                             </h1>
                             <div class="page-header-subtitle">
+                                <?php
+                                //get parent department
+                                $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
+                                $result = $conn->query($sql);
+                                
+                                if ($result) {
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $row = $result->fetch_assoc();
+                                        $department_parent = isset($row['parent']) ? $row['parent'] : -1;
+                                    }
+                                } else {
+                                    echo "error: cannot find department";
+                                }
+
+                                if ($department_parent > 0) {
+                                    $sql_parent_name = "SELECT name FROM department WHERE id = '$department_parent' LIMIT 1";
+                                    $parent_name_result = $conn->query($sql_parent_name);
+                                    $parent_assoc = $parent_name_result->fetch_assoc();
+                                    $parent_name = $parent_assoc['name'];
+                                    echo "Parent Department: ".$parent_name;
+                                }
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -76,7 +97,7 @@ include "includes/header.php";
                                     while ($row = $result->fetch_assoc()) {
                                         $department_id = $row['id'];
                                         $department_name = $row['name'];
-                                        
+
                                         echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td></tr>";
                                     }
                                 }
