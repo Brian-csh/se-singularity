@@ -2406,7 +2406,7 @@ label {
   opacity: 1;
 }
 .form-control::placeholder, .dataTable-input::placeholder {
-  color: #a7aeb8;
+  color: #494c51;
   opacity: 1;
 }
 .form-control:disabled, .dataTable-input:disabled, .form-control[readonly], [readonly].dataTable-input {
