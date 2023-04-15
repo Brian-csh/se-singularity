@@ -36,6 +36,11 @@
                         <div class="nav-link-icon"><i data-feather="home"></i></div>
                         Entities
                     </a>
+                    <!-- Sidenav Heading (Assets)-->
+                    <a class="nav-link" href="assets.php">
+                        <div class="nav-link-icon"><i data-feather="package"></i></div>
+                        Assets
+                    </a>
                 </div>
             </div>
             <!-- Sidenav Footer-->
