@@ -1,5 +1,5 @@
 <?php
-require 'includes/db/connect.php';
+require 'db/connect.php';
 
 session_start();
 
@@ -16,10 +16,10 @@ if(isset($_GET['mode'])) {
 $feishu_app_id = "cli_a4a8e931cd79900e";
 $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
 if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
-    $singularity_redirect = "http://localhost/singularity-eam/feishu_callback.php".$modeURL;
+    $singularity_redirect = "http://localhost:8000/includes/feishu_callback.php".$modeURL;
 }
 else {
-    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/feishu_callback.php".$modeURL;
+    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/includes/feishu_callback.php".$modeURL;
 }
 
 $url_components = parse_url($_SERVER['REQUEST_URI']);
@@ -61,8 +61,21 @@ if(isset($arr->access_token)){
 
     // set feishu user id in the database
     if($mode == "bind") {
+        // check if feishu account is already binded
+        $stmt = $conn->prepare('SELECT COUNT(*) as count FROM user WHERE feishu_id = ?');
+        $stmt->bind_param('s', $sub_id);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->free_result();
+        $stmt->close();
+        if ($count > 0) {
+            header('Location: ../index.php?bind_err='.urlencode("403"));
+            die();
+        }
         // Update sessions
-        $session_user_id = $_SESSION['admin']['id'];
+        $session_user_id = $_SESSION['user']['id'];
+        $_SESSION['feishu_bind'] = true;
 
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
@@ -71,7 +84,7 @@ if(isset($arr->access_token)){
         mysqli_query($conn, $sql);
         
         // Redirect
-        header('Location: index.php');
+        header('Location: ../index.php');
         exit();
     }
 
@@ -92,23 +105,28 @@ if(isset($arr->access_token)){
             $row = $result->fetch_assoc();
             $stmt->free_result();
             $conn->close();
+            $stmt->close();
 
-            $_SESSION['admin'] = $row;
-            header('Location: index.php');
+            $_SESSION['user']['id'] = $row['id'];
+            $_SESSION['user']['name'] = $row['name'];
+            $_SESSION['user']['role'] = $row['role'];
+            $_SESSION['user']['feishu_id'] = $row['feishu_id'];
+            $_SESSION['user']['entity'] = $row['entity'];
+            $_SESSION['user']['department'] = $row['department'];
+            header('Location: ../index.php');
             exit();
         } else {
             // If feishu_id does not exist, cannot sign in.
-            header('Location: signin.php?signin='.urlencode("403"));
+            header('Location: ../signin.php?signin='.urlencode("403"));
+            $stmt->close();
+            $conn->close();
             die();
         }
-        // close the statement
-        $stmt->close();
     }
-    $conn->close();
 }
 else{
     $user_info = NULL;
-    header('Location: signin.php?signin='.urlencode("403"));
+    header('Location: ../signin.php?signin='.urlencode("403"));
     die();
 }
 
