@@ -2,7 +2,7 @@
 require 'db/connect.php';
 
 session_start();
-
+include '../functions.php';
 // bind: existing Singularity users can bind their Feishu accs
 // signin: sign in to Singularity w Feishu (not sign up)
 if(isset($_GET['mode'])) {
@@ -80,6 +80,12 @@ if(isset($arr->access_token)){
         // Construct the SQL update statement
         $sql = "UPDATE user SET feishu_id = '$sub_id' WHERE id = '$session_user_id'";
 
+        // Insert Log (Bind Feishu Account)
+        $query = "SELECT * FROM user WHERE id = '$session_user_id'";
+        $result = $conn->query($query);
+        $row = $result -> fetch_array(MYSQLI_ASSOC);
+        insert_log($conn,$row,$_SESSION['user']['name'],5);
+
         // Execute the SQL statement
         mysqli_query($conn, $sql);
         
@@ -104,6 +110,11 @@ if(isset($arr->access_token)){
             $result = $stmt->get_result();
             $row = $result->fetch_assoc();
             $stmt->free_result();
+
+            //Insert Log (Log in with Feishu)
+            $username = $row['name'];
+            insert_log($conn,$row,$username,4);
+
             $conn->close();
             $stmt->close();
 

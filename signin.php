@@ -5,7 +5,7 @@ $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
 require 'includes/db/connect.php';
-
+include 'functions.php';
 $errors = "";
 $username = "";
 $password = "";
@@ -41,7 +41,7 @@ if (isset($_POST['normal-login_click'])) {
         $query = "SELECT * FROM user WHERE name = '$username'";
         $result = $conn->query($query);
         $row = $result -> fetch_array(MYSQLI_ASSOC);
-
+        
         if ($row) {
             if (isset($row['locked']) && $row['locked']) {
                 $errors = "Account is locked";
@@ -54,6 +54,8 @@ if (isset($_POST['normal-login_click'])) {
                 $_SESSION['user']['entity'] = $row['entity'];
                 $_SESSION['user']['department'] = $row['department'];
 
+                // Insert log
+                insert_log($conn,$row,$username,1);
 
                 header("Location: index.php");
             } else $errors = "Wrong password";
@@ -119,7 +121,7 @@ if (isset($_POST['normal-login_click'])) {
                                         <form id="feishu-login" action="signin.php" method="post">
                                             <!-- Form Group (login box)-->
                                             <div class="d-flex align-items-center justify-content-center">
-                                                <button type="submit" name="feishu-login_click" class="btn btn-lg text-light" >Login with 飞书</button>
+                                                <button type="submit" name="feishu-login_click" class="btn btn-lg btn-primary text-light" >Login with 飞书</button>
                                             </div>
                                         </form>
                                     </div>
