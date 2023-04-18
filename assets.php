@@ -139,6 +139,7 @@ if (isset($_POST['add_class'])) {
         </div>
     </main>
 
+    <!-- TODO: Hide this from non Project Manager roles. -->
 
     <!-- Add Class Modal -->
     <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
@@ -161,7 +162,7 @@ if (isset($_POST['add_class'])) {
                             <input type="radio" id="classItemType" name="class_type" value="ItemAsset" checked>
                             <label for="classItemType">Item Asset</label>
                             <input type="radio" id="classValueType" name="class_type" value="ValueAsset">
-                            <label for="classValueType">Value Asset</label><br>
+                            <label for="classValueType">Amount Asset</label><br>
                         </div>
 
                         <div class="mb-3">
@@ -192,7 +193,11 @@ if (isset($_POST['add_class'])) {
         </div>
     </div>
 
-
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
