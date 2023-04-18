@@ -30,7 +30,7 @@ include "includes/header.php";
                                 if ($result) {
                                     if (mysqli_num_rows($result) > 0) {
                                         $entity_data = mysqli_fetch_assoc($result);
-                                        $date_created = $entity_data['date_created'];
+                                        $date_created = gmdate("Y.m.d \ | H:i:s", $entity_data['date_created']);
                                     } else {
                                         $date_created = "N/A";
                                     }
