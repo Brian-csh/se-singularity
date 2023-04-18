@@ -9,13 +9,10 @@ $active = 'Create User';
 /* Functions */
 // Insert info
 if (isset($_POST['submit_changes'])) {
-    $id = $_POST['id'];
     $name = $_POST['Entityname'];
-    $status = 1;
 
-    if ($_POST['migration'] == 'migration') $status = 2;
-    $sql = "INSERT INTO entity (id, name) VALUES
-    ('$id', '$name')";
+    $sql = "INSERT INTO entity (name) VALUES
+    ('$name')";
 
     if ($conn->query($sql)) {
         header('Location: entities.php?id=' . $conn->insert_id);
@@ -108,30 +105,15 @@ if (isset($_POST['submit_changes'])) {
                             <form method="post" action="new_entity.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (ID)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputID">ID</label>
-                                        <input required class="form-control" id="inputID" type="text" value="" name="id">
-                                    </div>
                                     <!-- Form Group (EntityName)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntityName">Name</label>
                                         <input required class="form-control" id="inputEntityName" type="text" value="" name="Entityname">
                                     </div>
                                 </div>
-                                <!-- Form Row -->
-                                <!-- Form Row -->
-                                <div class="row gx-3 mb-4">
-                                    <!-- Form Group -->
-                                    <!-- entity super, checkbox-->
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputEntityHead">Entity Head</label>
-                                        <input required id="inputEntityHead" type="checkbox">
-                                    </div>
-                                </div>
 
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new user</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new entity</button>
                             </form>
                         </div>
                     </div>

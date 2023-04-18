@@ -4,7 +4,7 @@ class Database {
     private $host;
     private $db_name = 'singularity';
     private $username = 'root';
-    private $password = 'R&4*h223b5yP';
+    private $password = '';
     private $conn;
 
     // Constructor

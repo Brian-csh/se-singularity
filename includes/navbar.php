@@ -66,6 +66,7 @@
         } else {
             let links = document.querySelectorAll("a[href='/" + page +"']");
 
+            console.log(links)
             // Toggle the class only if it's in the
             if (links.length > 0 && !links[0].classList.contains("dropdown-settings-header")) {
                 links[0].classList.add("active");
