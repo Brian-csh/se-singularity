@@ -84,7 +84,7 @@ if(isset($arr->access_token)){
         $query = "SELECT * FROM user WHERE id = '$session_user_id'";
         $result = $conn->query($query);
         $row = $result -> fetch_array(MYSQLI_ASSOC);
-        insert_log($conn,$row,$_SESSION['user']['name'],5);
+        insert_log_login($conn,$row,$_SESSION['user']['name'],3);
 
         // Execute the SQL statement
         mysqli_query($conn, $sql);
@@ -113,7 +113,7 @@ if(isset($arr->access_token)){
 
             //Insert Log (Log in with Feishu)
             $username = $row['name'];
-            insert_log($conn,$row,$username,4);
+            insert_log_login($conn,$row,$username,2);
 
             $conn->close();
             $stmt->close();

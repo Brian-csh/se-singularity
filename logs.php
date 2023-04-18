@@ -37,6 +37,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                             <th>Date</th>
                             <th>Log</th>
                             <th>Type</th>
+                            <th>Subject</th>
                         </tr>
                         </thead>
                         <tfoot>
@@ -58,12 +59,13 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                 $log_id = $row["id"];
                                 $text = $row["text"];
                                 $type = $row["log_type"];
-
+                                $subject = $row["subject"];
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
                                 <td class='text-white'>$text</td>
                                 <td class='text-white'>$type</td>
+                                <td class='text-white'>$subject</td>
                                 </tr>";
                             }
                         }

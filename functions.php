@@ -1,10 +1,9 @@
 <?php
-function insert_log($conn,$row,$username,$id)
+function insert_log_login($conn,$row,$username,$type_id)
 {                  
     /*  BEGIN INSERT LOG */
     $time_now = time();
     //Fetch Log Type
-    $type_id = $id;
     $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
 
     //Fetch Entity, Role, Department
@@ -16,16 +15,15 @@ function insert_log($conn,$row,$username,$id)
     $role = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
     $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
 
-    if( $id == 1){
+    if( $type_id == 1){
         $text = $username." logged in! ".$role." of ".$department." in ".$entity;
-    } else if ($id == 4){
+    } else if ($type_id == 2){
         $text = $username." logged in through feishu! ".$role." of ".$department." in ".$entity;
-    } else if ($id == 5){
+    } else if ($type_id == 3){
         $text = $username." bound account to feishu! ".$role." of ".$department." in ".$entity;
     }
-
-    $sql = "INSERT INTO log (date, text,log_type) VALUES 
-    ('$time_now','$text','$type')";
+    $sql = "INSERT INTO log (date, text,log_type, subject) VALUES 
+    ('$time_now','$text','$type','$username')";//or $row[id]
     if( $conn->query($sql)){
         return "Record inserted successfully.";
     } else{
