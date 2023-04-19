@@ -122,7 +122,7 @@ if (isset($_POST['add_class'])) {
 
                                 echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='/asset.php?id=$asset_id&name=$asset_name'>" . $asset_name . "</a></td>
                                         <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_description</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
+                                        <a title=\"Edit asset\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
                                         <i data-feather=\"edit\"></i>
                                         </a>
                                         

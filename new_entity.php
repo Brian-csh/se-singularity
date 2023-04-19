@@ -3,8 +3,7 @@ include "includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
-$active = 'Create User';
-
+$active = 'Create Entity';
 
 /* Functions */
 // Insert info
