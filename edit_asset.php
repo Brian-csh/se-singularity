@@ -47,6 +47,29 @@ $asset_user_name = mysqli_fetch_array($conn->query("SELECT * FROM user WHERE id 
 // Fetch Status
 $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"))['status'];
 
+
+// TODO : HANDLE UPDATE
+
+// TODO : Update Asset info
+
+// TODO: Update Description
+if(isset($_POST['description_change'])){
+    $description = $_POST['description'];
+    $sql = "UPDATE asset SET description = '$description' WHERE id = '$asset_id'";
+    $result = $conn->query($sql);
+    if($result){
+        echo "<script>alert('Description updated successfully!')</script>";
+        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+    }
+    else{
+        echo "<script>alert('Description update failed!')</script>";
+    }
+}
+
+// TODO: Update Basic info
+
+// TODO: Update Financial info
+
 ?>
 
 <div id="layoutSidenav_content">
@@ -171,7 +194,7 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                             <div class="card">
                                 <div class="card-header">
                                     <h3> Financial Info
-                                    <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editFiancialInfoModal"><i data-feather="edit"></i></button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editFinancialInfoModal"><i data-feather="edit"></i></button>
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -338,7 +361,7 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
     </div>
 
 <!-- Asset Modal -->
-    <div class="modal fade" id="editAssetModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+    <div class="modal fade" id="editAssetModal" tabindex="-1" role="dialog" aria-labelledby="editAssetLabel" aria-hidden="true">
         <div class="modal-dialog" role="document" style = "max-width: 800px; max-heigth:80%">
             <div class="modal-content">
                 <div class="modal-header">
@@ -349,15 +372,15 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                     <div class="modal-body">
                         <!-- Edit asset name -->
                         <div class="mb-3">
-                            <label for="classAddName">Asset Name *</label>
+                            <label for="editAssetName">Asset Name *</label>
                             <!-- TODO: submit placeholder when no input-->
-                            <input class="form-control" id="classAddName" type="text" name="class_name" placeholder="<?php echo $asset_name; ?>" required>
+                            <input class="form-control" id="editAssetName" type="text" name="asset_name" placeholder="<?php echo $asset_name; ?>" required>
                         </div>
                         <!-- Edit position -->
                         <div class="mb-3">
-                            <label for="classAddName">Position</label>
+                            <label for="editAssetPosition">Position</label>
                             <!-- TODO: submit placeholder when no input-->
-                            <input class="form-control" id="classAddName" type="text" name="class_name" placeholder="<?php echo $asset_position; ?>" required>
+                            <input class="form-control" id="editAssetPosition" type="text" name="asset_position" placeholder="<?php echo $asset_position; ?>" required>
                         </div>
 
                         <!-- Edit CLASS -->
@@ -365,19 +388,19 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                             <div class="col">
                                 <!-- Edit class type -->
                                 <div class="mb-3">
-                                        <label for="classAddType">Class Type * &nbsp</label>
-                                        <input type="radio" id="classItemType" name="class_type" value="ItemAsset" checked>
-                                        <label for="classItemType">Item Asset</label>
-                                        <input type="radio" id="classValueType" name="class_type" value="ValueAsset">
-                                        <label for="classValueType">Amount Asset</label>
+                                        <label for="editAssetClassType">Class Type * &nbsp</label>
+                                        <input type="radio" id="editClassType_Item" name="class_type" value="ItemAsset" checked>
+                                        <label for="editClassType_Item">Item Asset</label>
+                                        <input type="radio" id="editClassType_Amount" name="class_type" value="ValueAsset">
+                                        <label for="editClassType_Amount">Amount Asset</label>
                                 </div>
                             </div>
                             
                             <div class="col">
                                 <!-- Edit customized class -->
                                 <div class="mb-3">
-                                    <label for="classAddName">Class<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_customized">
+                                    <label for="editAssetClass">Class<label>
+                                        <select class="form-control ms-2" id="inputCustomizedClass" name="class_customized">
                                             <option value=""><?php echo $asset_class_name?></option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM asset_class");
@@ -399,8 +422,8 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                             <div class="col">
                                 <!-- Edit Parent -->
                                 <div class="mb-3">
-                                    <label for="classAddName">Parent<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_parent">
+                                    <label for="editAssetParent">Parent<label>
+                                        <select class="form-control ms-2" id="editParentClass" name="editasset_parent">
                                             <option value=""><?php echo $asset_parent;?></option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM asset");
@@ -421,8 +444,8 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                             <div class="col">
                                 <!-- Edit user -->
                                 <div class="mb-3">
-                                    <label for="classAddName">Users<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_user">
+                                    <label for="editAssetUser">User<label>
+                                        <select class="form-control ms-2" id="editAssetUser" name="editasset_user">
                                             <option value=""><?php echo $asset_user_name; ?></option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM user");
@@ -441,8 +464,8 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                             <div class="col">
                                 <!-- Edit Status -->
                                 <div class="mb-3">
-                                    <label for="classAddName">Status<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_parent">
+                                    <label for="editAssetStatus">Status<label>
+                                        <select class="form-control ms-2" id="editAssetStatus" name="editasset_status">
                                             <option value=""><?php echo $asset_status;?></option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, status FROM asset_status_class");
@@ -463,7 +486,7 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="add_class">Submit</button>
+                        <button class="btn btn-success" type="submit" name="edit_asset">Update</button>
                     </div>
                 </form>
             </div>
@@ -471,132 +494,72 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
     </div>
 
     <!-- Basic info Modal -->
-    <div class="modal fade" id="editAssetModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document" style = "max-width: 800px; max-heigth:80%">
+    <div class="modal fade" id="editBasicInfoModal" tabindex="-1" role="dialog" aria-labelledby="BasicInfoEditLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Asset</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Basic Info</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="assets.php" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
-                        <!-- Edit asset name -->
+                        <!-- Edit Brand -->
                         <div class="mb-3">
-                            <label for="classAddName">Asset Name *</label>
+                            <label for="editBrand">Brand Name </label>
                             <!-- TODO: submit placeholder when no input-->
-                            <input class="form-control" id="classAddName" type="text" name="class_name" placeholder="<?php echo $asset_name; ?>" required>
+                            <input class="form-control" id="basicEditbrand" type="text" name="basic_brand" placeholder="<?php echo $asset_brand; ?>" >
                         </div>
-                        <!-- Edit position -->
+                        <!-- Edit Model-->
                         <div class="mb-3">
-                            <label for="classAddName">Position</label>
+                            <label for="editModel">Model </label>
                             <!-- TODO: submit placeholder when no input-->
-                            <input class="form-control" id="classAddName" type="text" name="class_name" placeholder="<?php echo $asset_position; ?>" required>
+                            <input class="form-control" id="basicEditmodel" type="text" name="basic_model" placeholder="<?php echo $asset_model; ?>">
                         </div>
-
-                        <!-- Edit CLASS -->
-                        <div class = "row">
-                            <div class="col">
-                                <!-- Edit class type -->
-                                <div class="mb-3">
-                                        <label for="classAddType">Class Type * &nbsp</label>
-                                        <input type="radio" id="classItemType" name="class_type" value="ItemAsset" checked>
-                                        <label for="classItemType">Item Asset</label>
-                                        <input type="radio" id="classValueType" name="class_type" value="ValueAsset">
-                                        <label for="classValueType">Amount Asset</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col">
-                                <!-- Edit customized class -->
-                                <div class="mb-3">
-                                    <label for="classAddName">Class<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_customized">
-                                            <option value=""><?php echo $asset_class_name?></option>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, name FROM asset_class");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name']&& $row['name']!=$asset_class_name) {
-                                                            unset($id, $class);
-                                                            $id = $row['id'];
-                                                            $class = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $class . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class = "row">
-                            <div class="col">
-                                <!-- Edit Parent -->
-                                <div class="mb-3">
-                                    <label for="classAddName">Parent<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_parent">
-                                            <option value=""><?php echo $asset_parent;?></option>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, name FROM asset");
-                                                    $id = 0; $parent = NULL;
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name']&& $row['name']!= $asset_parent) {
-                                                            unset($id, $parent);
-                                                            $id = $row['id'];
-                                                            $parent = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $parent . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <!-- Edit user -->
-                                <div class="mb-3">
-                                    <label for="classAddName">Users<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_user">
-                                            <option value=""><?php echo $asset_user_name; ?></option>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, name FROM user");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name'] && $row['name']!= $asset_user_name) {
-                                                            unset($id, $user);
-                                                            $id = $row['id'];
-                                                            $user = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $user . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <!-- Edit Status -->
-                                <div class="mb-3">
-                                    <label for="classAddName">Status<label>
-                                        <select class="form-control ms-2" id="inputParentClass" name="class_parent">
-                                            <option value=""><?php echo $asset_status;?></option>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, status FROM asset_status_class");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['status']&& $row['status']!= $asset_status) {
-                                                            unset($id, $status);
-                                                            $id = $row['id'];
-                                                            $status = $row['status'];
-                                                            echo '<option value="' . $id . '">' . $status . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div>
-
+                        <!-- Edit Serial Number -->
+                        <div class="mb-3">
+                            <label for="editSerialNumber">Serial Number </label>
+                            <!-- TODO: submit placeholder when no input-->
+                            <input class="form-control" id="basicEditserialnumber" type="text" name="basic_sn" placeholder="<?php echo $asset_serial_number; ?>">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="add_class">Submit</button>
+                        <button class="btn btn-success" type="submit" name="edit_basic">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial info Modal -->
+    <div class="modal fade" id="editFinancialInfoModal" tabindex="-1" role="dialog" aria-labelledby="FinancialInfoEditLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Financial Info</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="assets.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <!-- Edit Price -->
+                        <div class="mb-3">
+                            <label for="editOP">Original Price </label>
+                            <input class="form-control" id="financialEditOP" type="text" name="basic_brand" placeholder="<?php echo $asset_original_price; ?>" >
+                        </div>
+                        <!-- Edit Model-->
+                        <div class="mb-3">
+                            <label for="editCP">Current Price </label>
+                            <input class="form-control" id="financialEditCP" type="text" name="basic_model" placeholder="<?php echo $asset_current_price; ?>">
+                        </div>
+                        <!-- Edit Serial Number -->
+                        <div class="mb-3">
+                            <label for="editDeprecationModel">Deprecation Model </label>
+                            <textarea class="form-control" id="financialEditDM" type="text" name="basic_dm" rows = "5" placeholder="<?php echo $asset_deprecation_model; ?>"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="edit_basic">Update</button>
                     </div>
                 </form>
             </div>
