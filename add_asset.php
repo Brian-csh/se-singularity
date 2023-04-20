@@ -3,7 +3,7 @@ include "includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
-$active = 'Create User';
+$active = 'Add Asset';
 $errors = "";
 
 
@@ -111,12 +111,26 @@ if (isset($_POST['submit_changes'])) {
                                         <label class="small mb-1" for="inputParent">Asset Parent</label>
                                         <select class="form-control" name="asset_parent" required id="inputParent">
                                             <option value="">Select a Parent</option>
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM asset");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputExpiration">Expiration Date</label>
-                                        <input required class="form-control" id="inputExpiration" type="date" value="" name="expiration">
+                                    <!-- Asset price -->
+                                    <div class="col-md-2">
+                                        <label class="small mb-1" for="inputPrice">Price</label>
+                                        <input type="number" class="form-control" required name="price" id="inputPrice" placeholder="10.00">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="small mb-1" for="inputQuantity">Quantity</label>
+                                        <input type="number" class="form-control" required name="quantity" id="inputQuantity" placeholder="5">
                                     </div>
                                 </div>
                                 <div class="row gx-3 mb-3">
@@ -125,6 +139,16 @@ if (isset($_POST['submit_changes'])) {
                                         <label class="small mb-1" for="inputClass">Asset Class</label>
                                         <select class="form-control" name="asset_class" required id="inputClass">
                                             <option value="">Select an Asset Class</option>
+
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM asset_class");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
 
@@ -146,19 +170,16 @@ if (isset($_POST['submit_changes'])) {
                                         </select>
                                     </div>
 
-                                    <!-- Asset department (position) -->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select a Department</option>
-                                        </select>
+                                        <label class="small mb-1" for="inputLocation">Location</label>
+                                        <input required class="form-control" id="inputLocation" type="text" value="" name="location" placeholder="Enter an Asset Location">
                                     </div>
 
-                                    <!-- Asset price -->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputPrice">Price</label>
-                                        <input type="number" class="form-control" required name="price" id="inputPrice" placeholder="10.00">
+                                        <label class="small mb-1" for="inputExpiration">Expiration Date</label>
+                                        <input required class="form-control" id="inputExpiration" type="date" value="" name="expiration">
                                     </div>
+
 
                                 </div>
                                 <!-- Form Row -->
