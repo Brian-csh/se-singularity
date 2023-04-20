@@ -25,8 +25,7 @@ if (isset($_POST['submit_asset'])) {
     // $custom_attributes = $_POST['custom_attributes'];
 
     $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), '$price', '$description', '$position', '$expire', NULL)";
-    echo $sql;
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', NULL)";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
@@ -189,6 +188,7 @@ if (isset($_POST['submit_asset'])) {
                                         </select>
                                     </div>
 
+                                    <!-- TODO: Notify the user if there are no departments -->
                                     <!-- Asset department (position) -->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
@@ -222,7 +222,7 @@ if (isset($_POST['submit_asset'])) {
                                     <!-- Asset price -->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputPrice">Price</label>
-                                        <input type="number" class="form-control" name="price" id="inputPrice" placeholder="10.00">
+                                        <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
 
                                 </div>
