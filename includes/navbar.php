@@ -36,7 +36,7 @@
                         Entities
                     </a>
                     <!-- Sidenav Heading (logs)-->
-                    <a class="nav-link" href="logs.php">
+                    <a class="nav-link" href="/logs.php">
                         <div class="nav-link-icon"><i data-feather="log-in"></i></div>
                         Logs
                     </a>

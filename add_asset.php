@@ -191,10 +191,8 @@ if (isset($_POST['submit_asset'])) {
                                     <!-- TODO: Notify the user if there are no departments -->
                                     <!-- Asset department (position) -->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select a Department</option>
-                                        </select>
+                                        <label class="small mb-1" for="inputLocation">Location</label>
+                                        <input required class="form-control" id="inputLocation" type="text" value="" name="location" placeholder="Enter an Asset Location">
                                     </div>
 
                                     <!-- Form Group (user)-->
@@ -224,6 +222,7 @@ if (isset($_POST['submit_asset'])) {
                                         <label class="small mb-1" for="inputPrice">Price</label>
                                         <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
+
 
                                 </div>
                                 <!-- Form Row -->

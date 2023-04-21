@@ -3,22 +3,31 @@ include "includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
-$active = 'Create User';
+$active = 'Create Department';
+$errors = "";
 
+if (isset($_GET['entity_id'])) {
+    $entity_id = $_GET['entity_id'];
+}
 
-/* Functions */
-// Insert info
 if (isset($_POST['submit_changes'])) {
-    $name = $_POST['Entityname'];
+    $name = $_POST['name'];
     $date_created = time();
+    $parent = $_POST['parent'];
+    $entity_id = $_POST['entity_id'];
+    $entity_name = $_POST['entity_name'];
 
-    $sql = "INSERT INTO entity (name, date_created) VALUES
-    ('$name', '$date_created')";
-
-    if ($conn->query($sql)) {
-        header('Location: entities.php?id=' . $conn->insert_id);
+    if ($parent === "") {
+        $sql = "INSERT INTO department (name, entity, parent) 
+                VALUES ('$name', '$entity_id', NULL)";
     } else {
-        header('Location: new_entity.php?insert_error');
+        $sql = "INSERT INTO department (name, entity, parent)
+        VALUES ('$name', '$entity_id', '$parent')";
+    }
+    if ($conn->query($sql)) {
+        header('Location: entity.php?id='.$entity_id.'&name='.$entity_name);
+    } else {
+        header('Location: new_user.php?insert_error');
     }
 }
 ?>
@@ -87,7 +96,7 @@ if (isset($_POST['submit_changes'])) {
                         <div class="col-auto mb-3">
                             <h1 class="page-header-title">
                                 <div class="page-header-icon"><i data-feather="briefcase"></i></div>
-                                User
+                                Department
                             </h1>
                         </div>
                     </div>
@@ -101,20 +110,56 @@ if (isset($_POST['submit_changes'])) {
                 <div class="col-xl-12">
                     <!-- Account details card-->
                     <div class="card mb-4">
-                        <div class="card-header">Account Details</div>
+                        <div class="card-header">Department Details</div>
                         <div class="card-body">
-                            <form method="post" action="new_entity.php">
+                            <?php
+                                if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
+                                ' . $errors . '</div>'
+                            ?>
+                            <form method="post" action="new_department.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (EntityName)-->
+                                    <!-- Form Group (name)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputEntityName">Name</label>
-                                        <input required class="form-control" id="inputEntityName" type="text" value="" name="Entityname">
+                                        <label class="small mb-1" for="inputName">Name</label>
+                                        <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Username">
+                                    </div>
+                                    <!-- Form Group (entity)-->
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputEntity">Entity</label>
+                                        <select disabled class="form-control" required id="inputEntity" name="entity" <?php echo "value=\"$entity_id\""?>>
+                                            <?php
+                                            $results = $conn->query("SELECT name FROM entity where id='$entity_id'");
+                                            $entity_name = ($results->fetch_assoc())['name'];
+                                            echo "<option value=\"$entity_id\">$entity_name</option>"?>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <!-- Form Row -->
+                                <div class="row gx-3 mb-3">
+                                    <!-- Form Group (department, role)--> 
+                                    <div class="col-md-6">
+                                        <label class="small mb-1" for="inputDepartment">Parent Department</label>
+                                        <select class="form-control" id="inputDepartment" name="parent">
+                                            <option value="">N/A</option>
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM department where entity='$entity_id'");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
 
+                                <input type="hidden" name="entity_id" value="<?php echo $entity_id?>">
+                                <input type="hidden" name="entity_name" value="<?php echo $entity_name?>">
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new entity</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create new deparment</button>
                             </form>
                         </div>
                     </div>
@@ -132,6 +177,7 @@ if (isset($_POST['submit_changes'])) {
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+
 </div>
 
 </html>

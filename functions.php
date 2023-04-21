@@ -18,9 +18,9 @@ function insert_log($conn,$row,$username,$id)
 
     if( $id == 1){
         $text = $username." logged in! ".$role." of ".$department." in ".$entity;
-    } else if ($id == 4){
+    } else if ($id == 2){
         $text = $username." logged in through feishu! ".$role." of ".$department." in ".$entity;
-    } else if ($id == 5){
+    } else if ($id == 3){
         $text = $username." bound account to feishu! ".$role." of ".$department." in ".$entity;
     }
 
