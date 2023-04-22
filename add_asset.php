@@ -3,15 +3,34 @@ include "includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
-$active = 'Create User';
+$active = 'Add Asset';
 $errors = "";
 
 
-if (isset($_POST['submit_changes'])) {
+if (isset($_POST['submit_asset'])) {
 
     $name = $_POST['name'];
+    $asset_parent = $_POST['asset_parent'];
+    if (empty($asset_parent)) {
+        $asset_parent = NULL;
+      }
+    $expiration = $_POST['expiration'];
+    $asset_class = $_POST['asset_class'];
+    $department = $_POST['department'];
+    $asset_user = $_POST['asset_user'];
+    $price = $_POST['price'];
+    $description = $_POST['description'];
+    $position = $_POST['asset_location'];
+    $expire = $_POST['expiration'];
+    // $custom_attributes = $_POST['custom_attributes'];
 
-    $sql = "INSERT INTO asset (parent, name, class, user, price, description, position, expire) VALUES (NULL, NULL, '$name', NULL, NULL, NULL, NULL, NULL, NULL)";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', NULL)";
+    if ($conn->query($sql)) {
+        header('Location: assets.php');
+    } else {
+        header('Location: add_asset.php?insert_error');
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -99,7 +118,7 @@ if (isset($_POST['submit_changes'])) {
                             if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                             ?>
-                            <form method="post" action="new_user.php">
+                            <form method="post" action="add_asset.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <div class="col-md-4">
@@ -107,24 +126,47 @@ if (isset($_POST['submit_changes'])) {
                                         <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter an Asset Name">
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <!-- Form Group (asset parent)-->
+                                    <div class="col-md-3">
                                         <label class="small mb-1" for="inputParent">Asset Parent</label>
-                                        <select class="form-control" name="asset_parent" required id="inputParent">
+                                        <select class="form-control" id="inputParent" name="asset_parent">
                                             <option value="">Select a Parent</option>
+
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM asset");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputExpiration">Expiration Date</label>
-                                        <input required class="form-control" id="inputExpiration" type="date" value="" name="expiration">
+                                        <input class="form-control" id="inputExpiration" type="date" value="" name="expiration">
                                     </div>
                                 </div>
                                 <div class="row gx-3 mb-3">
-
+                                    
+                                    <!-- TODO display only asset classes associated with each entity -->
+                                    <!-- Form Group (asset class)-->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputClass">Asset Class</label>
-                                        <select class="form-control" name="asset_class" required id="inputClass">
+                                        <select class="form-control" id="inputClass" name="asset_class">
                                             <option value="">Select an Asset Class</option>
+
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM asset_class");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                     </div>
 
@@ -146,19 +188,41 @@ if (isset($_POST['submit_changes'])) {
                                         </select>
                                     </div>
 
+                                    <!-- TODO: Notify the user if there are no departments -->
                                     <!-- Asset department (position) -->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select a Department</option>
+                                        <label class="small mb-1" for="inputLocation">Location</label>
+                                        <input required class="form-control" id="inputLocation" type="text" value="" name="location" placeholder="Enter an Asset Location">
+                                    </div>
+
+                                    <!-- Form Group (user)-->
+                                    <div class="col-md-3">
+                                        <label class="small mb-1" for="inputUser">User</label>
+                                        <select class="form-control" id="inputUser" name="asset_user">
+                                            <option value="">Select a User</option>
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM user");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
                                         </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="small mb-1" for="inputLocation">Location</label>
+                                        <input class="form-control" id="inputLocation" type="text" value="" name="asset_location" placeholder="Enter a Location">
                                     </div>
 
                                     <!-- Asset price -->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputPrice">Price</label>
-                                        <input type="number" class="form-control" required name="price" id="inputPrice" placeholder="10.00">
+                                        <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
+
 
                                 </div>
                                 <!-- Form Row -->
@@ -170,7 +234,7 @@ if (isset($_POST['submit_changes'])) {
                                 </div>
 
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Create New Asset</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_asset">Create New Asset</button>
                             </form>
                         </div>
                     </div>
