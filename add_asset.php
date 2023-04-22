@@ -19,7 +19,7 @@ if (isset($_POST['submit_asset'])) {
     $department = $_POST['department'];
     $asset_user = $_POST['asset_user'];
     $price = $_POST['price'];
-    $description = $_POST['description'];
+    $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
     $expire = $_POST['expiration'];
     // $custom_attributes = $_POST['custom_attributes'];
