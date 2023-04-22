@@ -56,7 +56,7 @@ include "includes/navbar.php";
 
                                 echo "<tr data-id='$entity_id' ><td>$entity_id</td><td><a class='text-primary' href='entity.php?id=$entity_id&name=$name'>" . $name . "</a></td>
                                         <td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"entity.php?id=".$row['id']."\">
+                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entity_id&name=$name'>
                                         <i data-feather=\"edit\"></i>
                                         </a>
                   
