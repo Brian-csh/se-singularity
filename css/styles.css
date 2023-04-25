@@ -6316,6 +6316,17 @@ textarea.form-control-lg {
 .card-header:first-child {
   border-radius: 0.35rem 0.35rem 0 0;
 }
+.card-subheader {
+  padding: 1rem 0.5rem;
+  font-size: 16px;
+  color: #7c037c;
+  margin-bottom: 0;
+  background-color: rgba(33, 40, 50, 0.03);
+  border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+}
+.card-subheader:first-child {
+  border-radius: 0.35rem 0.35rem 0 0;
+}
 
 .card-footer {
   padding: 1rem 1.35rem;

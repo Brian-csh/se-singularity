@@ -6,6 +6,50 @@ $session_info = $_SESSION;
 $active = 'Add Asset';
 $errors = "";
 
+if (isset($_POST['add_custom_attribute'])) {
+    $attribute = $_POST['custom_attribute'];
+    if(isset($_POST['entity'])) {
+        $entity_id = $_POST['entity'];
+    }
+    else {
+        $entity_id = $session_info['user']['entity'];
+    }
+    $entity_id = 5;
+    echo $entity_id."entityid is ";
+    // one way or another im going to need to process this with json
+    // whether or not its a separate table or just a column
+    $sql = "SELECT custom_attribute FROM asset_attribute WHERE id = '$entity_id'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Update the existing row with the new attribute value
+        $row = $result->fetch_assoc();
+        $custom_attribute_array = unserialize($row["custom_attribute"]);
+        if (is_array($custom_attribute_array)) {
+            array_push($custom_attribute_array, $attribute);
+        } else {
+            $custom_attribute_array = array($attribute);
+        }
+        $custom_attribute_array = serialize($custom_attribute_array);
+        $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE id = $entity_id";
+        if ($conn->query($sql) === FALSE) {
+            echo "Error updating record: " . $conn->error;
+        }
+    } else {
+        // Insert a new row with the attribute value
+        $custom_attribute_array = serialize(array($attribute));
+        echo $custom_attribute_array;
+        $sql = "INSERT INTO asset_attribute (id, custom_attribute) VALUES ('$entity_id', '$custom_attribute_array')";
+        if ($conn->query($sql) === FALSE) {
+            echo "Error inserting record: " . $conn->error;
+        }
+    }
+    if ($conn->query($sql_add_class)) {
+        // TODO: create a popup for success
+    } else {
+        echo "Failed to create new attribute";
+    }
+}
 
 if (isset($_POST['submit_asset'])) {
 
@@ -56,6 +100,10 @@ if (isset($_POST['submit_asset'])) {
 <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
 <script src="js/datatables/datatables-simple-demo.js"></script>
 <script>
+     function getCustomAttributes(entityId) {
+        
+    }
+
     function updateDepartments(entityId) {
         $.ajax({
             url: 'includes/scripts/ajax.php',
@@ -295,9 +343,12 @@ if (isset($_POST['submit_asset'])) {
                                         <label class="small mb-1" for="inputPrice">Price</label>
                                         <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
-                                <!-- </div>
-                                <div class="card-subheader">Custom Asset Attributes</div>
-                                <div class="row gx-3 mb-3"> -->
+                                </div>
+                                <div class="card-subheader d-inline">Custom Asset Attributes</div>
+                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
+                                <!-- process json stuff -->
+                                <div class="row gx-3 mb-3">
+
                                 </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
@@ -319,6 +370,47 @@ if (isset($_POST['submit_asset'])) {
 
         </div>
     </main>
+    <!-- Add Class Modal -->
+    <div class="modal fade" id="addAttributesModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Custom Attributes</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="add_asset.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <?php if ($session_info['user']['role'] == 1): ?>            
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputEntity">Entity *</label>
+                                <select class="form-control" required id="inputEntity" name="entity">
+                                    <option value="">Select an Entity</option>
+
+                                    <?php
+                                        $results = $conn->query("SELECT id, name FROM entity");
+                                        while ($row = $results->fetch_assoc()) {
+                                            unset($id, $name);
+                                            $id = $row['id'];
+                                            $name = $row['name'];
+                                            echo '<option value="' . $id . '">' . $name . '</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                        <div class="mb-3">
+                            <label for="addAttributeLabel">Custom Attribute *</label>
+                            <input class="form-control" id="addAttributeLabel" type="text" name="custom_attribute" placeholder="Your custom attribute" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="add_custom_attribute">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 </html>
