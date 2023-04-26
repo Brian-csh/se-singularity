@@ -34,7 +34,7 @@ if (isset($_POST['add_class'])) {
     if ($conn->query($sql_add_class)) {
         // TODO: create a popup for success
     } else {
-        echo "Pain in my assholes.";
+        echo "Error.";
     }
 }
 
