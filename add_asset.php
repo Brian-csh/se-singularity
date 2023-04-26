@@ -5,7 +5,45 @@ $session_info = $_SESSION;
 
 $active = 'Add Asset';
 $errors = "";
+$custom_attribute_errors = "";
 
+if (isset($_POST['add_custom_attribute'])) {
+    $attribute = $_POST['custom_attribute'];
+    // todo: check for dups
+    if (!strpos($attribute, ',')) {
+        if(isset($_POST['entity'])) {
+            $custom_entity_id = $_POST['entity'];
+        }
+        else {
+            $custom_entity_id = $session_info['user']['entity'];
+        }
+        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
+        $result = $conn->query($sql);
+    
+        if ($result->num_rows > 0) {
+            // Update the existing row with the new attribute value
+            $row = $result->fetch_assoc();
+            $custom_attribute_array = json_decode($row["custom_attribute"]);
+            if (is_array($custom_attribute_array)) {
+                array_push($custom_attribute_array, $attribute);
+            } else {
+                $custom_attribute_array = array($attribute);
+            }
+            $custom_attribute_array = json_encode($custom_attribute_array);
+            $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE entity_id = $custom_entity_id";
+            if ($conn->query($sql) === FALSE) {
+                echo "Error updating record: " . $conn->error;
+            }
+        } else {
+            // Insert a new row with the attribute value
+            $custom_attribute_array = json_encode(array($attribute));
+            $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$custom_entity_id', '$custom_attribute_array')";
+            if ($conn->query($sql) === FALSE) {
+                echo "Error inserting record: " . $conn->error;
+            }
+        }
+    }
+}
 
 if (isset($_POST['submit_asset'])) {
 
@@ -22,15 +60,38 @@ if (isset($_POST['submit_asset'])) {
     $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
     $expire = $_POST['expiration'];
-    // $custom_attributes = $_POST['custom_attributes'];
+    if(isset($_POST['entity'])) {
+        $custom_entity_id = $_POST['entity'];
+    }
+    else {
+        $custom_entity_id = $session_info['user']['entity'];
+    }
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire,status) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''),'1', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '2023-04-30','1')";
+    // Posting custom attributes
+    $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        // Update the existing row with the new attribute value
+        $row = $result->fetch_assoc();
+        $custom_attribute_array = json_decode($row["custom_attribute"]);
+        
+        $ca_obj = new stdClass();
+        // Loop through the array and set the values in the object
+        foreach ($custom_attribute_array as $key) {
+            $value = $_POST[strtolower(str_replace(' ', '', $key))];
+            $ca_obj->$key = $value;
+        }
+        $ca_json = json_encode($ca_obj);
+    }
+
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
         header('Location: add_asset.php?insert_error');
     }
+    echo $ca_json;
 }
 ?>
 <!DOCTYPE html>
@@ -59,6 +120,66 @@ if (isset($_POST['submit_asset'])) {
     </script>
 </head>
 
+<script src="js/jquery-3.6.0.min.js"></script>
+<script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="js/scripts.js"></script>
+<script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
+<script src="js/datatables/datatables-simple-demo.js"></script>
+<script>
+    function updateDepartments(entityId) {
+        $.ajax({
+            url: 'includes/scripts/ajax.php',
+            method: 'POST',
+            data: {
+                request: 'get_departments',
+                entity_id: entityId
+            },
+            dataType: 'json',
+            success: function (departments) {
+                var departmentSelect = $('#inputDepartment');
+                departmentSelect.empty();
+
+                // Add the default "Select a Department" option
+                departmentSelect.append($('<option>', {
+                    value: "",
+                    text: "Select a Department"
+                }));
+
+                // Create a map to store parent departments and their subdepartments
+                var departmentMap = {};
+
+                // Separate parent and subdepartments
+                departments.forEach(function (department) {
+                    if (department.parent === null) {
+                        departmentMap[department.id] = {
+                            name: department.name,
+                            subdepartments: []
+                        };
+                    } else {
+                        departmentMap[department.parent].subdepartments.push(department);
+                    }
+                });
+
+                // Add parent departments and their subdepartments to the select element
+                for (var parentId in departmentMap) {
+                    // Add parent department
+                    departmentSelect.append($('<option>', {
+                        value: parentId,
+                        text: departmentMap[parentId].name
+                    }));
+
+                    // Add subdepartments with indentation
+                    departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
+                        departmentSelect.append($('<option>', {
+                            value: subdepartment.id,
+                            text: "— " + subdepartment.name // Indentation using an em dash (—)
+                        }));
+                    });
+                }
+            },
+        });
+    }
+</script>
 <body class="nav-fixed">
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-black border-bottom border-dark" id="sidenavAccordion">
     <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 me-2 ms-lg-2 me-lg-0" id="sidebarToggle" onclick="document.body.classList.toggle('sidenav-toggled');localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sidenav-toggled'));
@@ -178,26 +299,35 @@ if (isset($_POST['submit_asset'])) {
                                             ?>
                                         </select>
                                     </div>
-
                                     <!-- Form Group (entity)-->
-                                    <div class="col-md-3">
-                                        <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments()">
-                                            <option value="">Select an Entity</option>
+                                    <!-- Only needed if user is superadmin -->
+                                    <?php if ($session_info['user']['role'] == 1): ?>
+                                    
+                                        <div class="col-md-3">
+                                            <label class="small mb-1" for="inputEntity">Entity</label>
+                                            <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments(inputEntity)">
+                                                <option value="">Select an Entity</option>
 
-                                            <?php
-                                            $results = $conn->query("SELECT id, name FROM entity");
-                                            while ($row = $results->fetch_assoc()) {
-                                                unset($id, $name);
-                                                $id = $row['id'];
-                                                $name = $row['name'];
-                                                echo '<option value="' . $id . '">' . $name . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
+                                                <?php
+                                                $results = $conn->query("SELECT id, name FROM entity");
+                                                while ($row = $results->fetch_assoc()) {
+                                                    unset($id, $name);
+                                                    $id = $row['id'];
+                                                    $name = $row['name'];
+                                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    <?php elseif ($session_info['user']['role'] == 2 || $session_info['user']['role'] == 3): ?>
+                                        <script>
+                                            const entityNo = <?php echo $session_info['user']['entity']; ?>;
+                                            updateDepartments(entityNo);
+                                        </script>
+                                    <?php endif; ?>
 
-                                    <!-- TODO: Notify the user if there are no departments -->
+                                    <!-- TODO: Notify the user if there are no departments, 
+                                        prompt to create department? -->
                                     <!-- Asset department (position) -->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputLocation">Location</label>
@@ -220,7 +350,9 @@ if (isset($_POST['submit_asset'])) {
                                             ?>
                                         </select>
                                     </div>
-
+                                </div>
+                                <div class="row gx-3 mb-3">
+                                    <!-- Asset Location -->
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputLocation">Location</label>
                                         <input class="form-control" id="inputLocation" type="text" value="" name="asset_location" placeholder="Enter a Location">
@@ -231,8 +363,34 @@ if (isset($_POST['submit_asset'])) {
                                         <label class="small mb-1" for="inputPrice">Price</label>
                                         <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
-
-
+                                </div>
+                                <div class="card-subheader d-inline">Custom Asset Attributes</div>
+                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
+                                <!-- process json stuff -->
+                                <div class="row gx-3 mb-3">
+                                    <?php 
+                                        if(!isset($entity_id)) {
+                                            $entity_id = $session_info['user']['entity'];
+                                        }
+                                        #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
+                                        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
+                                        $result = $conn->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            $row = $result->fetch_assoc();
+                                            $custom_attribute_array = json_decode($row["custom_attribute"]);
+                                            $custom_attribute_amt = count($custom_attribute_array);
+                                            if($custom_attribute_amt > 0) {
+                                                foreach ($custom_attribute_array as $string) {
+                                                    echo '
+                                                        <div class="col-md-5">
+                                                            <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
+                                                            <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
+                                                        </div>
+                                                    ';
+                                                }
+                                            }
+                                        }
+                                    ?>
                                 </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
@@ -254,72 +412,47 @@ if (isset($_POST['submit_asset'])) {
 
         </div>
     </main>
+    <!-- Add Class Modal -->
+    <div class="modal fade" id="addAttributesModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Custom Attributes</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="add_asset.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <?php if ($session_info['user']['role'] == 1): ?>            
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputEntity">Entity *</label>
+                                <select class="form-control" required id="inputEntity" name="entity">
+                                    <option value="">Select an Entity</option>
 
-
-    <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
-    <script src="js/datatables/datatables-simple-demo.js"></script>
-
-    <script>
-        function updateDepartments() {
-            let entityId = $('#inputEntity').val();
-
-            $.ajax({
-                url: 'includes/scripts/ajax.php',
-                method: 'POST',
-                data: {
-                    request: 'get_departments',
-                    entity_id: entityId
-                },
-                dataType: 'json',
-                success: function (departments) {
-                    var departmentSelect = $('#inputDepartment');
-                    departmentSelect.empty();
-
-                    // Add the default "Select a Department" option
-                    departmentSelect.append($('<option>', {
-                        value: "",
-                        text: "Select a Department"
-                    }));
-
-                    // Create a map to store parent departments and their subdepartments
-                    var departmentMap = {};
-
-                    // Separate parent and subdepartments
-                    departments.forEach(function (department) {
-                        if (department.parent === null) {
-                            departmentMap[department.id] = {
-                                name: department.name,
-                                subdepartments: []
-                            };
-                        } else {
-                            departmentMap[department.parent].subdepartments.push(department);
-                        }
-                    });
-
-                    // Add parent departments and their subdepartments to the select element
-                    for (var parentId in departmentMap) {
-                        // Add parent department
-                        departmentSelect.append($('<option>', {
-                            value: parentId,
-                            text: departmentMap[parentId].name
-                        }));
-
-                        // Add subdepartments with indentation
-                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                            departmentSelect.append($('<option>', {
-                                value: subdepartment.id,
-                                text: "— " + subdepartment.name // Indentation using an em dash (—)
-                            }));
-                        });
-                    }
-                },
-            });
-        }
-    </script>
-
+                                    <?php
+                                        $results = $conn->query("SELECT id, name FROM entity");
+                                        while ($row = $results->fetch_assoc()) {
+                                            unset($id, $name);
+                                            $id = $row['id'];
+                                            $name = $row['name'];
+                                            echo '<option value="' . $id . '">' . $name . '</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                        <?php endif; ?>
+                        <div class="mb-3">
+                            <label for="addAttributeLabel">Custom Attribute *</label>
+                            <input class="form-control" id="addAttributeLabel" type="text" name="custom_attribute" placeholder="Your custom attribute" required onkeydown="return (event.keyCode !== 188);">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="add_custom_attribute">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 </html>
