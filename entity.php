@@ -10,7 +10,6 @@ $active = $entity_name;
 include "includes/header.php";
 ?>
 
-
 <div id="layoutSidenav_content">
     <main>
         <header class="page-header pt-10 page-header-dark bg-gradient-primary-to-secondary pb-5">
@@ -66,6 +65,7 @@ include "includes/header.php";
                                 Departments
                             </h1>
                             <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end">+ Add</a>
+                            <a <?php echo "href=\"includes/entity_sync_redirect.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end me-2">Sync Feishu</a>
                         </div>
                     </div>
                 </div>
