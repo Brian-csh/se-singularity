@@ -245,8 +245,26 @@ if (isset($_POST['add_class'])) {
                     text: 'Retire',
                     action: function (e, dt, node, config) {
                         var selectedRows = dt.rows({selected: true}).data().toArray();
-                        console.log(selectedRows);
-                        // Perform actions with the selected rows data
+                        var assetIds = selectedRows.map(function (row) {
+                            return row.id;
+                        });
+
+                        // Perform AJAX request
+                        $.ajax({
+                            url: "includes/scripts/retire_assets.php",
+                            method: "POST",
+                            data: {
+                                assets: assetIds
+                            },
+                            success: function (response) {
+                                console.log(response);
+                                // Perform any additional actions on success
+                                dt.ajax.reload(); // Refresh the DataTables
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                console.error(textStatus, errorThrown);
+                            }
+                        });
                     }
                 }
             ],
