@@ -5,40 +5,42 @@ $session_info = $_SESSION;
 
 $active = 'Add Asset';
 $errors = "";
+$custom_attribute_errors = "";
 
 if (isset($_POST['add_custom_attribute'])) {
     $attribute = $_POST['custom_attribute'];
-    if(isset($_POST['entity'])) {
-        $entity_id = $_POST['entity'];
-    }
-    else {
-        $entity_id = $session_info['user']['entity'];
-    }
-    // one way or another im going to need to process this with json
-    // whether or not its a separate table or just a column
-    $sql = "SELECT custom_attribute FROM asset_attribute WHERE id = '$entity_id'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        // Update the existing row with the new attribute value
-        $row = $result->fetch_assoc();
-        $custom_attribute_array = unserialize($row["custom_attribute"]);
-        if (is_array($custom_attribute_array)) {
-            array_push($custom_attribute_array, $attribute);
+    // todo: check for dups
+    if (!strpos($attribute, ',')) {
+        if(isset($_POST['entity'])) {
+            $custom_entity_id = $_POST['entity'];
+        }
+        else {
+            $custom_entity_id = $session_info['user']['entity'];
+        }
+        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
+        $result = $conn->query($sql);
+    
+        if ($result->num_rows > 0) {
+            // Update the existing row with the new attribute value
+            $row = $result->fetch_assoc();
+            $custom_attribute_array = json_decode($row["custom_attribute"]);
+            if (is_array($custom_attribute_array)) {
+                array_push($custom_attribute_array, $attribute);
+            } else {
+                $custom_attribute_array = array($attribute);
+            }
+            $custom_attribute_array = json_encode($custom_attribute_array);
+            $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE entity_id = $custom_entity_id";
+            if ($conn->query($sql) === FALSE) {
+                echo "Error updating record: " . $conn->error;
+            }
         } else {
-            $custom_attribute_array = array($attribute);
-        }
-        $custom_attribute_array = serialize($custom_attribute_array);
-        $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE id = $entity_id";
-        if ($conn->query($sql) === FALSE) {
-            echo "Error updating record: " . $conn->error;
-        }
-    } else {
-        // Insert a new row with the attribute value
-        $custom_attribute_array = serialize(array($attribute));
-        $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$entity_id', '$custom_attribute_array')";
-        if ($conn->query($sql) === FALSE) {
-            echo "Error inserting record: " . $conn->error;
+            // Insert a new row with the attribute value
+            $custom_attribute_array = json_encode(array($attribute));
+            $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$custom_entity_id', '$custom_attribute_array')";
+            if ($conn->query($sql) === FALSE) {
+                echo "Error inserting record: " . $conn->error;
+            }
         }
     }
 }
@@ -58,15 +60,38 @@ if (isset($_POST['submit_asset'])) {
     $description = $_POST['description'];
     $position = $_POST['asset_location'];
     $expire = $_POST['expiration'];
-    // $custom_attributes = $_POST['custom_attributes'];
+    if(isset($_POST['entity'])) {
+        $custom_entity_id = $_POST['entity'];
+    }
+    else {
+        $custom_entity_id = $session_info['user']['entity'];
+    }
+
+    // Posting custom attributes
+    $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        // Update the existing row with the new attribute value
+        $row = $result->fetch_assoc();
+        $custom_attribute_array = json_decode($row["custom_attribute"]);
+        
+        $ca_obj = new stdClass();
+        // Loop through the array and set the values in the object
+        foreach ($custom_attribute_array as $key) {
+            $value = $_POST[strtolower(str_replace(' ', '', $key))];
+            $ca_obj->$key = $value;
+        }
+        $ca_json = json_encode($ca_obj);
+    }
 
     $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', NULL)";
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
         header('Location: add_asset.php?insert_error');
     }
+    echo $ca_json;
 }
 ?>
 <!DOCTYPE html>
@@ -92,10 +117,6 @@ if (isset($_POST['submit_asset'])) {
 <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
 <script src="js/datatables/datatables-simple-demo.js"></script>
 <script>
-     function getCustomAttributes(entityId) {
-        
-    }
-
     function updateDepartments(entityId) {
         $.ajax({
             url: 'includes/scripts/ajax.php',
@@ -340,7 +361,29 @@ if (isset($_POST['submit_asset'])) {
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
                                 <!-- process json stuff -->
                                 <div class="row gx-3 mb-3">
-
+                                    <?php 
+                                        if(!isset($entity_id)) {
+                                            $entity_id = $session_info['user']['entity'];
+                                        }
+                                        #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
+                                        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
+                                        $result = $conn->query($sql);
+                                        if ($result->num_rows > 0) {
+                                            $row = $result->fetch_assoc();
+                                            $custom_attribute_array = json_decode($row["custom_attribute"]);
+                                            $custom_attribute_amt = count($custom_attribute_array);
+                                            if($custom_attribute_amt > 0) {
+                                                foreach ($custom_attribute_array as $string) {
+                                                    echo '
+                                                        <div class="col-md-5">
+                                                            <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
+                                                            <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
+                                                        </div>
+                                                    ';
+                                                }
+                                            }
+                                        }
+                                    ?>
                                 </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
@@ -392,7 +435,7 @@ if (isset($_POST['submit_asset'])) {
                         <?php endif; ?>
                         <div class="mb-3">
                             <label for="addAttributeLabel">Custom Attribute *</label>
-                            <input class="form-control" id="addAttributeLabel" type="text" name="custom_attribute" placeholder="Your custom attribute" required>
+                            <input class="form-control" id="addAttributeLabel" type="text" name="custom_attribute" placeholder="Your custom attribute" required onkeydown="return (event.keyCode !== 188);">
                         </div>
                     </div>
                     <div class="modal-footer">
