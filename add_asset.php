@@ -19,13 +19,13 @@ if (isset($_POST['submit_asset'])) {
     $department = $_POST['department'];
     $asset_user = $_POST['asset_user'];
     $price = $_POST['price'];
-    $description = $_POST['description'];
+    $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
     $expire = $_POST['expiration'];
     // $custom_attributes = $_POST['custom_attributes'];
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', NULL)";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire,status) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''),'1', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '2023-04-30','1')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
@@ -47,7 +47,16 @@ if (isset($_POST['submit_asset'])) {
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
-
+    <script src="https://cdn.tiny.cloud/1/asb4xsfiuva8d91yy7xuxeuce9jbpe7tee28ml49p4prl31z/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      tinymce.init({
+        selector: '#descriptionTextarea',
+        plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+        toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
+        skin: "oxide-dark",
+        content_css: "dark"
+      });
+    </script>
 </head>
 
 <body class="nav-fixed">
