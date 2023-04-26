@@ -3,7 +3,7 @@
 if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
     $DB_Server = "localhost";
     $DB_Username = "root";
-    $DB_Password = "";
+    $DB_Password = "pass";
 } else {
     $DB_Server = "singularity-db.Singularity.secoder.local";
     $DB_Username = "singularity";
