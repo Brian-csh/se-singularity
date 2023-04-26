@@ -138,15 +138,7 @@ if(isset($_POST['edit_financial'])){
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.tiny.cloud/1/asb4xsfiuva8d91yy7xuxeuce9jbpe7tee28ml49p4prl31z/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-      tinymce.init({
-        selector: '#descriptionTextarea',
-        plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
-        toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
-        skin: "oxide-dark",
-        content_css: "dark"
-      });
-    </script>
+    
 </head>
 
 <body class="nav-fixed">
@@ -232,7 +224,7 @@ if(isset($_POST['edit_financial'])){
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
-                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20" placeholder="<?php echo stripslashes($asset_description);?>"></textarea>
+                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20"></textarea>
                                 <button type="submit" name="description_change" class="btn btn-primary text-light float-end" style="background:green; border:none">Change description</button>
                             </div>
                         </div>
@@ -514,6 +506,22 @@ if(isset($_POST['edit_financial'])){
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        $(document).ready(function() {
+            tinymce.init({
+            selector: '#descriptionTextarea',
+            plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+            toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
+            skin: "oxide-dark",
+            content_css: "dark",
+            setup: function (editor) {
+            editor.on('init', function (e) {
+                editor.setContent('<?php echo preg_replace("/\s+/"," ",$asset_description);?>');
+            });
+            }
+        });
+        });
+    </script>
     <?php
     include "includes/footer.php";
     ?>
