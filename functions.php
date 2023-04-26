@@ -1,11 +1,10 @@
 <?php
-function insert_log_login($conn,$row,$username,$type_id)
+function insert_log_login($conn,$row,$type_id)
 {                  
     /*  BEGIN INSERT LOG */
     $time_now = time();
-    //Fetch Log Type
-    $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
-
+    $username = $row['name'];
+    $user_id = $row['id'];
     //Fetch Entity, Role, Department
     $entity_id = $row['entity'];
     $role_id = $row['role'];
@@ -23,11 +22,18 @@ function insert_log_login($conn,$row,$username,$type_id)
         $text = $username." bound account to feishu! ".$role." of ".$department." in ".$entity;
     }
     $sql = "INSERT INTO log (date, text,log_type, subject) VALUES 
-    ('$time_now','$text','$type','$username')";//or $row[id]
+    ('$time_now','$text','$type_id','$user_id')";
     if( $conn->query($sql)){
         return "Record inserted successfully.";
     } else{
         return "ERROR: Could not able to execute $sql. " . $conn->error;
     }
+}
+
+function insert_log_asset($conn, $row, $type_id)
+{
+    if( $type_id ==5){
+
+    } else if 
 }
 ?>

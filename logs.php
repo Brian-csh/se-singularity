@@ -58,8 +58,17 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                 $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
                                 $log_id = $row["id"];
                                 $text = $row["text"];
-                                $type = $row["log_type"];
-                                $subject = $row["subject"];
+                                //Fetch Log Type
+                                $type_id = $row["log_type"];
+                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
+
+                                //Fetch Subject
+                                $subject_id = $row["subject"];
+                                if($type_id>=1 && $type_id <=3){
+                                    $subject = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$subject_id'"))['name'];
+                                } else {
+                                    $subject = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"))['name'];
+                                }
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>

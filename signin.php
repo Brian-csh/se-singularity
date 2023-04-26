@@ -55,7 +55,7 @@ if (isset($_POST['normal-login_click'])) {
                 $_SESSION['user']['department'] = $row['department'];
 
                 // Insert log
-                insert_log_login($conn,$row,$username,1);
+                insert_log_login($conn,$row,1);
 
                 header("Location: index.php");
             } else $errors = "Wrong password";
