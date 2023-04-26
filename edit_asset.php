@@ -8,6 +8,7 @@ if (isset($_GET['name'])) {
 
 $active = $edit_name;
 include "includes/header.php";
+include "functions.php";
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
 
@@ -48,7 +49,7 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
 
 
 
-// TODO : Update Asset info
+// Update Asset info
 if(isset($_POST['edit_asset'])){
     $asset_new_parent = $_POST['editAssetParent'];
     $asset_new_name = $_POST['editAssetName']; if(!$asset_new_name) $asset_new_name = $asset_name;
@@ -65,6 +66,7 @@ if(isset($_POST['edit_asset'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Asset info updated successfully!')</script>";
+        insert_log_asset($conn,$asset_data,6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -80,6 +82,7 @@ if(isset($_POST['description_change'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Description updated successfully!')</script>";
+        insert_log_asset($conn,$asset_data,6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -96,6 +99,7 @@ if(isset($_POST['edit_basic'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Basic info updated successfully!')</script>";
+        insert_log_asset($conn,$asset_data,6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -103,7 +107,7 @@ if(isset($_POST['edit_basic'])){
     }
 }
 
-// TODO: Update Financial info
+// Update Financial info
 if(isset($_POST['edit_financial'])){
     $financial_op = $_POST['financial_op']; if(!$financial_op) $financial_op = $asset_original_price;
     $financial_cp = $_POST['financial_cp']; if(!$financial_cp) $financial_cp = $asset_current_price;
@@ -228,8 +232,7 @@ if(isset($_POST['edit_financial'])){
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
-                                <?php echo $asset_description;?>
-                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20" placeholder=""></textarea>
+                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20" placeholder="<?php echo stripslashes($asset_description);?>"></textarea>
                                 <button type="submit" name="description_change" class="btn btn-primary text-light float-end" style="background:green; border:none">Change description</button>
                             </div>
                         </div>

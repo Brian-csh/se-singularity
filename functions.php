@@ -32,8 +32,32 @@ function insert_log_login($conn,$row,$type_id)
 
 function insert_log_asset($conn, $row, $type_id)
 {
-    if( $type_id ==5){
+    /*  BEGIN INSERT LOG */
+    $time_now = time();
 
-    } else if 
+    $asset_id = $row['id'];
+    $text = '';
+
+    if( $type_id ==4){
+    } else if ( $type_id ==5){
+        $text = "Asset ". $row['name']." created!";
+    } else if ( $type_id ==6){
+        $text = "Asset ". $row['name']." info changed!";
+    } else if ( $type_id ==7){
+        $text = "Asset ". $row['name']." registered from..!";
+    } else if ( $type_id ==8){
+        $text = "Asset ". $row['name']." register approved!";
+    } else if ( $type_id ==9){
+        $text = "Asset ". $row['name']." deleted!";
+    }
+
+    $sql = "INSERT INTO log (date, text,log_type, subject) VALUES
+    ('$time_now','$text','$type_id','$asset_id')";
+
+    if ($conn->query($sql)){
+        return "Record inserted successfully.";
+    } else {
+        return "ERROR: Could not able to execute $sql. " . $conn->error;
+    }
 }
 ?>
