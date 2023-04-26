@@ -74,7 +74,7 @@ if (isset($_POST['add_class'])) {
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <th>Description</th>
+                            <!-- <th>Description</th> -->
                             <th>Position</th>
                             <th>Expiration Date</th>
                         </tr>
@@ -87,7 +87,7 @@ if (isset($_POST['add_class'])) {
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <th>Description</th>
+                            <!-- <th>Description</th> -->
                             <th>Position</th>
                             <th>Expiration Date</th>
                         </tr>
@@ -100,6 +100,7 @@ if (isset($_POST['add_class'])) {
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
+                                if($row['name']=='NULL') continue;
                                 $asset_id = $row['id'];
                                 $asset_name = $row['name'];
 
@@ -118,10 +119,10 @@ if (isset($_POST['add_class'])) {
                                 $asset_price = $row['price'];
                                 $asset_description = $row['description'];
                                 $asset_position = $row['position'];
-                                $asset_expire = gmdate("Y.m.d \ | H:i:s",$row['expire']+28000);
+                                $asset_expire = date("Y-m-d", strtotime($row['expire']));
 
                                 echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='/asset.php?id=$asset_id&name=$asset_name'>" . $asset_name . "</a></td>
-                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_description</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
+                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
                                         <a title=\"Edit asset\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
                                         <i data-feather=\"edit\"></i>
                                         </a>

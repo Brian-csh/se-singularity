@@ -8,7 +8,6 @@ if (isset($_GET['name'])) {
 
 $active = $edit_name;
 include "includes/header.php";
-
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
 
@@ -22,14 +21,14 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_price = $asset_data['price'];
         $asset_description = $asset_data['description'];
         $asset_position = $asset_data['position'];
-        $asset_expire = gmdate("Y.m.d \ | H:i:s",$asset_data['expire']+28000);
+        $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));
         $asset_status_id = $asset_data['status'];
         $asset_brand = $asset_data['brand'];
         $asset_model = $asset_data['model'];
         $asset_serial_number = $asset_data['serial number'];
         $asset_original_price = $asset_data['price'];
         $asset_current_price = $asset_data['current price'];
-        $asset_deprecation_model = $asset_data['deprecation model'];
+        $asset_depreciation_model = $asset_data['depreciation model'];
 }
 
 // Fetch Data
@@ -51,18 +50,18 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
 
 // TODO : Update Asset info
 if(isset($_POST['edit_asset'])){
-    $asset_new_parent = $_POST['editAssetparent']; if(!$asset_new_parent) $asset_new_parent = $asset_parent_id;
+    $asset_new_parent = $_POST['editAssetParent'];
     $asset_new_name = $_POST['editAssetName']; if(!$asset_new_name) $asset_new_name = $asset_name;
 
-    // error_log(print_r($_POST['editAssetClass'], true));
-    $asset_new_class = $_POST['editAssetClass']; if(!$asset_new_class) $asset_new_class = $asset_data_id;
-    var_dump($asset_new_class);
+
+    $asset_new_class = $_POST['editAssetClass'];
+    $asset_new_expire = $_POST['editAssetExpire']; if(!$asset_new_expire) $asset_new_expire = $asset_expire;
 
     $asset_new_user = $_POST['editAssetUser']; if(!$asset_new_user) $asset_new_user = $asset_user_id;
-    $asset_new_position = $_POST['editAssetPosition']; if(!$asset_new_position) $asset_new_position = $asset_position;
-    $asset_new_status = $_POST['editAssetStatus']; if(!$asset_new_status) $asset_new_status = $asset_status_id;
-    $sql = "UPDATE asset SET parent = '$asset_new_parent',name = '$asset_new_name',class = '$asset_new_class', 
-        user = '$asset_new_user', position = '$asset_new_user', status = '$asset_new_status' WHERE id = '$asset_id'";
+    $asset_new_position = $_POST['editAssetPosition'];
+    $asset_new_status = $_POS['editAssetStatus']; if(!$asset_new_status) $asset_new_status = $asset_status_id;
+    $sql = "UPDATE asset SET parent =$asset_new_parent,name = '$asset_new_name',class = '$asset_new_class', 
+        user = NULLIF('$asset_new_user',''), expire = '$asset_new_expire',position = '$asset_new_position', status = '$asset_new_status' WHERE id = '$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Asset info updated successfully!')</script>";
@@ -74,6 +73,7 @@ if(isset($_POST['edit_asset'])){
 }
 
 
+// Update Description
 if(isset($_POST['description_change'])){
     $description = $_POST['description']; if(!$description) $description = $asset_description;
     $sql = "UPDATE asset SET description = '$description' WHERE id = '$asset_id'";
@@ -87,8 +87,9 @@ if(isset($_POST['description_change'])){
     }
 }
 
+// Update basic info
 if(isset($_POST['edit_basic'])){
-    $basic_brand = $_POST['basic_brand']; if(!$basi_brand) $basic_brand = $asset_brand;
+    $basic_brand = $_POST['basic_brand']; if(!$basic_brand) $basic_brand = $asset_brand;
     $basic_model = $_POST['basic_model']; if(!$basic_model) $basic_model = $asset_model;
     $basic_sn = $_POST['basic_sn']; if(!$basic_sn) $basic_sn = $asset_serial_number;
     $sql = "UPDATE asset SET brand='$basic_brand', model='$basic_model', `serial number`='$basic_sn' WHERE id='$asset_id'";
@@ -107,7 +108,7 @@ if(isset($_POST['edit_financial'])){
     $financial_op = $_POST['financial_op']; if(!$financial_op) $financial_op = $asset_original_price;
     $financial_cp = $_POST['financial_cp']; if(!$financial_cp) $financial_cp = $asset_current_price;
     $financial_dp = $_POST['financial_dp']; if(!$financial_dp) $financial_dp = $asset_deprecation_model;
-    $sql = "UPDATE asset SET `price`='$financial_op', `current price`='$financial_cp', `deprecation model`='$financial_dp' WHERE id='$asset_id'";
+    $sql = "UPDATE asset SET `price`='$financial_op', `current price`='$financial_cp', `depreciation model`='$financial_dp' WHERE id='$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Financial info updated successfully!')</script>";
@@ -118,7 +119,33 @@ if(isset($_POST['edit_financial'])){
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title><?= $active ?> - Singularity EAM</title>
+    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
+    <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.tiny.cloud/1/asb4xsfiuva8d91yy7xuxeuce9jbpe7tee28ml49p4prl31z/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      tinymce.init({
+        selector: '#descriptionTextarea',
+        plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+        toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
+        skin: "oxide-dark",
+        content_css: "dark"
+      });
+    </script>
+</head>
+
+<body class="nav-fixed">
 <div id="layoutSidenav_content">
     <main>
     <header class="page-header pt-10 page-header-dark bg-gradient-primary-to-secondary pb-5">
@@ -174,8 +201,10 @@ if(isset($_POST['edit_financial'])){
                                                 <td><?php
                                                         if($asset_class_type == 0)
                                                             echo "Item Asset";
-                                                        else 
+                                                        else if($asset_class_type == 1)
                                                             echo "Amount Asset"; 
+                                                        else 
+                                                            echo "NULL";
                                                     ?>
                                                 </td>
                                                 <td><?php echo $asset_class_name; ?></td>
@@ -199,15 +228,16 @@ if(isset($_POST['edit_financial'])){
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
+                                <?php echo $asset_description;?>
+                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20" placeholder=""></textarea>
                                 <button type="submit" name="description_change" class="btn btn-primary text-light float-end" style="background:green; border:none">Change description</button>
-                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20" placeholder="<?php echo $asset_description; ?>"></textarea>
                             </div>
                         </div>
                     </form>
 
                     <div class = "row mb-3">
 
-                        <!-- TODO: Asset Basic Info Table -->
+                        <!-- Asset Basic Info Table -->
                         <div class="col mb-3">
                             <div class="card">
                                 <div class="card-header">
@@ -238,7 +268,7 @@ if(isset($_POST['edit_financial'])){
                             </div>
                         </div>
 
-                        <!-- TODO: Asset Financial Info Table -->
+                        <!-- Asset Financial Info Table -->
                         <div class = "col mb-3">
                             <div class="card">
                                 <div class="card-header">
@@ -259,8 +289,8 @@ if(isset($_POST['edit_financial'])){
                                                 <td><?php echo $asset_current_price; ?></td>
                                             </tr>
                                             <tr>
-                                                <th>Deprecation Model</th>
-                                                <td><?php echo $asset_deprecation_model; ?></td>
+                                                <th>Depreciation Model</th>
+                                                <td><?php echo $asset_depreciation_model; ?></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -289,13 +319,11 @@ if(isset($_POST['edit_financial'])){
                         <!-- Edit asset name -->
                         <div class="mb-3">
                             <label for="editAssetName">Asset Name</label>
-                            <!-- TODO: submit placeholder when no input-->
                             <input class="form-control" id="editAssetName" type="text" name="editAssetName" placeholder="<?php echo $asset_name; ?>">
                         </div>
                         <!-- Edit position -->
                         <div class="mb-3">
                             <label for="editAssetPosition">Position</label>
-                            <!-- TODO: submit placeholder when no input-->
                             <input class="form-control" id="editAssetPosition" type="text" name="editAssetPosition" placeholder="<?php echo $asset_position; ?>">
                         </div>
                         
@@ -303,14 +331,15 @@ if(isset($_POST['edit_financial'])){
                             <!-- Edit CLASS -->
                             <div class="col">
                                 <!-- Edit customized class -->
-                                <div class="mb-3">
+                                <div class="md-3">
                                     <label for="editAssetClass">Class</label>
                                         <select class="form-control ms-2" id="inputParentClass" name="editAssetClass">
-                                            <option value=""><?php echo $asset_class_name?></option>
+                                            <?php echo '<option value="' . $asset_class_id . '">' . $asset_class_name . '</option>'?>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM asset_class");
                                                     while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name']&& $row['name']!=$asset_class_name) {
+                                                        $id = 0; $parent = NULL;
+                                                        if ($row['name']!=$asset_class_name) {
                                                             unset($id, $class);
                                                             $id = $row['id'];
                                                             $class = $row['name'];
@@ -324,6 +353,10 @@ if(isset($_POST['edit_financial'])){
 
                             <div class= "col">
                                 <!-- Edit Expiration date -->
+                                <div class="md-4">
+                                        <label class="small mb-1" for="inputExpiration">Expiration Date</label>
+                                        <input class="form-control" id="inputExpiration" type="date" value="" name="editAssetExpire">
+                                </div>
                             </div>
                         </div>
 
@@ -333,12 +366,13 @@ if(isset($_POST['edit_financial'])){
                                 <div class="mb-3">
                                     <label for="editAssetParent">Parent</label>
                                         <select class="form-control ms-2" id="editParent" name="editAssetParent">
-                                            <option value=""><?php echo $asset_parent;?></option>
+                                            <?php echo '<option value="' . $asset_parent_id . '">' . $asset_parent . '</option>';?>
                                                 <?php
+                                                    // $id = 0; $parent = NULL;
+                                                    // echo '<option value="' . $id . '">' . $parent . '</option>';
                                                     $results = $conn->query("SELECT id, name FROM asset");
-                                                    $id = 0; $parent = NULL;
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name']&& $row['name']!= $asset_parent) {
+                                                    while ($row= $results->fetch_assoc()) {
+                                                        if ($row['name']!= $asset_parent&&$row['name']!= $asset_name) {
                                                             unset($id, $parent);
                                                             $id = $row['id'];
                                                             $parent = $row['name'];
@@ -350,16 +384,16 @@ if(isset($_POST['edit_financial'])){
                                 </div>
                             </div>
 
-                            <div class="col">
-                                <!-- Edit user -->
+                            <!-- Edit user -->
+                            <!-- <div class="col">
                                 <div class="mb-3">
                                     <label for="editAssetUser">Users</label>
                                         <select class="form-control ms-2" id="editUser" name="editAssetUser">
-                                            <option value=""><?php echo $asset_user_name; ?></option>
+                                            <?php echo '<option value="' . $asset_user_id . '">' . $asset_user_name . '</option>'; ?>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM user");
                                                     while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name'] && $row['name']!= $asset_user_name) {
+                                                        if ($row['name']!= $asset_user_name) {
                                                             unset($id, $user);
                                                             $id = $row['id'];
                                                             $user = $row['name'];
@@ -369,13 +403,13 @@ if(isset($_POST['edit_financial'])){
                                                     ?>
                                         </select>
                                 </div>
-                            </div>
-                            <div class="col">
-                                <!-- Edit Status -->
+                            </div> -->
+                            <!-- Edit Status -->
+                            <!-- <div class="col">
                                 <div class="mb-3">
                                     <label for="editAssetStatus">Status</label>
                                         <select class="form-control ms-2" id="editStatus" name="editAssetStatus">
-                                            <option value=""><?php echo $asset_status;?></option>
+                                            <?php echo '<option value="' . $asset_status_id . '">' . $asset_status . '</option>';?>
                                                 <?php
                                                     $results = $conn->query("SELECT id, status FROM asset_status_class");
                                                     while ($row = $results->fetch_assoc()) {
@@ -389,7 +423,7 @@ if(isset($_POST['edit_financial'])){
                                                     ?>
                                         </select>
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
                     </div>
@@ -459,7 +493,7 @@ if(isset($_POST['edit_financial'])){
                         </div>
                         <!-- Edit Serial Number -->
                         <div class="mb-3">
-                            <label for="editDeprecationModel">Deprecation Model </label>
+                            <label for="editDeprecationModel">Depreciation Model </label>
                             <textarea class="form-control" id="financialEditDM" type="text" name="financial_dp" rows = "5" placeholder="<?php echo $asset_deprecation_model; ?>"></textarea>
                         </div>
                     </div>
@@ -480,3 +514,8 @@ if(isset($_POST['edit_financial'])){
     <?php
     include "includes/footer.php";
     ?>
+
+
+</div>
+
+</html>

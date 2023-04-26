@@ -24,8 +24,8 @@ if (isset($_POST['submit_asset'])) {
     $expire = $_POST['expiration'];
     // $custom_attributes = $_POST['custom_attributes'];
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', NULL)";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire,status) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''),'1', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '2023-04-30','1')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
