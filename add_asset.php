@@ -14,8 +14,6 @@ if (isset($_POST['add_custom_attribute'])) {
     else {
         $entity_id = $session_info['user']['entity'];
     }
-    $entity_id = 5;
-    echo $entity_id."entityid is ";
     // one way or another im going to need to process this with json
     // whether or not its a separate table or just a column
     $sql = "SELECT custom_attribute FROM asset_attribute WHERE id = '$entity_id'";
@@ -38,16 +36,10 @@ if (isset($_POST['add_custom_attribute'])) {
     } else {
         // Insert a new row with the attribute value
         $custom_attribute_array = serialize(array($attribute));
-        echo $custom_attribute_array;
-        $sql = "INSERT INTO asset_attribute (id, custom_attribute) VALUES ('$entity_id', '$custom_attribute_array')";
+        $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$entity_id', '$custom_attribute_array')";
         if ($conn->query($sql) === FALSE) {
             echo "Error inserting record: " . $conn->error;
         }
-    }
-    if ($conn->query($sql_add_class)) {
-        // TODO: create a popup for success
-    } else {
-        echo "Failed to create new attribute";
     }
 }
 
