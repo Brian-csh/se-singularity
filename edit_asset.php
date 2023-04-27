@@ -30,6 +30,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_original_price = $asset_data['price'];
         $asset_current_price = $asset_data['current price'];
         $asset_depreciation_model = $asset_data['depreciation model'];
+        $custom_attributes = $asset_data['custom_attr'];
 }
 
 // Fetch Data
@@ -122,6 +123,29 @@ if(isset($_POST['edit_financial'])){
     else{
         echo "<script>alert('Financial info update failed!')</script>";
     }
+}
+
+// Update custom attribute info
+if(isset($_POST['edit_custom_attr'])){
+    $custom_attribute_arr = json_decode($custom_attributes, true);
+
+    foreach ($custom_attribute_arr as $custom_key => $custom_value) {
+        $form_name = str_replace(" ", "_", $custom_key);
+        $custom_attribute_arr[$custom_key] = $_POST['ca_'. $form_name];
+        if(!$custom_attribute_arr[$custom_key]) $custom_attribute_arr[$custom_key] = $custom_value;
+    }
+    $custom_attributes = json_encode($custom_attribute_arr);
+
+    $sql = "UPDATE asset SET custom_attr='$custom_attributes' WHERE id='$asset_id'";
+    $result = $conn->query($sql);
+    // if($result){
+    //     echo "<script>alert('Custom attribute info updated successfully!')</script>";
+    //     insert_log_asset($conn,$asset_data,6);
+    //     echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+    // }
+    // else{
+    //     echo "<script>alert('Custom attribute info update failed!')</script>";
+    // }
 }
 ?>
 <!DOCTYPE html>
@@ -295,6 +319,38 @@ if(isset($_POST['edit_financial'])){
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class = "row mb-3">
+
+                        <!-- Asset Custom Attribute Info Table -->
+                        <div class="col mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3> Custom Attributes
+                                        <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editCustomAttributeModal"><i data-feather="edit"></i></button>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class = "col">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <?php 
+                                                    $custom_attribute_obj = json_decode($custom_attributes);
+                                                    foreach ($custom_attribute_obj as $custom_key => $custom_value) {
+                                                        echo '
+                                                            <tr>
+                                                                <th>'. $custom_key .'</th>
+                                                                <td>'. $custom_value .'</td>
+                                                            </tr>
+                                                        ';
+                                                    }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -497,6 +553,38 @@ if(isset($_POST['edit_financial'])){
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_financial">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom attribute Modal -->
+    <div class="modal fade" id="editCustomAttributeModal" tabindex="-1" role="dialog" aria-labelledby="CustomAttributeEditLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Custom</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <?php 
+                            $custom_attribute_obj = json_decode($custom_attributes);
+                            foreach ($custom_attribute_obj as $custom_key => $custom_value) {
+                                $form_name = str_replace(" ", "_", $custom_key);
+                                echo '
+                                    <div class="mb-3">
+                                        <label for="custom_attribute_'.$custom_key.'">'.$custom_key.' </label>
+                                        <input class="form-control" id="custom_attribute_'.$custom_key.'" type="text" name="ca_'.$form_name.'" placeholder="'. $custom_value .'" >
+                                    </div>
+                                ';
+                            }
+                        ?>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="edit_custom_attr">Update</button>
                     </div>
                 </form>
             </div>

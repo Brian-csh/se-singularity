@@ -146,7 +146,7 @@ if (isset($_POST['add_class'])) {
                             <th>Price</th>
                             <th>Description</th>
                             <th>Position</th>
-                            <th>Expiration Date</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -287,7 +287,7 @@ if (isset($_POST['add_class'])) {
                 { "data": "price" },
                 { "data": "description" },
                 { "data": "position" },
-                { "data": "expire" },
+                { "data": "status" },
                 { "data": "actions" }
             ],
             select: {

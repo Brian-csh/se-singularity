@@ -90,6 +90,7 @@ if (isset($_POST['submit_asset'])) {
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
+        echo "Error inserting asset: " . $conn->error;
         // header('Location: add_asset.php?insert_error');
     }
 }
