@@ -13,16 +13,29 @@ $result = $conn->query($sql);
 
 $data = array();
 while($row = $result->fetch_assoc()) {
+    if ($row['status'] == 1) {
+        $status = "IDLE";
+    } else if ($row['status'] == 2) {
+        $status = "IN USE";
+    } else if ($row['status'] == 3) {
+        $status = "IN MAINTAIN";
+    } else if ($row['status'] == 4) {
+        $status = "RETIRED";
+    } else if ($row['status'] == 5) {
+        $status = "DELETED";
+    }
     $data[] = array(
         "id" => $row['id'],
         "parent" => $row['parent'],
-        "name" => $row['name'],
+        "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        // "name" => $row['name'],
         "class" => $row['class'],
         "user" => $row['user'],
         "price" => $row['price'],
         "description" => $row['description'],
         "position" => $row['position'],
         "expire" => $row['expire'],
+        "status" => $status,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
         Info
         </a>"
