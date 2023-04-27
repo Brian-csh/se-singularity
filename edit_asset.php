@@ -417,6 +417,7 @@ if(isset($_POST['edit_custom_attr'])){
                                 <div class="mb-3">
                                     <label for="editAssetParent">Parent</label>
                                         <select class="form-control ms-2" id="editParent" name="editAssetParent">
+                                            <option value="NULL">No Parent</option>
                                             <?php echo '<option value="' . $asset_parent_id . '">' . $asset_parent . '</option>';?>
                                                 <?php
                                                     // $id = 0; $parent = NULL;
