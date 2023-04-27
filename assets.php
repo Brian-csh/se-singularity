@@ -144,7 +144,7 @@ if (isset($_POST['add_class'])) {
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <!-- <th>Description</th> -->
+                            <th>Description</th>
                             <th>Position</th>
                             <th>Expiration Date</th>
                             <th>Actions</th>

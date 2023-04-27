@@ -23,7 +23,7 @@ while($row = $result->fetch_assoc()) {
         "description" => $row['description'],
         "position" => $row['position'],
         "expire" => $row['expire'],
-        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"user.php?id=".$row['id']."\">
+        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
         Info
         </a>"
     );
