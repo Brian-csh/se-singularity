@@ -58,7 +58,9 @@ if (isset($_POST['submit_asset'])) {
     $price = $_POST['price'];
     $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
-    $expire = $_POST['expiration'];
+    $expire = date("Y-m-d",strtotime($_POST['expiration']));
+    // $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));
+
     if(isset($_POST['entity'])) {
         $custom_entity_id = $_POST['entity'];
     }
@@ -85,8 +87,8 @@ if (isset($_POST['submit_asset'])) {
         $ca_json = json_encode($ca_obj);
     }
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created')";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created,status) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
