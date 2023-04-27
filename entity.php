@@ -1,4 +1,6 @@
 <?php
+session_start();
+$session_info = $_SESSION;
 if (isset($_GET['id'])) {
     $entity_id = $_GET['id'];
 }
@@ -65,7 +67,11 @@ include "includes/header.php";
                                 Departments
                             </h1>
                             <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end">+ Add</a>
-                            <a <?php echo "href=\"includes/entity_sync_redirect.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end me-2">Sync Feishu</a>
+                            <?php if($entity_id == $_SESSION['user']['entity']) {
+                                echo "<a href='includes/entity_sync.php?entity_id=$entity_id' class='btn btn-primary btn-xs float-end me-2'>
+                                        Sync Feishu
+                                    </a>";
+                            } ?>
                         </div>
                     </div>
                 </div>
