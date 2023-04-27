@@ -47,71 +47,7 @@ if (isset($_POST['add_class'])) {
 <!-- DataTables Buttons CSS -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css"/>
 
-<!-- DataTables styles -->
-<style>
-    tbody {
-        color: #FAFAFA;
-    }
-    thead, tfoot {
-        color: grey;
-    }
-    button.dt-button {
-        color: white;
-        background: orange;
-        border-radius: 20px;
-    }
 
-    .dataTable {
-            border-collapse: separate;
-            width: 100%;
-            border-spacing: 0;
-            border-radius: 5px;
-            overflow: hidden;
-            padding-top: 1rem;
-        }
-
-        .dataTable thead th {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            border: 1px solid #4e4e4e;
-        }
-
-        .dataTable tbody tr:nth-child(even) {
-            background-color: #262626;
-        }
-
-        .dataTable tbody tr:nth-child(odd) {
-            background-color: #1b1b1b;
-        }
-
-        .dataTable tbody tr:hover {
-            background-color: #4a4a4a;
-        }
-
-        .dataTable tbody th, .dataTable tbody td {
-            border: 1px solid #4e4e4e;
-        }
-        .dataTables_info {
-            color: grey !important;
-        }
-        .paginate_button.current {
-            background: purple !important;
-            color: white !important;
-        }
-        .dataTable tbody th, .dataTable tbody td {
-            border: 1px solid #4e4e4e;
-            padding: 10px;
-        }
-
-        .dataTable tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 5px;
-        }
-
-        .dataTable tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 5px;
-        }
-
-</style>
 
 <div id="layoutSidenav_content">
     <main>
