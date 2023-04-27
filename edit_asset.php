@@ -305,7 +305,7 @@ if(isset($_POST['edit_financial'])){
     <!-- Edit Modals -->
     <!-- Asset Modal -->
     <div class="modal fade" id="editAssetModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document" style = "max-width: 800px; max-heigth:80%">
+        <div class="modal-dialog" role="document" style = "max-width: 800px; max-height:80%">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Edit Asset</h5>
