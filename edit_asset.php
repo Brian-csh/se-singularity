@@ -6,7 +6,7 @@ if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
 
-$active = $edit_name;
+// $active = $edit_name;
 include "includes/header.php";
 include "functions.php";
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
@@ -63,11 +63,11 @@ if(isset($_POST['edit_asset'])){
     $asset_new_position = $_POST['editAssetPosition'];
     $asset_new_status = $_POS['editAssetStatus']; if(!$asset_new_status) $asset_new_status = $asset_status_id;
     $sql = "UPDATE asset SET parent =$asset_new_parent,name = '$asset_new_name',class = '$asset_new_class', 
-        user = NULLIF('$asset_new_user',''), expire = '$asset_new_expire',position = '$asset_new_position', status = '$asset_new_status' WHERE id = '$asset_id'";
+        expire = '$asset_new_expire',position = '$asset_new_position' WHERE id = '$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Asset info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,6);
+        insert_log_asset($conn,$asset_data,$session_info['id'],7);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -83,7 +83,7 @@ if(isset($_POST['description_change'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Description updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,6);
+        insert_log_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -100,7 +100,7 @@ if(isset($_POST['edit_basic'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Basic info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,6);
+        insert_log_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -117,6 +117,7 @@ if(isset($_POST['edit_financial'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Financial info updated successfully!')</script>";
+        insert_log_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -253,6 +254,7 @@ if(isset($_POST['edit_custom_attr'])){
                             </div>
                         </div>
                     </form>
+
 
                     <div class = "row mb-3">
 

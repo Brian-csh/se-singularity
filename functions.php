@@ -30,29 +30,38 @@ function insert_log_login($conn,$row,$type_id)
     }
 }
 
-function insert_log_asset($conn, $row, $type_id)
+function insert_log_asset($conn, $row,$user_id,$type_id)
 {
     /*  BEGIN INSERT LOG */
     $time_now = time();
-
     $asset_id = $row['id'];
     $text = '';
+    $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
 
     if( $type_id ==4){
     } else if ( $type_id ==5){
-        $text = "Asset ". $row['name']." created!";
+        $text = "Asset ". $row['name']." created by " . $user_name;
     } else if ( $type_id ==6){
-        $text = "Asset ". $row['name']." info changed!";
+        $text = "Asset ". $row['name']." info changed by " . $user_name;
     } else if ( $type_id ==7){
-        $text = "Asset ". $row['name']." registered from..!";
+        $text = "Asset ". $row['name']." registered (use) from " . $user_name;
     } else if ( $type_id ==8){
-        $text = "Asset ". $row['name']." register approved!";
+        $text = "Asset ". $row['name']." register(use) approved by " . $user_name;
     } else if ( $type_id ==9){
-        $text = "Asset ". $row['name']." deleted!";
+        $text = "Asset ". $row['name']." registered (move) from " . $user_name;
+    } else if ( $type_id ==10){
+        $text = "Asset ". $row['name']." registered (move) approved by" . $user_name;
+    } else if ( $type_id ==11){
+        $text = "Asset ". $row['name']." registered (repair) from " . $user_name;
+    } else if ( $type_id ==12){
+        $text = "Asset ". $row['name']." registered (repair) approved by " . $user_name;
+    } else if ( $type_id ==13){
+        $text = "Asset ". $row['name']." deleted by " . $user_name;
     }
+    /* TODO: finish other cases*/
 
-    $sql = "INSERT INTO log (date, text,log_type, subject) VALUES
-    ('$time_now','$text','$type_id','$asset_id')";
+    $sql = "INSERT INTO log (date, text,log_type, subject,`By`) VALUES
+    ('$time_now','$text','$type_id','$asset_id','$user_id')";
 
     if ($conn->query($sql)){
         return "Record inserted successfully.";

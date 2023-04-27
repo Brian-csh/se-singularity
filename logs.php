@@ -45,6 +45,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                             <th>Date</th>
                             <th>Log</th>
                             <th>Type</th>
+                            <th>Subject</th>
                         </tr>
                         </tfoot>
                         <tbody>

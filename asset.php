@@ -8,8 +8,25 @@ if (isset($_GET['name'])) {
 
 $active = $asset_name;
 include "includes/header.php";
+
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title><?= $active ?> - Singularity EAM</title>
+    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
+    <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="nav-fixed">
 
 <div id="layoutSidenav_content">
     <main>
@@ -27,29 +44,16 @@ include "includes/header.php";
                             $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
                             $result = $conn->query($sql_asset);
 
-                            if ($result) {
-                                if (mysqli_num_rows($result) > 0) {
+                            if ($result&&mysqli_num_rows($result) > 0) {
                                     $asset_data = mysqli_fetch_assoc($result);
-                                    $date_create = new DateTime();
-                                    $date_create->setTimestamp($asset_data['date_created']);
-                                    $asset_name = $asset_data['name'];
-                                } else {
-                                    $date_create = "N/A";
-                                }
+                                    $date_create = gmdate("Y.m.d \ | H:i:s",$asset_data['date_created']+28000);
                             }
-                            $date_create->setTimezone(new DateTimeZone('Asia/Shanghai'));
-                            echo "Date Created: {$date_create->format('Y-m-d H:i:s')}<br>";
-                            
-                            //fetch logs
-                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_name') ORDER BY date_created DESC";
+                            echo "Date Created: {$date_create}<br>";
+
+                            // Fetch logs
+                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id') ORDER BY date DESC";
                             $result = $conn->query($sql_log);
 
-                            if ($result) {
-                                if (mysqli_num_rows($result) > 0) {
-                                    $user_data = mysqli_fetch_assoc($result);
-                                    echo "Entity Head: $user_data <br>";
-                                }
-                            }
                             ?>
                             </div>
                         </div>
@@ -66,50 +70,48 @@ include "includes/header.php";
                     </div>
                     <table id="datatablesSimple" style="display: none">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Parent</th>
-                                <th>Name</th>
-                                <th>Class</th>
-                                <th>User</th>
-                                <th>Price</th>
-                                <th>Description</th>
-                                <th>Position</th>
-                                <th>Expiration Date</th>
-                            </tr>
+                        <tr>
+                            <th>Date</th>
+                            <th>Log</th>
+                            <th>Type</th>
+                            <th>By</th>
+                        </tr>
                         </thead>
                         <tfoot>
-                            <tr>
-                                <th>ID</th>
-                                <th>Parent</th>
-                                <th>Name</th>
-                                <th>Class</th>
-                                <th>User</th>
-                                <th>Price</th>
-                                <th>Description</th>
-                                <th>Position</th>
-                                <th>Expiration Date</th>
-                            </tr>
+                        <tr>
+                            <th>Date</th>
+                            <th>Log</th>
+                            <th>Type</th>
+                            <th>By</th>
+                        </tr>
                         </tfoot>
                         <tbody>
-                            <?php
-                            // select all the logs for the asset
-                            $sql_department = "SELECT * FROM department WHERE id = '$asset_id'";
-                            $result = $conn->query($sql_department);
+                        <?php
 
-                            if ($result) {
-                                if (mysqli_num_rows($result) > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        $department_id = $row['id'];
-                                        $department_name = $row['name'];
-                                        $department_parent = $row['parent'];
+                            while ($row = $result->fetch_assoc()) {
+                                                                
+                                //Fetch Log Type
+                                $type_id = $row["log_type"];
+                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
+                                if($type_id>=1 && $type_id <=3)continue;
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td><td>$department_parent</td></tr>";
-                                    }
-                                } else {
-                                    header('Location: entity.php');
-                                }
+                                $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
+                                $log_id = $row["id"];
+                                $text = $row["text"];
+
+                                // Fetch user name
+                                $user_id = $row["By"];
+                                $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
+
+
+                                echo "<tr data-id='$log_id' >
+                                <td class='text-primary'>$date</td>
+                                <td class='text-white'>$text</td>
+                                <td class='text-white'>$type</td>
+                                <td class='text-white'>$by</td>
+                                </tr>";
                             }
+
                             ?>
                         </tbody>
                     </table>
@@ -129,3 +131,6 @@ include "includes/header.php";
     <?php
     include "includes/footer.php";
     ?>
+</div>
+
+</html>
