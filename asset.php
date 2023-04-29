@@ -101,7 +101,8 @@ include "includes/header.php";
 
                                 // Fetch user name
                                 $user_id = $row["By"];
-                                $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
+                                $by = "";
+                                if ($user_id != '') $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
 
 
                                 echo "<tr data-id='$log_id' >

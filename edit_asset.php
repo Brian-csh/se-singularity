@@ -6,7 +6,7 @@ if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
 
-// $active = $edit_name;
+ $active = 'Asset #' . $asset_id . ' Edit';
 include "includes/header.php";
 include "functions.php";
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
@@ -30,6 +30,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_original_price = $asset_data['price'];
         $asset_current_price = $asset_data['current price'];
         $asset_depreciation_model = $asset_data['depreciation model'];
+        $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
 }
 
@@ -127,25 +128,27 @@ if(isset($_POST['edit_financial'])){
 
 // Update custom attribute info
 if(isset($_POST['edit_custom_attr'])){
-    $custom_attribute_arr = json_decode($custom_attributes, true);
 
-    foreach ($custom_attribute_arr as $custom_key => $custom_value) {
-        $form_name = str_replace(" ", "_", $custom_key);
-        $custom_attribute_arr[$custom_key] = $_POST['ca_'. $form_name];
-        if(!$custom_attribute_arr[$custom_key]) $custom_attribute_arr[$custom_key] = $custom_value;
+    $ca_fields = [];
+    // Loop through the $_POST array
+    foreach ($_POST as $key => $value) {
+        // Check if the key starts with "ca"
+        if (strncmp($key, 'ca', 2) === 0) {
+            // Add the key-value pair to the $ca_fields array
+            $ca_fields[$key] = $value;
+        }
     }
-    $custom_attributes = json_encode($custom_attribute_arr);
+    $custom_attributes = json_encode($ca_fields);
 
     $sql = "UPDATE asset SET custom_attr='$custom_attributes' WHERE id='$asset_id'";
-    $result = $conn->query($sql);
-    // if($result){
-    //     echo "<script>alert('Custom attribute info updated successfully!')</script>";
-    //     insert_log_asset($conn,$asset_data,6);
-    //     echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-    // }
-    // else{
-    //     echo "<script>alert('Custom attribute info update failed!')</script>";
-    // }
+     if($conn->query($sql)){
+         echo "<script>alert('Custom attribute info updated successfully!')</script>";
+//         insert_log_asset($conn,$asset_data,6);
+//         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+     }
+     else{
+         echo "<script>alert('Custom attribute info update failed!')</script>";
+     }
 }
 ?>
 <!DOCTYPE html>
@@ -334,16 +337,24 @@ if(isset($_POST['edit_custom_attr'])){
                                         <div class = "col">
                                         <table class="table table-hover">
                                             <tbody>
-                                                <?php 
+                                                <?php
+                                                if ($custom_attributes) {
                                                     $custom_attribute_obj = json_decode($custom_attributes);
                                                     foreach ($custom_attribute_obj as $custom_key => $custom_value) {
+                                                        $custom_key_id = substr($custom_key, 3);
+
+                                                        // Get the custom key name
+                                                        $custom_key_name = $conn->query("SELECT * FROM asset_attribute WHERE id = $custom_key_id")->fetch_assoc()['custom_attribute'];
                                                         echo '
                                                             <tr>
-                                                                <th>'. $custom_key .'</th>
+                                                                <th>'. $custom_key_name .'</th>
                                                                 <td>'. $custom_value .'</td>
                                                             </tr>
                                                         ';
                                                     }
+                                                } else {
+                                                    echo '<p class="text-white">No custom attributes available for this asset</p>';
+                                                }
                                                 ?>
                                             </tbody>
                                         </table>
@@ -570,17 +581,31 @@ if(isset($_POST['edit_custom_attr'])){
                 </div>
                 <form method="POST" enctype="multipart/form-data">
                     <div class="modal-body">
-                        <?php 
-                            $custom_attribute_obj = json_decode($custom_attributes);
-                            foreach ($custom_attribute_obj as $custom_key => $custom_value) {
-                                $form_name = str_replace(" ", "_", $custom_key);
-                                echo '
-                                    <div class="mb-3">
-                                        <label for="custom_attribute_'.$custom_key.'">'.$custom_key.' </label>
-                                        <input class="form-control" id="custom_attribute_'.$custom_key.'" type="text" name="ca_'.$form_name.'" placeholder="'. $custom_value .'" >
-                                    </div>
-                                ';
+                        <?php
+                        // Get the entity of the asset
+                        if (isset($asset_department_id)) {
+                            $sql = "SELECT entity FROM department WHERE id = '$asset_department_id'";
+                            $result = mysqli_query($conn, $sql);
+                            $row = mysqli_fetch_assoc($result);
+                            $entity = $row['entity'];
+
+                            // Get all custom attributes for this entity
+                            $sql = "SELECT * FROM asset_attribute WHERE entity_id = '$entity'";
+                            $result = mysqli_query($conn, $sql);
+                            if ($result -> num_rows > 0) {
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    $attribute_id = $row['id'];
+                                    $attribute_name = $row['custom_attribute'];
+                                    // Display the attribute name and value
+                                    echo '<div class="mb-3">';
+                                    echo '<label for="customEdit' . $attribute_id . '">' . $attribute_name . '</label>';
+                                    echo '<input class="form-control" id="customEdit' . $attribute_id . '" type="text" name="ca_' . $attribute_id . '" placeholder="Attribute Value">';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo "No custom attributes found for this asset's entity.";
                             }
+                        }
                         ?>
                     </div>
                     <div class="modal-footer">
