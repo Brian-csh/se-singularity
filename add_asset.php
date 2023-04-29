@@ -52,20 +52,23 @@ if (isset($_POST['submit_asset'])) {
     if (empty($asset_parent)) {
         $asset_parent = NULL;
       }
-    $expiration = $_POST['expiration'];
     $asset_class = $_POST['asset_class'];
     $department = $_POST['department'];
     $asset_user = $_POST['asset_user'];
     $price = $_POST['price'];
     $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
-    $expire = $_POST['expiration'];
+    $expire = date("Y-m-d",strtotime($_POST['expiration']));
+    // $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));
+
     if(isset($_POST['entity'])) {
         $custom_entity_id = $_POST['entity'];
     }
     else {
         $custom_entity_id = $session_info['user']['entity'];
     }
+
+    $date_created = time();
 
     // Posting custom attributes
     $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
@@ -84,14 +87,14 @@ if (isset($_POST['submit_asset'])) {
         $ca_json = json_encode($ca_obj);
     }
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json')";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created,status) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
-        header('Location: add_asset.php?insert_error');
+        echo "Error inserting asset: " . $conn->error;
+        // header('Location: add_asset.php?insert_error');
     }
-    echo $ca_json;
 }
 ?>
 <!DOCTYPE html>
@@ -126,59 +129,61 @@ if (isset($_POST['submit_asset'])) {
 <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
 <script src="js/datatables/datatables-simple-demo.js"></script>
 <script>
-    function updateDepartments(entityId) {
-        $.ajax({
-            url: 'includes/scripts/ajax.php',
-            method: 'POST',
-            data: {
-                request: 'get_departments',
-                entity_id: entityId
-            },
-            dataType: 'json',
-            success: function (departments) {
-                var departmentSelect = $('#inputDepartment');
-                departmentSelect.empty();
+    function updateDepartments() {
+            let entityId = $('#inputEntity').val();
 
-                // Add the default "Select a Department" option
-                departmentSelect.append($('<option>', {
-                    value: "",
-                    text: "Select a Department"
-                }));
+            $.ajax({
+                url: 'includes/scripts/ajax.php',
+                method: 'POST',
+                data: {
+                    request: 'get_departments',
+                    entity_id: entityId
+                },
+                dataType: 'json',
+                success: function (departments) {
+                    var departmentSelect = $('#inputDepartment');
+                    departmentSelect.empty();
 
-                // Create a map to store parent departments and their subdepartments
-                var departmentMap = {};
-
-                // Separate parent and subdepartments
-                departments.forEach(function (department) {
-                    if (department.parent === null) {
-                        departmentMap[department.id] = {
-                            name: department.name,
-                            subdepartments: []
-                        };
-                    } else {
-                        departmentMap[department.parent].subdepartments.push(department);
-                    }
-                });
-
-                // Add parent departments and their subdepartments to the select element
-                for (var parentId in departmentMap) {
-                    // Add parent department
+                    // Add the default "Select a Department" option
                     departmentSelect.append($('<option>', {
-                        value: parentId,
-                        text: departmentMap[parentId].name
+                        value: "",
+                        text: "Select a Department"
                     }));
 
-                    // Add subdepartments with indentation
-                    departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                        departmentSelect.append($('<option>', {
-                            value: subdepartment.id,
-                            text: "— " + subdepartment.name // Indentation using an em dash (—)
-                        }));
+                    // Create a map to store parent departments and their subdepartments
+                    var departmentMap = {};
+
+                    // Separate parent and subdepartments
+                    departments.forEach(function (department) {
+                        if (department.parent === null) {
+                            departmentMap[department.id] = {
+                                name: department.name,
+                                subdepartments: []
+                            };
+                        } else {
+                            departmentMap[department.parent].subdepartments.push(department);
+                        }
                     });
-                }
-            },
-        });
-    }
+
+                    // Add parent departments and their subdepartments to the select element
+                    for (var parentId in departmentMap) {
+                        // Add parent department
+                        departmentSelect.append($('<option>', {
+                            value: parentId,
+                            text: departmentMap[parentId].name
+                        }));
+
+                        // Add subdepartments with indentation
+                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
+                            departmentSelect.append($('<option>', {
+                                value: subdepartment.id,
+                                text: "— " + subdepartment.name // Indentation using an em dash (—)
+                            }));
+                        });
+                    }
+                },
+            });
+        }
 </script>
 <body class="nav-fixed">
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-black border-bottom border-dark" id="sidenavAccordion">
@@ -252,7 +257,7 @@ if (isset($_POST['submit_asset'])) {
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <div class="col-md-4">
-                                        <label class="small mb-1" for="inputName">Asset Name</label>
+                                        <label class="small mb-1" for="inputName">Asset Name *</label>
                                         <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter an Asset Name">
                                     </div>
 
@@ -304,7 +309,7 @@ if (isset($_POST['submit_asset'])) {
                                     <?php if ($session_info['user']['role'] == 1): ?>
                                     
                                         <div class="col-md-3">
-                                            <label class="small mb-1" for="inputEntity">Entity</label>
+                                            <label class="small mb-1" for="inputEntity">Entity *</label>
                                             <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments(inputEntity)">
                                                 <option value="">Select an Entity</option>
 
@@ -330,8 +335,10 @@ if (isset($_POST['submit_asset'])) {
                                         prompt to create department? -->
                                     <!-- Asset department (position) -->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputLocation">Location</label>
-                                        <input required class="form-control" id="inputLocation" type="text" value="" name="location" placeholder="Enter an Asset Location">
+                                        <label class="small mb-1" for="inputDepartment">Department *</label>
+                                        <select class="form-control" id="inputDepartment" name="department" required>
+                                            <option value="">Select a Department</option>
+                                        </select>
                                     </div>
 
                                     <!-- Form Group (user)-->

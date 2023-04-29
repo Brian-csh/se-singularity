@@ -34,11 +34,20 @@ if (isset($_POST['add_class'])) {
     if ($conn->query($sql_add_class)) {
         // TODO: create a popup for success
     } else {
-        echo "Pain in my assholes.";
+        echo "Error.";
     }
 }
 
 ?>
+<link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<!-- DataTables Select CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css"/>
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css"/>
+
+
 
 <div id="layoutSidenav_content">
     <main>
@@ -62,10 +71,7 @@ if (isset($_POST['add_class'])) {
         <div class="container-fluid px-4">
             <div class="card">
                 <div class="card-body">
-                    <div id="tablePreloader">
-                        <p class="text-white p-3">Loading...</p>
-                    </div>
-                    <table id="datatablesSimple" style="display: none">
+                    <table id="myTable" >
                         <thead>
                         <tr>
                             <th>ID</th>
@@ -74,27 +80,16 @@ if (isset($_POST['add_class'])) {
                             <th>Class</th>
                             <th>User</th>
                             <th>Price</th>
-                            <!-- <th>Description</th> -->
+                            <th>Description</th>
                             <th>Position</th>
-                            <th>Expiration Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
-                        <tfoot>
-                        <tr>
-                        <th>ID</th>
-                            <th>Parent</th>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>User</th>
-                            <th>Price</th>
-                            <!-- <th>Description</th> -->
-                            <th>Position</th>
-                            <th>Expiration Date</th>
-                        </tr>
-                        </tfoot>
                         <tbody>
                         <?php
 
+/*
 
                         $result = $conn->query($sql);
 
@@ -131,7 +126,7 @@ if (isset($_POST['add_class'])) {
                             }
                         }
 
-
+*/
                         ?>
                         </tbody>
                     </table>
@@ -202,9 +197,70 @@ if (isset($_POST['add_class'])) {
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <!-- DataTables Select JS -->
+<script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+
+<!-- DataTables Buttons JS -->
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#myTable').DataTable({
+            ordering: false,
+            searching: true,
+            processing: true,
+            serverSide: true,
+            ajax: "includes/scripts/datatables.php",
+            columns: [
+                { "data": "id" },
+                { "data": "parent" },
+                { "data": "name" },
+                { "data": "class" },
+                { "data": "user" },
+                { "data": "price" },
+                { "data": "description" },
+                { "data": "position" },
+                { "data": "status" },
+                { "data": "actions" }
+            ],
+            select: {
+                style: 'multi'
+            },
+            buttons: [
+                {
+                    text: 'Retire',
+                    action: function (e, dt, node, config) {
+                        var selectedRows = dt.rows({selected: true}).data().toArray();
+                        var assetIds = selectedRows.map(function (row) {
+                            return row.id;
+                        });
+
+                        // Perform AJAX request
+                        $.ajax({
+                            url: "includes/scripts/retire_assets.php",
+                            method: "POST",
+                            data: {
+                                assets: assetIds
+                            },
+                            success: function (response) {
+                                console.log(response);
+                                // Perform any additional actions on success
+                                dt.ajax.reload(); // Refresh the DataTables
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                console.error(textStatus, errorThrown);
+                            }
+                        });
+                    }
+                }
+            ],
+            dom: 'Bfrtip' // Add this line to display buttons
+        });
+    });
+    </script>
     <?php
     include "includes/footer.php";
     ?> 
