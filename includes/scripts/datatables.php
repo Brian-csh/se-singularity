@@ -26,18 +26,25 @@ while($row = $result->fetch_assoc()) {
     }
 
     if (isset($row['user'])) {
-        $asset_user_id = $row['user'];
-        $asset_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id'"))['name'];
+        $user_id = $row['user'];
+        $user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
     } else {
-        $asset_user = "N/A";
+        $user = "N/A";
+    }
+
+    if (isset($row['parent'])) {
+        $parent_id = $row['parent'];
+        $parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$parent_id'"))['name'];
+    } else {
+        $parent = "N/A";
     }
 
     $data[] = array(
         "id" => $row['id'],
-        "parent" => $row['parent'],
+        "parent" => $parent,
         "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
         "class" => $row['class'],
-        "user" => $asset_user,
+        "user" => $user,
         "price" => $row['price'],
         "description" => $row['description'],
         "position" => $row['position'],
