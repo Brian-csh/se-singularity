@@ -39,11 +39,18 @@ while($row = $result->fetch_assoc()) {
         $parent = "N/A";
     }
 
+    if (isset($row['class'])) {
+        $class_id = $row['class'];
+        $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
+    } else {
+        $class = "N/A";
+    }
+
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
         "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
-        "class" => $row['class'],
+        "class" => $class,
         "user" => $user,
         "price" => $row['price'],
         "description" => $row['description'],
