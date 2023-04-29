@@ -1,13 +1,40 @@
 <?php
+$active = 'Entity #' . $_GET['id'];
+
+include "includes/header.php";
+
 if (isset($_GET['id'])) {
     $entity_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $entity_name = $_GET['name'];
+
+// Fetch entity values
+$sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
+$result = $conn->query($sql);
+if ($result -> num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $entity_name = $row['name'];
+    }
+} else {
+    exit("No entity found with that ID.");
 }
 
-$active = $entity_name;
-include "includes/header.php";
+if (isset($_GET['delete_attribute_id']) and $_GET['delete_attribute_id'] != "") {
+    $attribute_deletion_id = $_GET['delete_attribute_id'];
+
+    // Get data about this attribute
+    $sql = "SELECT * FROM asset_attribute WHERE id = '$attribute_deletion_id' LIMIT 1";
+    $result = $conn->query($sql);
+    if ($result -> num_rows > 0) {
+        while ($row_delete = $result->fetch_assoc()) {
+            $attribute_entity_id = $row_delete['entity_id'];
+
+            // Delete the attribute
+            $sql = "DELETE FROM asset_attribute WHERE id = '$attribute_deletion_id' LIMIT 1";
+            $conn->query($sql);
+        }
+    }
+}
+
 ?>
 
 
@@ -122,6 +149,30 @@ include "includes/header.php";
                 </div>
             </div>
         </div>
+        <div class="container p-3 pt-5">
+            <h1>
+                Custom Attributes:
+            </h1>
+            <p class="text-white ">
+                <?php
+                $sql = "SELECT * FROM asset_attribute WHERE entity_id = '$entity_id'";
+                $result = $conn->query($sql);
+
+                if ($result) {
+                    if (mysqli_num_rows($result) > 0) {
+                        echo "<ul class='text-white'>";
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<li>" . $row['custom_attribute'] . " | <a class='text-danger' href='entity.php?id=" . $entity_id . "&delete_attribute_id=" . $row['id'] . "'>Delete</a></li>";
+                        }
+                        echo "</ul>";
+                    } else {
+                        echo "No custom attributes";
+                    }
+                }
+                ?>
+            </p>
+        </div>
+
     </main>
 
 
