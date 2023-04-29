@@ -25,12 +25,19 @@ while($row = $result->fetch_assoc()) {
         $status = "DELETED";
     }
 
+    if (isset($row['user'])) {
+        $asset_user_id = $row['user'];
+        $asset_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id'"))['name'];
+    } else {
+        $asset_user = "N/A";
+    }
+
     $data[] = array(
         "id" => $row['id'],
         "parent" => $row['parent'],
         "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
         "class" => $row['class'],
-        "user" => $row['user'],
+        "user" => $asset_user,
         "price" => $row['price'],
         "description" => $row['description'],
         "position" => $row['position'],
