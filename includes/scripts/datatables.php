@@ -7,8 +7,14 @@ $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
+$departmentid = intval($_GET['departmentid']);
+
 // Fetch data from your database table
-$sql = "SELECT * FROM asset LIMIT $start, $length";
+if ($departmentid == -1)
+    $sql = "SELECT * FROM asset LIMIT $start, $length";
+else
+    $sql = "SELECT * FROM asset WHERE department = $departmentid LIMIT $start, $length";
+
 $result = $conn->query($sql);
 
 $data = array();
@@ -53,7 +59,7 @@ while($row = $result->fetch_assoc()) {
         "class" => $class,
         "user" => $user,
         "price" => $row['price'],
-        "description" => $row['description'],
+        "description" => strip_tags(substr($row['description'],0,30)) . "...",
         "position" => $row['position'],
         "expire" => $row['expire'],
         "status" => $status,

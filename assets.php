@@ -11,6 +11,12 @@ Item Asset: 0
 Value Asset: 1
 */
 
+if (isset($_GET['departmentid'])) {
+    $departmentid = $_GET['departmentid'];
+} else {
+    $departmentid = -1;
+}
+
 if (isset($_POST['add_class'])) {
 
     $name = $_POST['class_name'];
@@ -213,7 +219,12 @@ if (isset($_POST['add_class'])) {
             searching: true,
             processing: true,
             serverSide: true,
-            ajax: "includes/scripts/datatables.php",
+            ajax: {
+                url: "includes/scripts/datatables.php",
+                data: function(d) {
+                        d.departmentid = <?=$departmentid?>;
+                }
+            },
             columns: [
                 { "data": "id" },
                 { "data": "parent" },
