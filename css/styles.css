@@ -21133,3 +21133,12 @@ button.dt-button {
   background: orange !important;
   border-radius: 20px !important;
 }
+
+.dataTables_wrapper .dataTables_length select {
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 5px;
+  background-color: transparent;
+  padding: 4px;
+  color: #a7aeb8;
+}
