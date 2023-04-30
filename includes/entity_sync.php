@@ -47,6 +47,7 @@ else {
     $entity_id = 1;
 }
 
+$contacts_added = 0;
 
 foreach ($users as $user) {
     $user_id = $user['user_id']; // The feishu_id to search for
@@ -58,22 +59,21 @@ foreach ($users as $user) {
     if ($result) {
         $row_count = mysqli_fetch_row($result)[0];
         if ($row_count <= 0) {
-            echo $user_id;
+            $contacts_added++;
             // A row with the feishu_id does not exists in the table
             $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role, feishu_id) 
             VALUES ('$date_created', '$user_name', '$hashed_password', '$entity_id', NULL, '$entity_head', '$role_id', '$user_id')";
 
             if ($conn->query($sql)) {
             } else {
-                header('Location: ../entities.php&sync_error');
+                header('Location: ../entities.php?sync_error=4000');
             }
         }
-    } else {
-    // Error executing the query
-    // Handle the error here
+    }
+    else {
+        header('Location: ../entities.php?sync_error=4001');
     }
 }
 
-header('Location: ../entities.php');
-
+header('Location: ../entities.php?sync_success='.$contacts_added);
 ?>
