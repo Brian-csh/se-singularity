@@ -217,6 +217,7 @@ if (isset($_POST['add_class'])) {
                 searching: true,
                 processing: true,
                 serverSide: true,
+                searchDelay: 500,
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {

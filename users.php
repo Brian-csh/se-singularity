@@ -139,6 +139,7 @@ if (isset($_GET['departmentid'])) {
                 searching: true,
                 processing: true,
                 serverSide: true,
+                searchDelay: 500,
                 ajax: {
                     url: "includes/scripts/datatables_users.php",
                     data: function(d) {
