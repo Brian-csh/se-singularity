@@ -5,6 +5,12 @@ $active = "Users";
 include "includes/header.php";
 include "includes/navbar.php";
 
+if (isset($_GET['entityid'])) {
+    $entityid = $_GET['entityid'];
+} else {
+    $entityid = -1;
+}
+
 if (isset($_GET['departmentid'])) {
     $departmentid = $_GET['departmentid'];
 } else {
@@ -137,6 +143,7 @@ if (isset($_GET['departmentid'])) {
                     url: "includes/scripts/datatables_users.php",
                     data: function(d) {
                         d.departmentid = <?= $departmentid ?>;
+                        d.entityid = <?= $entityid ?>;
                     }
                 },
                 columns: [{

@@ -8,12 +8,15 @@ $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
 $departmentid = intval($_GET['departmentid']);
+$entityid = intval($_GET['entityid']);
 
 // Fetch data from your database table
-if ($departmentid == -1)
-    $sql = "SELECT * FROM user LIMIT $start, $length";
+if ($departmentid != -1)
+    $sql = "SELECT * FROM user WHERE department = $departmentid LIMIT $start, $length"; 
+else if ($entityid != -1)
+    $sql = "SELECT * FROM user WHERE entity = $entityid LIMIT $start, $length";
 else
-    $sql = "SELECT * FROM user WHERE department = $departmentid LIMIT $start, $length";
+    $sql = "SELECT * FROM user LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
