@@ -12,11 +12,19 @@ $entityid = intval($_GET['entityid']);
 
 // Fetch data from your database table
 if ($departmentid != -1)
-    $sql = "SELECT * FROM user WHERE department = $departmentid LIMIT $start, $length"; 
+    $sql = "SELECT * FROM user WHERE department = $departmentid"; 
 else if ($entityid != -1)
-    $sql = "SELECT * FROM user WHERE entity = $entityid LIMIT $start, $length";
+    $sql = "SELECT * FROM user WHERE entity = $entityid";
 else
-    $sql = "SELECT * FROM user LIMIT $start, $length";
+    $sql = "SELECT * FROM user WHERE 1=1";
+
+if (isset($_GET['search']['value'])) {
+    $search_string = $_GET['search']['value'];
+    if (!empty($search_string))
+        $sql .= " AND (name LIKE '%$search_string%')";
+}
+
+$sql .= " LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
