@@ -53,11 +53,11 @@ while($row = $result->fetch_assoc()) {
     $data[] = array(
         "id" => $row['id'],
         "date_registered" => gmdate("Y.m.d \ | H:i:s", $row['date_created']),
-        "name" => "<a class='text-primary' href='/edit_user.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        "name" => "<a class='text-primary' href='/edit_user.php?id=".$row['id']."'>". $row['name']."</a>",
         "entity" => $entity,
         "department" => $department,
         "role" => $role,
-        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_user.php?id=".$row['id']."&name=".$row['name']."\">
+        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_user.php?id=".$row['id']."\">
         Info
         </a>"
     );
