@@ -3,8 +3,20 @@ include "includes/db/connect.php";
 if (isset($_GET['id'])) {
     $department_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $department_name = $_GET['name'];
+
+//get the department name given the id from database using mysql
+$sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
+$result = $conn->query($sql);
+
+if ($result) {
+    if (mysqli_num_rows($result) > 0) {
+        $row = $result->fetch_assoc();
+        $department_parent = isset($row['parent']) ? $row['parent'] : -1;
+        $entity_id = $row['entity'];
+        $department_name = $row['name'];
+    }
+} else {
+    exit("No department found with that ID.");
 }
 
 if (isset($_POST['edit_details'])) {
@@ -19,9 +31,9 @@ if (isset($_POST['edit_details'])) {
         $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$department_id'";
     }
     if ($conn->query($sql)) {
-        header('Location: department.php?id='.$department_id.'&name='.$updated_department_name);
+        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name);
     } else {
-        header('Location: department.php?id='.$department_id.'&name='.$updated_department_name.'&insert_error');
+        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name . '&insert_error');
     }
 }
 $active = $department_name;
@@ -43,19 +55,6 @@ include "includes/header.php";
                             <div class="page-header-subtitle">
                                 <?php
                                 //get parent department
-                                $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
-                                $result = $conn->query($sql);
-
-                                if ($result) {
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $row = $result->fetch_assoc();
-                                        $department_parent = isset($row['parent']) ? $row['parent'] : -1;
-                                        $entity_id = $row['entity'];
-                                    }
-                                } else {
-                                    echo "error: cannot find department";
-                                }
-
                                 if ($department_parent > 0) {
                                     $sql_parent_name = "SELECT name FROM department WHERE id = '$department_parent' LIMIT 1";
                                     $parent_name_result = $conn->query($sql_parent_name);
@@ -163,7 +162,7 @@ include "includes/header.php";
 
 
                     </div>
-                    <input type="hidden" name="department_id" value="<?php echo $department_id?>">
+                    <input type="hidden" name="department_id" value="<?php echo $department_id ?>">
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
