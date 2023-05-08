@@ -136,7 +136,7 @@ include "includes/header.php";
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset CLass</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset Class</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="department.php" method="post" enctype="multipart/form-data">

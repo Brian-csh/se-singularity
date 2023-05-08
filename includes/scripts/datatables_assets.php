@@ -13,7 +13,7 @@ $departmentid = intval($_GET['departmentid']);
 if ($departmentid == -1)
     $sql = "SELECT * FROM asset WHERE 1=1";
 else
-    $sql = "SELECT * FROM asset WHERE department = $departmentid LIMIT $start, $length";
+    $sql = "SELECT * FROM asset WHERE department = $departmentid";
 
 if (isset($_GET['search']['value'])) {
     $search_string = $_GET['search']['value'];

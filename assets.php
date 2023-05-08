@@ -193,6 +193,39 @@ if (isset($_POST['add_class'])) {
         </div>
     </div>
 
+        <!-- Add Class Modal -->
+<div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Move to Another Department</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="destinationDepartment">Destination Department Name</label>
+                    <select class="form-control" id="destinationDepartment">
+                        <option value="">N/A</option>
+                        <?php
+                        $results = $conn->query("SELECT id, name FROM department"); // where entity=$entity_id of the admin?
+                        while ($row = $results->fetch_assoc()) {
+                            unset($id, $name);
+                            $id = $row['id'];
+                            $name = $row['name'];
+                            echo '<option value="' . $id . '">' . $name . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-success" type="submit" id="confirmButton">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
@@ -258,34 +291,74 @@ if (isset($_POST['add_class'])) {
                 select: {
                     style: 'multi'
                 },
-                buttons: [{
-                    text: 'Retire',
-                    action: function(e, dt, node, config) {
-                        var selectedRows = dt.rows({
-                            selected: true
-                        }).data().toArray();
-                        var assetIds = selectedRows.map(function(row) {
-                            return row.id;
-                        });
+                buttons: [
+                    {
+                        text: 'Retire',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
 
-                        // Perform AJAX request
-                        $.ajax({
-                            url: "includes/scripts/retire_assets.php",
-                            method: "POST",
-                            data: {
-                                assets: assetIds
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                // Perform any additional actions on success
-                                dt.ajax.reload(); // Refresh the DataTables
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                console.error(textStatus, errorThrown);
-                            }
-                        });
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/retire_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                    // Perform any additional actions on success
+                                    dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: 'Move',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            $('#chooseDepartmentModal').modal('show');
+
+                            $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
+                                var departmentId = $('#destinationDepartment').val()
+                                // Perform AJAX request
+                                $.ajax({
+                                    url: "includes/scripts/move_assets.php",
+                                    method: "POST",
+                                    data: {
+                                        assets: assetIds,
+                                        destination: departmentId
+                                    },
+                                    success: function(response) {
+                                        console.log(response);
+                                        // Perform any additional actions on success
+                                        dt.ajax.reload(); // Refresh the DataTables
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        console.error(textStatus, errorThrown);
+                                    }
+                                });
+
+                                $('#chooseDepartmentModal').modal('hide');
+                            });
+                        }
+                        
                     }
-                }],
+
+                ],
                 dom: 'Bfrtip' // Add this line to display buttons
             });
         });
@@ -293,3 +366,4 @@ if (isset($_POST['add_class'])) {
     <?php
     include "includes/footer.php";
     ?>
+
