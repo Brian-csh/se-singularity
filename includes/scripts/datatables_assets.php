@@ -8,12 +8,15 @@ $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
 $departmentid = intval($_GET['departmentid']);
+$userid = intval($_GET['userid']);
 
 // Fetch data from your database table
-if ($departmentid == -1)
-    $sql = "SELECT * FROM asset WHERE 1=1";
+if ($userid != -1)
+    $sql = "SELECT * FROM asset WHERE user = $userid";
+else if ($departmentid != -1)
+    $sql = "SELECT * FROM asset WHERE department = $departmentid";  
 else
-    $sql = "SELECT * FROM asset WHERE department = $departmentid";
+    $sql = "SELECT * FROM asset WHERE 1=1"; 
 
 if (isset($_GET['search']['value'])) {
     $search_string = $_GET['search']['value'];

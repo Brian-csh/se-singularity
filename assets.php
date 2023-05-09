@@ -17,6 +17,12 @@ if (isset($_GET['departmentid'])) {
     $departmentid = -1;
 }
 
+if (isset($_GET['userid'])) {
+    $userid = $_GET['userid'];
+} else {
+    $userid = -1;
+}
+
 if (isset($_POST['add_class'])) {
 
     $name = $_POST['class_name'];
@@ -255,6 +261,7 @@ if (isset($_POST['add_class'])) {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
                         d.departmentid = <?= $departmentid ?>;
+                        d.userid = <?= $userid ?>;
                     }
                 },
                 columns: [{
