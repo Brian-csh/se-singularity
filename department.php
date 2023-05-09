@@ -79,6 +79,7 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">Edit</a>
                         </div>
                     </div>
@@ -171,6 +172,13 @@ include "includes/header.php";
             </div>
         </div>
     </div>
+
+    <script>
+    var btn = document.getElementById('manageUsers');
+    btn.addEventListener('click', function() {
+      document.location.href = 'users.php?departmentid=<?= $department_id ?>';
+    });
+    </script>
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
