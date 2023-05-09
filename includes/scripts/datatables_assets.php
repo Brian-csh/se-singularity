@@ -8,12 +8,34 @@ $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
 $departmentid = intval($_GET['departmentid']);
+$userid = intval($_GET['userid']);
 
 // Fetch data from your database table
-if ($departmentid == -1)
-    $sql = "SELECT * FROM asset LIMIT $start, $length";
+if ($userid != -1)
+    $sql = "SELECT * FROM asset WHERE user = $userid";
+else if ($departmentid != -1)
+    $sql = "SELECT * FROM asset WHERE department = $departmentid";  
 else
-    $sql = "SELECT * FROM asset WHERE department = $departmentid LIMIT $start, $length";
+    $sql = "SELECT * FROM asset WHERE 1=1"; 
+
+if (isset($_GET['search']['value'])) {
+    $search_string = $_GET['search']['value'];
+    if (!empty($search_string)) {
+        $class_condition = "";
+        $asset_class_sql = "SELECT * FROM asset_class WHERE name LIKE '%$search_string%'";
+        $asset_query_result = $conn->query($asset_class_sql);
+        if ($asset_query_result->num_rows > 0) {
+            $class_array = array();
+            while ($row = $asset_query_result->fetch_assoc()) {
+                array_push($class_array, $row['id']);
+            }
+            $class_condition .= " OR class IN (" . implode(", ", $class_array) . ")";
+        }
+        $sql .= " AND (name LIKE '%$search_string%' OR description LIKE '%$search_string%'" . $class_condition . ")";
+
+    }
+}
+$sql .= " LIMIT $start, $length";
 
 $result = $conn->query($sql);
 

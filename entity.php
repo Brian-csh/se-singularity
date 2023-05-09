@@ -159,7 +159,7 @@ if (isset($_POST['create_asset_attribute'])) {
                                         $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
 
                                         echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='department.php?id=$department_id&name=$department_name'>$department_name</a></td><td>$parent_name</td></tr>";
+                                                "<td><a class='text-primary' href='department.php?id=$department_id'>$department_name</a></td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }

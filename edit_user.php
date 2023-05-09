@@ -2,13 +2,15 @@
 include "includes/db/connect.php";
 
 //return the name of the entity corresponding to @param int $id
-function getEntityName($id, $conn) {
+function getEntityName($id, $conn)
+{
     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
     return mysqli_fetch_array($conn->query($sql_entity))['name'];
 }
 
 //return the name of the department corresponding to @param int $id
-function getDepartmentName($id, $conn) {
+function getDepartmentName($id, $conn)
+{
     $sql_department = "SELECT name FROM department WHERE id = '$id'";
     return mysqli_fetch_array($conn->query($sql_department))['name'];
 }
@@ -122,44 +124,44 @@ if (isset($_GET['id'])) {
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
                             <?php
-                                if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
+                            if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
-                            <?php echo  "<p style=\"color: gray;\">date joined: ".$last_modified."</p>"?>
+                            <?php echo  "<p style=\"color: gray;\">date joined: " . $last_modified . "</p>" ?>
                             <form method="post" action="update_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
-                                        <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name?>" name="name">
+                                        <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name ?>" name="name">
                                     </div>
                                     <!-- Form Group (entity)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity?>" name="entity">
+                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity ?>" name="entity">
                                     </div>
 
                                 </div>
                                 <!-- Form Row        -->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (department, role)--> 
+                                    <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <input disabled class="form-control" id="inputDepartment" type="text" value="<?php echo $department?>" name="department">
+                                        <input disabled class="form-control" id="inputDepartment" type="text" value="<?php echo $department ?>" name="department">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
-                                        <select class="form-control" id="inputRole" name="role" value=<?php echo $current_role?>>
-                                            <option value="1" <?php echo ($current_role == 1) ? "selected" : "null"?>>superadmin</option>
-                                            <option value="2" <?php echo ($current_role == 2) ? "selected" : "null"?>>admin</option>
-                                            <option value="3" <?php echo ($current_role == 3) ? "selected" : "null"?>>resource manager</option>
-                                            <option value="4" <?php echo ($current_role == 4) ? "selected" : "null"?>>user</option>
+                                        <select class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
+                                            <option value="1" <?php echo ($current_role == 1) ? "selected" : "null" ?>>superadmin</option>
+                                            <option value="2" <?php echo ($current_role == 2) ? "selected" : "null" ?>>admin</option>
+                                            <option value="3" <?php echo ($current_role == 3) ? "selected" : "null" ?>>resource manager</option>
+                                            <option value="4" <?php echo ($current_role == 4) ? "selected" : "null" ?>>user</option>
                                         </select>
 
                                     </div>
                                 </div>
                                 <!-- Form Row -->
-                                <?php 
+                                <?php
                                 if ($user_id != $session_info['id'])
                                     echo "<div class=\"row gx-3 mb-4\">
                                         <!-- Form Group -->
@@ -167,10 +169,14 @@ if (isset($_GET['id'])) {
 
                                         <div class=\"col-md-4\">
                                             <label class=\"small mb-1\" for=\"inputLockAccount\">Lock Account</label>
-                                            <input id=\"inputLockAccount\" type=\"checkbox\" name=\"lock_account\" <?php echo ($locked) ? \"checked\" : \"\" ?>>
+                                            <input class=\"form-check-input\" id=\"inputLockAccount\" type=\"checkbox\" name=\"lock_account\" <?php echo ($locked) ? \"checked\" : \"\" ?>>
                                         </div>
                                     </div>"
                                 ?>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($user_id == $session_info['id']) ? "disabled" : "" ?> <?php echo ($locked) ? "checked" : "" ?> />
+                                    <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
+                                </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
@@ -182,7 +188,7 @@ if (isset($_GET['id'])) {
                                     </div>
                                 </div>
 
-                                <input type="hidden" name="id" value="<?php echo $user_id?>">
+                                <input type="hidden" name="id" value="<?php echo $user_id ?>">
                                 <!-- Save changes button-->
                                 <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Update</button>
                             </form>

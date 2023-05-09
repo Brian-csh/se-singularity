@@ -1,5 +1,5 @@
 <?php
-$sql = "SELECT * FROM asset ORDER BY id DESC";
+// $sql = "SELECT * FROM asset ORDER BY id DESC";
 $active = "Assets";
 
 include "includes/header.php";
@@ -17,16 +17,20 @@ if (isset($_GET['departmentid'])) {
     $departmentid = -1;
 }
 
+if (isset($_GET['userid'])) {
+    $userid = $_GET['userid'];
+} else {
+    $userid = -1;
+}
+
 if (isset($_POST['add_class'])) {
 
     $name = $_POST['class_name'];
-    if($_POST['class_type'] == "ItemAsset") {
+    if ($_POST['class_type'] == "ItemAsset") {
         $class_type = 0;
-    }
-    else if($_POST['class_type'] == "ValueAsset") {
+    } else if ($_POST['class_type'] == "ValueAsset") {
         $class_type = 1;
-    }
-    else {
+    } else {
         $class_type = -1;
     }
     if (isset($_POST['class_parent']) && $_POST['class_parent']) {
@@ -48,10 +52,10 @@ if (isset($_POST['add_class'])) {
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
 <!-- DataTables Select CSS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css" />
 
 <!-- DataTables Buttons CSS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" />
 
 
 
@@ -64,7 +68,7 @@ if (isset($_POST['add_class'])) {
                         <div class="col-auto mb-3 d-inline w-100">
                             <h1 class="page-header-title text-white d-inline">
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
-                                <?=$active?>
+                                <?= $active ?>
                             </h1>
                             <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
@@ -77,25 +81,25 @@ if (isset($_POST['add_class'])) {
         <div class="container-fluid px-4">
             <div class="card">
                 <div class="card-body">
-                    <table id="myTable" >
+                    <table id="myTable">
                         <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Parent</th>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>User</th>
-                            <th>Price</th>
-                            <th>Description</th>
-                            <th>Position</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Parent</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>User</th>
+                                <th>Price</th>
+                                <th>Description</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <?php
+                            <?php
 
-/*
+                            /*
 
                         $result = $conn->query($sql);
 
@@ -133,7 +137,7 @@ if (isset($_POST['add_class'])) {
                         }
 
 */
-                        ?>
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -169,20 +173,20 @@ if (isset($_POST['add_class'])) {
 
                         <div class="mb-3">
                             <label for="classAddName">Parent Class<label>
-                                <select class="form-control ms-2" id="inputParentClass" name="class_parent">
-                                    <option value="">Select a Parent Class</option>
+                                    <select class="form-control ms-2" id="inputParentClass" name="class_parent">
+                                        <option value="">Select a Parent Class</option>
                                         <?php
-                                            $results = $conn->query("SELECT id, name FROM asset_class");
-                                            while ($row = $results->fetch_assoc()) {
-                                                if ($row['name']) {
-                                                    unset($id, $parent);
-                                                    $id = $row['id'];
-                                                    $parent = $row['name'];
-                                                    echo '<option value="' . $id . '">' . $parent . '</option>';
-                                                }
+                                        $results = $conn->query("SELECT id, name FROM asset_class");
+                                        while ($row = $results->fetch_assoc()) {
+                                            if ($row['name']) {
+                                                unset($id, $parent);
+                                                $id = $row['id'];
+                                                $parent = $row['name'];
+                                                echo '<option value="' . $id . '">' . $parent . '</option>';
                                             }
-                                            ?>
-                                </select>
+                                        }
+                                        ?>
+                                    </select>
                         </div>
 
                     </div>
@@ -195,9 +199,42 @@ if (isset($_POST['add_class'])) {
         </div>
     </div>
 
+        <!-- Add Class Modal -->
+<div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Move to Another Department</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="destinationDepartment">Destination Department Name</label>
+                    <select class="form-control" id="destinationDepartment">
+                        <option value="">N/A</option>
+                        <?php
+                        $results = $conn->query("SELECT id, name FROM department"); // where entity=$entity_id of the admin?
+                        while ($row = $results->fetch_assoc()) {
+                            unset($id, $name);
+                            $id = $row['id'];
+                            $name = $row['name'];
+                            echo '<option value="' . $id . '">' . $name . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-success" type="submit" id="confirmButton">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
-        if ( window.history.replaceState ) {
-            window.history.replaceState( null, null, window.location.href );
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
         }
     </script>
 
@@ -208,70 +245,132 @@ if (isset($_POST['add_class'])) {
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <!-- DataTables Select JS -->
-<script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
 
-<!-- DataTables Buttons JS -->
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <!-- DataTables Buttons JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#myTable').DataTable({
-            ordering: false,
-            searching: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "includes/scripts/datatables.php",
-                data: function(d) {
-                        d.departmentid = <?=$departmentid?>;
-                }
-            },
-            columns: [
-                { "data": "id" },
-                { "data": "parent" },
-                { "data": "name" },
-                { "data": "class" },
-                { "data": "user" },
-                { "data": "price" },
-                { "data": "description" },
-                { "data": "position" },
-                { "data": "status" },
-                { "data": "actions" }
-            ],
-            select: {
-                style: 'multi'
-            },
-            buttons: [
-                {
-                    text: 'Retire',
-                    action: function (e, dt, node, config) {
-                        var selectedRows = dt.rows({selected: true}).data().toArray();
-                        var assetIds = selectedRows.map(function (row) {
-                            return row.id;
-                        });
-
-                        // Perform AJAX request
-                        $.ajax({
-                            url: "includes/scripts/retire_assets.php",
-                            method: "POST",
-                            data: {
-                                assets: assetIds
-                            },
-                            success: function (response) {
-                                console.log(response);
-                                // Perform any additional actions on success
-                                dt.ajax.reload(); // Refresh the DataTables
-                            },
-                            error: function (jqXHR, textStatus, errorThrown) {
-                                console.error(textStatus, errorThrown);
-                            }
-                        });
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                ordering: false,
+                searching: true,
+                processing: true,
+                serverSide: true,
+                searchDelay: 500,
+                ajax: {
+                    url: "includes/scripts/datatables_assets.php",
+                    data: function(d) {
+                        d.departmentid = <?= $departmentid ?>;
+                        d.userid = <?= $userid ?>;
                     }
-                }
-            ],
-            dom: 'Bfrtip' // Add this line to display buttons
+                },
+                columns: [{
+                        "data": "id"
+                    },
+                    {
+                        "data": "parent"
+                    },
+                    {
+                        "data": "name"
+                    },
+                    {
+                        "data": "class"
+                    },
+                    {
+                        "data": "user"
+                    },
+                    {
+                        "data": "price"
+                    },
+                    {
+                        "data": "description"
+                    },
+                    {
+                        "data": "position"
+                    },
+                    {
+                        "data": "status"
+                    },
+                    {
+                        "data": "actions"
+                    }
+                ],
+                select: {
+                    style: 'multi'
+                },
+                buttons: [
+                    {
+                        text: 'Retire',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/retire_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                    // Perform any additional actions on success
+                                    dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: 'Move',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            $('#chooseDepartmentModal').modal('show');
+
+                            $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
+                                var departmentId = $('#destinationDepartment').val()
+                                // Perform AJAX request
+                                $.ajax({
+                                    url: "includes/scripts/move_assets.php",
+                                    method: "POST",
+                                    data: {
+                                        assets: assetIds,
+                                        destination: departmentId
+                                    },
+                                    success: function(response) {
+                                        console.log(response);
+                                        // Perform any additional actions on success
+                                        dt.ajax.reload(); // Refresh the DataTables
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        console.error(textStatus, errorThrown);
+                                    }
+                                });
+
+                                $('#chooseDepartmentModal').modal('hide');
+                            });
+                        }
+                        
+                    }
+
+                ],
+                dom: 'Bfrtip' // Add this line to display buttons
+            });
         });
-    });
     </script>
     <?php
     include "includes/footer.php";
-    ?> 
+    ?>
+
