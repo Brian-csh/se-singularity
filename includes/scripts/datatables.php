@@ -6,6 +6,7 @@ require "../db/connect.php";
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
+$user_role = strval($_GET['role_id']);
 
 // Fetch data from your database table
 $sql = "SELECT * FROM asset LIMIT $start, $length";
@@ -46,6 +47,7 @@ while($row = $result->fetch_assoc()) {
         $class = "N/A";
     }
 
+if( $user_role != '4'){
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -61,6 +63,23 @@ while($row = $result->fetch_assoc()) {
         Info
         </a>"
     );
+} else { // user_role == 4 (user)
+    $data[] = array(
+        "id" => $row['id'],
+        "parent" => $parent,
+        "name" => "<a class='text-primary' href='../../asset_info.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        "class" => $class,
+        "user" => $user,
+        "price" => $row['price'],
+        "description" => $row['description'],
+        "position" => $row['position'],
+        "expire" => $row['expire'],
+        "status" => $status,
+        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"request_asset_status.php?id=".$row['id']."&name=".$row['name']."\">
+        Info
+        </a>"
+    );
+}
 }
 
 // Get the total number of records in the table
