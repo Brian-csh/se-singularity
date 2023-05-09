@@ -6,6 +6,20 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitb3aed4d08958af5e5bc4211e3391fa8b
 {
+    public static $prefixLengthsPsr4 = array (
+        'O' => 
+        array (
+            'OSS\\' => 4,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'OSS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aliyuncs/oss-sdk-php/src/OSS',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -13,6 +27,8 @@ class ComposerStaticInitb3aed4d08958af5e5bc4211e3391fa8b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb3aed4d08958af5e5bc4211e3391fa8b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb3aed4d08958af5e5bc4211e3391fa8b::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInitb3aed4d08958af5e5bc4211e3391fa8b::$classMap;
 
         }, null, ClassLoader::class);

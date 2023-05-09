@@ -3,6 +3,7 @@
       "ext-pdo": "*",
       "ext-curl": "*",
       "ext-mysqli": "*",
-      "ext-json": "*"
+      "ext-json": "*",
+      "aliyuncs/oss-sdk-php": "^2.6"
     }
 }

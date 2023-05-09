@@ -6,9 +6,14 @@ if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
 
- $active = 'Asset #' . $asset_id . ' Edit';
+$active = 'Asset #' . $asset_id . ' Edit';
+
 include "includes/header.php";
 include "functions.php";
+include "includes/oss.php";
+use OSS\OssClient;
+use OSS\Core\OssException;
+
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
 
@@ -86,6 +91,7 @@ if(isset($_POST['description_change'])){
         echo "<script>alert('Description updated successfully!')</script>";
         insert_log_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+        header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name);
     }
     else{
         echo "<script>alert('Description update failed!')</script>";
@@ -150,6 +156,29 @@ if(isset($_POST['edit_custom_attr'])){
          echo "<script>alert('Custom attribute info update failed!')</script>";
      }
 }
+
+//uploading an image for an asset
+if (isset($_POST['upload_image'])) {
+    if (isset($_FILES['file'])) {
+        $file = $_FILES['file'];
+        $localFilePath = $file['tmp_name']; //path in local machine
+        $originalFilename = $file['name'];
+
+        // Generate a unique object name for the file in OSS
+        $objectName = uniqid() . '-' . $originalFilename;
+
+        try {
+            // Upload the file to OSS
+            $ossClient->uploadFile($bucket, $objectName, $localFilePath);
+            echo "<script>alert('File uploaded successfully. Object name: " . $objectName . "')</script>";
+        } catch (OssException $e) {
+            echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
+        }
+    } else {
+        echo "<script>alert('No file selected or an error occurred during file upload.')</script>";
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -196,8 +225,12 @@ if(isset($_POST['edit_custom_attr'])){
                     <!-- TODO: SHOW Image,RTF description input box,Basic info, Financial Info -->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
-                            <!-- TODO: Asset Image -->
-                            IMAGE UPLOADER
+                            <!-- Asset Image -->
+                            <h1>Upload Image</h1>
+                            <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file" style="color: white">
+                                <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
+                            </form>
                         </div>
                         <div class = "col -md-6">
                             <!-- TODO: Asset table -->
