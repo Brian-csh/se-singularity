@@ -7,7 +7,8 @@ $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 // Retire assets
 if (!empty($assetIds)) {
     $ids = implode(',', $assetIds);
-    $sql = "UPDATE asset SET status = 4 WHERE id IN ($ids)";
+    //set user to null for the asset and notify user 
+    $sql = "UPDATE asset SET status = 4, user = null WHERE id IN ($ids)";
     $result = $conn->query($sql);
 
     if ($result) {
