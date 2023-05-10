@@ -42,16 +42,12 @@ $result = $conn->query($sql);
 
 $data = array();
 while($row = $result->fetch_assoc()) {
-    if ($row['status'] == 1) {
-        $status = "IDLE";
-    } else if ($row['status'] == 2) {
-        $status = "IN USE";
-    } else if ($row['status'] == 3) {
-        $status = "IN MAINTAIN";
-    } else if ($row['status'] == 4) {
-        $status = "RETIRED";
-    } else if ($row['status'] == 5) {
-        $status = "DELETED";
+
+    if(isset($row['status'])){
+        $status_id = $row['status'];
+        $status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$status_id'"))['status'];
+    } else {
+        $status = "N/A";
     }
 
     if (isset($row['user'])) {
@@ -75,6 +71,8 @@ while($row = $result->fetch_assoc()) {
         $class = "N/A";
     }
 
+
+    //TODO : add link to descpription (modal or sth)
 if( $user_role != '4'){
     $data[] = array(
         "id" => $row['id'],
@@ -99,7 +97,7 @@ if( $user_role != '4'){
         "class" => $class,
         "user" => $user,
         "price" => $row['price'],
-        "description" => $row['description'],
+        "description" => strip_tags(substr($row['description'],0,30)) . "...",
         "position" => $row['position'],
         "expire" => $row['expire'],
         "status" => $status,

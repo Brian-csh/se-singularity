@@ -8,7 +8,7 @@ if (isset($_GET['name'])) {
 
 $active = 'Asset #' . $asset_id . ' Edit';
 include "includes/header.php";
-include "functions.php";
+include "includes/scripts/functions.php";
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
 

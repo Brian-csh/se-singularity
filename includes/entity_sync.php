@@ -1,6 +1,6 @@
 <?php
 require 'db/connect.php';
-include '../functions.php';
+include '../includes/scripts/functions.php';
 session_start();
 
 // request access token

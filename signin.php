@@ -5,7 +5,7 @@ $session_info = $_SESSION;
 if (isset($session_info['admin'])) header("Location: users.php");
 
 require 'includes/db/connect.php';
-include 'functions.php';
+include 'includes/scripts/functions.php';
 $errors = "";
 $username = "";
 $password = "";

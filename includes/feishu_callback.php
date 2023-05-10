@@ -2,7 +2,7 @@
 require 'db/connect.php';
 
 session_start();
-include '../functions.php';
+include '../includes/scripts/functions.php';
 // bind: existing Singularity users can bind their Feishu accs
 // signin: sign in to Singularity w Feishu (not sign up)
 if(isset($_GET['mode'])) {
