@@ -149,7 +149,7 @@ include "includes/header.php";
                             <select class="form-control" id="inputDepartment" name="parent">
                                 <option value="">N/A</option>
                                 <?php
-                                $results = $conn->query("SELECT id, name FROM department where entity='$entity_id'");
+                                $results = $conn->query("SELECT id, name FROM department where entity='$entity_id' AND id!='$department_id' AND (parent IS NULL OR parent!='$department_id')"); //parent cannot be itself nor its sub-department
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
