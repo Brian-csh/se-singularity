@@ -215,7 +215,7 @@ $user_id = $_SESSION['user']['id'];
                         <div class ="mb-3">
                             <label for="destinationUser">Destination User Name</label>
                             <select class="form-control" id="destinationUser">
-                                <option value=""> N/A </option>
+                                <!-- <option value=""> N/A </option> -->
                                 <?php
                                     $results = $conn->query("SELECT id, name,department,role FROM user WHERE entity = '$entity_id' and role = '4' and id != '$user_id'");
                                     while ($row = $results->fetch_assoc() ) {
@@ -349,7 +349,8 @@ $user_id = $_SESSION['user']['id'];
                 },
                 buttons: [
                     {
-                        text: 'Retire',
+                        text: <?php if($user_role_id == 4) { ?> 'Return',
+                                <?php } else { ?> 'Retire', <?php }?>
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -360,17 +361,37 @@ $user_id = $_SESSION['user']['id'];
 
                             // Perform AJAX request
                             $.ajax({
-                                url: "includes/scripts/retire_assets.php",
+                                url: <?php if($user_role_id == 4) { ?> 'includes/scripts/return_assets.php',
+                                        <?php } else { ?> "includes/scripts/retire_assets.php", <?php }?>
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    role_id : <?= $user_role_id?>
+                                    user_id: <?=$_SESSION['user']['id']?>
                                 },
+                                <?php if ($user_role_id ==4 ) { ?>
                                 success: function(response) {
                                     console.log(response);
                                     // Perform any additional actions on success
                                     dt.ajax.reload(); // Refresh the DataTables
                                 },
+                                <?php } else {?>
+                                sucess: function(response){
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                }, 
+                                <?php }?>
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     console.error(textStatus, errorThrown);
                                 }
@@ -470,12 +491,23 @@ $user_id = $_SESSION['user']['id'];
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    role_id : <?= $user_role_id?> //actually we don't need this..?
+                                    user_id: <?=$_SESSION['user']['id']?>
                                 },
                                 success: function(response) {
                                     console.log(response);
-                                    // Perform any additional actions on success
-                                    dt.ajax.reload(); // Refresh the DataTables
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
                                 },
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     console.error(textStatus, errorThrown);

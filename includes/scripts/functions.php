@@ -128,19 +128,20 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
         case 1: // request use
             // only can request IDLE assets
             foreach($asset_ids as $asset_id){
-                //fetch status of asset
+                //fetch status of asset                
                 $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
-                if(asset_status == 1){ // IN IDLE
+                $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+                if($asset_status == 1){ // IN IDLE
                     $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time) VALUES 
-                            ('$initiator','$participant','$asset_id','$request_type','$time')";
-                    $result = $conn->query($sql);
+                            ('$initiator',null,'$asset_id','$request_type','$time')";
+                    array_push($results,[$asset_name,$conn->query($sql)]);
                     //Make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
 
                     $sql = "UPDATE asset SET status =6 WHERE id = '$asset_id'";
-                    $result = $conn->query($sql);
+                    $conn->query($sql);
                 } else { // NOT IN IDLE
-                    
+                    array_push($results,[$asset_name,false]);
                 }
             }
 
@@ -157,8 +158,8 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 //fetch user
                 $user = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-                if($user == $initiator){ // user is initiator
-                    //TODO : add constraints for status
+                $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+                if($user == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
                             ('$initiator','$participant','$asset_id','$request_type','$time')";
                     array_push($results,[$asset_name,$conn->query($sql)]);
