@@ -7,7 +7,6 @@ if (isset($_GET['id'])) {
 //get the department name given the id from database using mysql
 $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
 $result = $conn->query($sql);
-
 if ($result) {
     if (mysqli_num_rows($result) > 0) {
         $row = $result->fetch_assoc();
@@ -54,7 +53,7 @@ include "includes/header.php";
                             </h1>
                             <div class="page-header-subtitle">
                                 <?php
-                                //get parent department
+                                //get parent department name
                                 if ($department_parent > 0) {
                                     $sql_parent_name = "SELECT name FROM department WHERE id = '$department_parent' LIMIT 1";
                                     $parent_name_result = $conn->query($sql_parent_name);
@@ -115,10 +114,10 @@ include "includes/header.php";
                             if ($result) {
                                 if (mysqli_num_rows($result) > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $department_id = $row['id'];
-                                        $department_name = $row['name'];
+                                        $id = $row['id'];
+                                        $name = $row['name'];
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td><td>$department_name</td></tr>";
+                                        echo "<tr data-id='$id' ><td>$id</td><td>$name</td></tr>";
                                     }
                                 }
                             }
@@ -137,7 +136,7 @@ include "includes/header.php";
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset Class</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Department</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="department.php" method="post" enctype="multipart/form-data">
@@ -150,7 +149,7 @@ include "includes/header.php";
                             <select class="form-control" id="inputDepartment" name="parent">
                                 <option value="">N/A</option>
                                 <?php
-                                $results = $conn->query("SELECT id, name FROM department where entity='$entity_id'");
+                                $results = $conn->query("SELECT id, name FROM department where entity='$entity_id' AND id!='$department_id' AND (parent IS NULL OR parent!='$department_id')"); //parent cannot be itself nor its sub-department
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
