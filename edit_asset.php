@@ -42,7 +42,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
-        $asset_image = $asset_data['image'];
+        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
 // Fetch Data
@@ -247,12 +247,15 @@ include "includes/header.php";
                                     echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
                                 }
                             ?>
-                            <div id="image-container" style="padding: 20px">                               
-                                <?php
-                                    if (isset($asset_image)) {
-                                        echo "<img src=\"" . $asset_image . "\" alt=\"Image Not Found\" loading=\"lazy\">";
+                            <div id="image-container" style="padding: 20px">
+                                <script>
+                                    window.onload = function() {
+                                        var img = document.getElementById('assetImage');
+                                        img.src = "<?=$asset_image?>"; // Set the source of the image
                                     }
-                                ?>
+                                </script>
+                                <img src="" id="assetImage">                            
+                                
                             </div>
                             <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="file" style="color: white">
