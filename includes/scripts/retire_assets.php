@@ -27,7 +27,7 @@ if($user_role != 4){ // manager move
     include "functions.php";
     if (!empty($assetIds)){
         $ids = implode(',', $assetIds);
-        // Make request to manager
+        // TODO : Make request to manager
         $result = make_request();
         if ($result) {
             echo json_encode(['success' => true, 'message' => 'Assets retire requests made successfully.']);

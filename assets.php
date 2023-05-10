@@ -49,6 +49,7 @@ if (isset($_POST['add_class'])) {
 }
 $user_role_id = $_SESSION['user']['role'];
 $entity_id = $_SESSION['user']['entity'];
+$user_id = $_SESSION['user']['id'];
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -216,8 +217,8 @@ $entity_id = $_SESSION['user']['entity'];
                             <select class="form-control" id="destinationUser">
                                 <option value=""> N/A </option>
                                 <?php
-                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE entity = $entity_id and role = '4'");
-                                    while ($row = $results->fetch_assoc()) {
+                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE entity = '$entity_id' and role = '4' and id != '$user_id'");
+                                    while ($row = $results->fetch_assoc() ) {
                                         unset($id, $name);
                                         $id = $row['id'];
                                         $name = $row['name'];
@@ -277,7 +278,7 @@ $entity_id = $_SESSION['user']['entity'];
             <div class="modal-dialog" role="document">
             </div>
         </div> -->
-        
+
 <!-- Request Modal -->
     <script>
         if (window.history.replaceState) {
@@ -299,7 +300,7 @@ $entity_id = $_SESSION['user']['entity'];
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
-                ordering: false,
+                ordering: true,
                 searching: true,
                 processing: true,
                 serverSide: true,
@@ -398,7 +399,7 @@ $entity_id = $_SESSION['user']['entity'];
                                             assets: assetIds,
                                             destination: departmentId,
                                             role_id: <?= $_SESSION['user']['role'] ?>
-                                        },
+                                        }, // TODO : handle requests
                                         success: function(response) {
                                             console.log(response);
                                             // Perform any additional actions on success
@@ -429,6 +430,17 @@ $entity_id = $_SESSION['user']['entity'];
                                         success: function(response) {
                                             console.log(response);
                                             // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for move.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " is moved.")
+                                                }
+                                            }
                                             dt.ajax.reload(); // Refresh the DataTables
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
@@ -452,29 +464,22 @@ $entity_id = $_SESSION['user']['entity'];
                                 return row.id;
                             });
 
-                            $('#chooseDepartmentModal').modal('show');
-
-                            $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
-                                var departmentId = $('#destinationDepartment').val()
-                                // Perform AJAX request
-                                $.ajax({
-                                    url: "includes/scripts/request_assets.php",
-                                    method: "POST",
-                                    data: {
-                                        assets: assetIds,
-                                        destination: departmentId
-                                    },
-                                    success: function(response) {
-                                        console.log(response);
-                                        // Perform any additional actions on success
-                                        dt.ajax.reload(); // Refresh the DataTables
-                                    },
-                                    error: function(jqXHR, textStatus, errorThrown) {
-                                        console.error(textStatus, errorThrown);
-                                    }
-                                });
-
-                                $('#chooseDepartmentModal').modal('hide');
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/request_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds,
+                                    role_id : <?= $user_role_id?> //actually we don't need this..?
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                    // Perform any additional actions on success
+                                    dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
                             });
                         }
                     },

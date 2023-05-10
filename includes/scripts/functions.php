@@ -83,11 +83,14 @@ function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
     }
 }
 
-function insert_log_asset_user($conn,$initiator,$participant,$asset_id,$request_type,$time) // TODO: finish this
+function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$request_type,$time) // TODO: finish this
 {
     $text = '';
     switch ($request_type){
-        case 7 : 
+        case 7 :  // asset_request_use
+            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+            $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+            $text= "Asset ". $asset_name." requested (use) from " . $user_name;
             break;
         case 8 :
             break;
@@ -99,7 +102,7 @@ function insert_log_asset_user($conn,$initiator,$participant,$asset_id,$request_
 
             $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant'"))['name'];
 
-            $text= "Asset ". $asset_name." requested (move) from " . $user_name . " to " . $participant_name;
+            $text= "Asset ". $asset_name." was requested (move) from " . $user_name . " to " . $participant_name;
             break;
         case 10:
             break;
@@ -120,32 +123,58 @@ function insert_log_asset_user($conn,$initiator,$participant,$asset_id,$request_
 // Request functions
 function make_request($conn,$initiator,$participant = null,$asset_ids,$request_type){
     $time = time();
-    $sql;
+    $results = [];
     switch ($request_type){
         case 1: // request use
+            // only can request IDLE assets
+            foreach($asset_ids as $asset_id){
+                //fetch status of asset
+                $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+                if(asset_status == 1){ // IN IDLE
+                    $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time) VALUES 
+                            ('$initiator','$participant','$asset_id','$request_type','$time')";
+                    $result = $conn->query($sql);
+                    //Make log
+                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
+
+                    $sql = "UPDATE asset SET status =6 WHERE id = '$asset_id'";
+                    $result = $conn->query($sql);
+                } else { // NOT IN IDLE
+                    
+                }
+            }
 
             break;
-        case 2: // request return
+        case 2: // request return == idle
 
             break; 
-        case 3: // request repair
+        case 3: // request repair  == move
             
             break;
         case 4: // request move (user to user, participant is new user(only one), asset_ids can be list)
+            //only can request IN USE assets and user is initiator
             foreach($asset_ids as $asset_id){
-                $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
-                        ('$initiator','$participant','$asset_id','$request_type','$time')";
-                $result = $conn->query($sql);
-                //make log
-                insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
+                //fetch user
+                $user = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+                if($user == $initiator){ // user is initiator
+                    //TODO : add constraints for status
+                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
+                            ('$initiator','$participant','$asset_id','$request_type','$time')";
+                    array_push($results,[$asset_name,$conn->query($sql)]);
+                    //make log
+                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
 
-                $sql = "UPDATE asset SET status = 10 WHERE id = '$asset_id'";
-                $result = $conn->query($sql);
+                    $sql = "UPDATE asset SET status = 9 WHERE id = '$asset_id'";
+                    $conn->query($sql);
+                } else { // user is not initiator
+                    array_push($results,[$asset_name,false]);
+                }
             }
             break;
         default :
             echo "";
         }
-    return $result;
+    return $results;
 }
 ?>

@@ -85,7 +85,7 @@ if( $user_role != '4'){
         "position" => $row['position'],
         "expire" => $row['expire'], 
         // add Modal for the requests?
-        // "status" => ($status_id >=6 && $status_id <= 10 )? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
+        // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
         "status" => $status,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
         Info

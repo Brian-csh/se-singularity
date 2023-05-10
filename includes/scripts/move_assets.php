@@ -37,14 +37,16 @@ $conn->close();
     } else {
         
         //MAKE request to manager(leaves log at the same time)
-        $result = make_request($conn,$user_id,$destination,$assetIds,4);
+        $results = make_request($conn,$user_id,$destination,$assetIds,4);
 
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Assets moved successfully to another user.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error moving assets to another user.']);
-        }
+        $responseData = array('result' => $results);
 
+        //Encode the array as JSON
+        $responseJson = json_encode($responseData);
+
+        // Send the response
+        header('Content-Type : application/json');
+        echo $responseJson;
     }
     $conn->close();
 }
