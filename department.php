@@ -175,7 +175,7 @@ include "includes/header.php";
 
     <script>
     var btn = document.getElementById('manageUsers');
-    btn.addEventListZener('click', function() {
+    btn.addEventListener('click', function() {
       document.location.href = 'users.php?departmentid=<?= $department_id ?>';
     });
     </script>

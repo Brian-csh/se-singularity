@@ -17,7 +17,7 @@ include "includes/navbar.php";
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?=$active?>
                             </h1>
-                            <a href="/includes/add/new_entity.php" class="btn btn-primary btn-xs float-end">+ Add entity</a>
+                            <a href="new_entity.php" class="btn btn-primary btn-xs float-end">+ Add entity</a>
                         </div>
                     </div>
                 </div>
