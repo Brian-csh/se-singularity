@@ -8,10 +8,10 @@ if (isset($_GET['name'])) {
 
 $active = 'Asset #' . $asset_id . ' Edit';
 
-include "includes/header.php";
+include "includes/db/connect.php";
 include "functions.php";
 include "includes/oss.php";
-use OSS\OssClient;
+
 use OSS\Core\OssException;
 
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
@@ -37,6 +37,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
+        $asset_image = $asset_data['image'];
 }
 
 // Fetch Data
@@ -91,7 +92,6 @@ if(isset($_POST['description_change'])){
         echo "<script>alert('Description updated successfully!')</script>";
         insert_log_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-        header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name);
     }
     else{
         echo "<script>alert('Description update failed!')</script>";
@@ -171,6 +171,12 @@ if (isset($_POST['upload_image'])) {
             // Upload the file to OSS
             $ossClient->uploadFile($bucket, $objectName, $localFilePath);
             echo "<script>alert('File uploaded successfully. Object name: " . $objectName . "')</script>";
+            $image_url = 'https://singularity-eam.oss-cn-beijing.aliyuncs.com/' . $objectName;
+            $sql = "UPDATE asset SET image='$image_url' WHERE id='$asset_id'";
+            if (!$conn->query($sql)) {
+                echo "<script>alert('Update image failed!')</script>";
+            }
+            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name);
         } catch (OssException $e) {
             echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
         }
@@ -179,6 +185,7 @@ if (isset($_POST['upload_image'])) {
     }
 }
 
+include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -226,7 +233,14 @@ if (isset($_POST['upload_image'])) {
                     <div class = "row mb-3">
                         <div class = "col -md-6">
                             <!-- Asset Image -->
-                            <h1>Upload Image</h1>
+                            <h1>Image</h1>
+                            <div id="image-container" style="padding: 20px">
+                                <?php
+                                    if (isset($asset_image)) {
+                                        echo "<img src=\"" . $asset_image . "\" alt=\"Image Not Found\" loading=\"lazy\">";
+                                    }
+                                ?>
+                            </div>
                             <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="file" style="color: white">
                                 <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
