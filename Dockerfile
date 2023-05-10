@@ -15,6 +15,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install dependencies
 COPY composer.json composer.lock ./
+RUN apt install zip unzip php-zip
 RUN composer install --no-scripts --no-autoloader
 
 # Expose port 80 for Apache
