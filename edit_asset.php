@@ -5,6 +5,11 @@ if (isset($_GET['id'])) {
 if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
+if (isset($_GET['success'])) {
+    $upload_status = $_GET['success'];
+} else {
+    $upload_status = 0;
+}
 
 $active = 'Asset #' . $asset_id . ' Edit';
 
@@ -170,14 +175,15 @@ if (isset($_POST['upload_image'])) {
         try {
             // Upload the file to OSS
             $ossClient->uploadFile($bucket, $objectName, $localFilePath);
-            echo "<script>alert('File uploaded successfully. Object name: " . $objectName . "')</script>";
             $image_url = 'https://singularity-eam.oss-cn-beijing.aliyuncs.com/' . $objectName;
             $sql = "UPDATE asset SET image='$image_url' WHERE id='$asset_id'";
             if (!$conn->query($sql)) {
+                $upload_status = -1;
                 echo "<script>alert('Update image failed!')</script>";
             }
-            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name);
+            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=1');
         } catch (OssException $e) {
+            $upload_status = -1;
             echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
         }
     } else {
@@ -234,7 +240,14 @@ include "includes/header.php";
                         <div class = "col -md-6">
                             <!-- Asset Image -->
                             <h1>Image</h1>
-                            <div id="image-container" style="padding: 20px">
+                            <?php
+                                if ($upload_status == 1) {
+                                    echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
+                                } else if ($upload_status == -1) {
+                                    echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
+                                }
+                            ?>
+                            <div id="image-container" style="padding: 20px">                               
                                 <?php
                                     if (isset($asset_image)) {
                                         echo "<img src=\"" . $asset_image . "\" alt=\"Image Not Found\" loading=\"lazy\">";
