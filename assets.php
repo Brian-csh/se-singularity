@@ -71,7 +71,7 @@ $entity_id = $_SESSION['user']['entity'];
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
+                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                         </div>
                     </div>
@@ -271,6 +271,13 @@ $entity_id = $_SESSION['user']['entity'];
             </div>
         </div>
 
+
+        <!-- handleRequestModal -->
+        <!-- <div class="modal fade" id="handleRequestModal" tabindex="-1" role="dialog" aria-labelledby="BasicInfoEditLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            </div>
+        </div> -->
+        
 <!-- Request Modal -->
     <script>
         if (window.history.replaceState) {
@@ -505,6 +512,10 @@ $entity_id = $_SESSION['user']['entity'];
             });
         });
     </script>
+    
+    <!-- For Request Modal -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
     <?php
     include "includes/footer.php";
     ?>

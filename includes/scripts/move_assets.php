@@ -29,6 +29,7 @@ if($user_role != 4){ // manager move
 // Close the database connection
 $conn->close();
 } else { // user move
+    // TODO: only can move in use assets
     if (empty($assetIds)) {
         echo json_encode(['success' => false, 'message' => 'No assets selected.']);
     } else if ($destination == -1) {

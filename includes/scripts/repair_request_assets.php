@@ -4,6 +4,8 @@ require "../db/connect.php";
 // Get asset IDs from POST data
 $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 
+//TDOO : CAN only retire 'IDLE' assets
+
 // Retire assets
 if (!empty($assetIds)) {
     $ids = implode(',', $assetIds);
