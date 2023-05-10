@@ -4,11 +4,13 @@ require "../db/connect.php";
 // Get asset IDs from POST data
 $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 
-// Retire assets 
+//TDOO : CAN only retire 'IDLE' assets
+
+// Retire assets
 if (!empty($assetIds)) {
     $ids = implode(',', $assetIds);
     //set user to null for the asset and notify user 
-    $sql = "UPDATE asset SET status = 4, user = null WHERE id IN ($ids)";
+    $sql = "UPDATE asset SET status = 3 WHERE id IN ($ids)";
     $result = $conn->query($sql);
 
     if ($result) {
@@ -19,6 +21,7 @@ if (!empty($assetIds)) {
 } else {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 }
+
 // Close the database connection
 $conn->close();
 ?>

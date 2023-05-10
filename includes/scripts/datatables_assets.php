@@ -6,6 +6,7 @@ require "../db/connect.php";
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
+$user_role = strval($_GET['role_id']);
 
 $departmentid = intval($_GET['departmentid']);
 $userid = intval($_GET['userid']);
@@ -41,16 +42,12 @@ $result = $conn->query($sql);
 
 $data = array();
 while($row = $result->fetch_assoc()) {
-    if ($row['status'] == 1) {
-        $status = "IDLE";
-    } else if ($row['status'] == 2) {
-        $status = "IN USE";
-    } else if ($row['status'] == 3) {
-        $status = "IN MAINTAIN";
-    } else if ($row['status'] == 4) {
-        $status = "RETIRED";
-    } else if ($row['status'] == 5) {
-        $status = "DELETED";
+
+    if(isset($row['status'])){
+        $status_id = $row['status'];
+        $status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$status_id'"))['status'];
+    } else {
+        $status = "N/A";
     }
 
     if (isset($row['user'])) {
@@ -74,6 +71,9 @@ while($row = $result->fetch_assoc()) {
         $class = "N/A";
     }
 
+
+    //TODO : add link to descpription (modal or sth)
+if( $user_role != '4'){
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -83,12 +83,31 @@ while($row = $result->fetch_assoc()) {
         "price" => $row['price'],
         "description" => strip_tags(substr($row['description'],0,30)) . "...",
         "position" => $row['position'],
-        "expire" => $row['expire'],
+        "expire" => $row['expire'], 
+        // add Modal for the requests?
+        // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
         "status" => $status,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
         Info
         </a>"
     );
+} else { // user_role == 4 (user)
+    $data[] = array(
+        "id" => $row['id'],
+        "parent" => $parent,
+        "name" => "<a class='text-primary' href='../../asset_info.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        "class" => $class,
+        "user" => $user,
+        "price" => $row['price'],
+        "description" => strip_tags(substr($row['description'],0,30)) . "...",
+        "position" => $row['position'],
+        "expire" => $row['expire'],
+        "status" => $status,
+        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"request_asset_status.php?id=".$row['id']."&name=".$row['name']."\">
+        Info
+        </a>"
+    );
+}
 }
 
 // Get the total number of records in the table

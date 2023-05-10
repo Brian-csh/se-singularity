@@ -38,6 +38,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                             <th>Log</th>
                             <th>Type</th>
                             <th>Subject</th>
+                            <th>By</th>
                         </tr>
                         </thead>
                         <tfoot>
@@ -46,6 +47,7 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                             <th>Log</th>
                             <th>Type</th>
                             <th>Subject</th>
+                            <th>By</th>
                         </tr>
                         </tfoot>
                         <tbody>
@@ -71,11 +73,16 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                     $subject = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"))['name'];
                                 }
 
+                                //Fetch By - always user
+                                $by_id = $row["By"];
+                                $by_whom = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$by_id'"))['name'];
+
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
                                 <td class='text-white'>$text</td>
                                 <td class='text-white'>$type</td>
                                 <td class='text-white'>$subject</td>
+                                <td class='text-white'>$by_whom</td>
                                 </tr>";
                             }
                         }

@@ -5,18 +5,10 @@ if (isset($_GET['id'])) {
 if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
-if (isset($_GET['success'])) {
-    $image_operation_status = $_GET['success'];
-} else {
-    $image_operation_status = 0;
-}
 
-$active = 'Asset #' . $asset_id . ' Edit';
-
-include "includes/db/connect.php";
+// $active = $edit_name;
+include "includes/header.php";
 include "includes/scripts/functions.php";
-include "includes/oss.php";
-use OSS\Core\OssException;
 
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
@@ -41,7 +33,6 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
-        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
 // Fetch Data
@@ -62,153 +53,6 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
 // Fetch deaprtment
 $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WHERE id = '$asset_department_id' LIMIT 1"))['name'];
 
-
-// Update Asset info
-if(isset($_POST['edit_asset'])){
-    $asset_new_parent = $_POST['editAssetParent'];
-    $asset_new_name = $_POST['editAssetName']; if(!$asset_new_name) $asset_new_name = $asset_name;
-
-
-    $asset_new_class = $_POST['editAssetClass'];
-    $asset_new_expire = $_POST['editAssetExpire']; if(!$asset_new_expire) $asset_new_expire = $asset_expire;
-
-    $asset_new_user = $_POST['editAssetUser']; if(!$asset_new_user) $asset_new_user = $asset_user_id;
-    $asset_new_position = $_POST['editAssetPosition'];
-    $asset_new_status = $_POS['editAssetStatus']; if(!$asset_new_status) $asset_new_status = $asset_status_id;
-    $sql = "UPDATE asset SET parent =$asset_new_parent,name = '$asset_new_name',class = '$asset_new_class', 
-        expire = '$asset_new_expire',position = '$asset_new_position' WHERE id = '$asset_id'";
-    $result = $conn->query($sql);
-    if($result){
-        echo "<script>alert('Asset info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-    }
-    else{
-        echo "<script>alert('Asset update failed!')</script>";
-    }
-}
-
-
-// Update Description
-if(isset($_POST['description_change'])){
-    $description = $_POST['description']; if(!$description) $description = $asset_description;
-    $sql = "UPDATE asset SET description = '$description' WHERE id = '$asset_id'";
-    $result = $conn->query($sql);
-    if($result){
-        echo "<script>alert('Description updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-    }
-    else{
-        echo "<script>alert('Description update failed!')</script>";
-    }
-}
-
-// Update basic info
-if(isset($_POST['edit_basic'])){
-    $basic_brand = $_POST['basic_brand']; if(!$basic_brand) $basic_brand = $asset_brand;
-    $basic_model = $_POST['basic_model']; if(!$basic_model) $basic_model = $asset_model;
-    $basic_sn = $_POST['basic_sn']; if(!$basic_sn) $basic_sn = $asset_serial_number;
-    $sql = "UPDATE asset SET brand='$basic_brand', model='$basic_model', `serial number`='$basic_sn' WHERE id='$asset_id'";
-    $result = $conn->query($sql);
-    if($result){
-        echo "<script>alert('Basic info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-    }
-    else{
-        echo "<script>alert('Basic info update failed!')</script>";
-    }
-}
-
-// Update Financial info
-if(isset($_POST['edit_financial'])){
-    $financial_op = $_POST['financial_op']; if(!$financial_op) $financial_op = $asset_original_price;
-    $financial_cp = $_POST['financial_cp']; if(!$financial_cp) $financial_cp = $asset_current_price;
-    $financial_dp = $_POST['financial_dp']; if(!$financial_dp) $financial_dp = $asset_deprecation_model;
-    $sql = "UPDATE asset SET `price`='$financial_op', `current price`='$financial_cp', `depreciation model`='$financial_dp' WHERE id='$asset_id'";
-    $result = $conn->query($sql);
-    if($result){
-        echo "<script>alert('Financial info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-    }
-    else{
-        echo "<script>alert('Financial info update failed!')</script>";
-    }
-}
-
-// Update custom attribute info
-if(isset($_POST['edit_custom_attr'])){
-
-    $ca_fields = [];
-    // Loop through the $_POST array
-    foreach ($_POST as $key => $value) {
-        // Check if the key starts with "ca"
-        if (strncmp($key, 'ca', 2) === 0) {
-            // Add the key-value pair to the $ca_fields array
-            $ca_fields[$key] = $value;
-        }
-    }
-    $custom_attributes = json_encode($ca_fields);
-
-    $sql = "UPDATE asset SET custom_attr='$custom_attributes' WHERE id='$asset_id'";
-     if($conn->query($sql)){
-         echo "<script>alert('Custom attribute info updated successfully!')</script>";
-//         insert_log_asset($conn,$asset_data,6);
-//         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
-     }
-     else{
-         echo "<script>alert('Custom attribute info update failed!')</script>";
-     }
-}
-
-//uploading an image for an asset
-if (isset($_POST['upload_image'])) {
-    if (isset($_FILES['file'])) {
-        $file = $_FILES['file'];
-        $localFilePath = $file['tmp_name']; //path in local machine
-        $originalFilename = $file['name'];
-
-        // Generate a unique object name for the file in OSS
-        $objectName = uniqid() . '-' . $originalFilename;
-
-        try {
-            // Upload the file to OSS
-            $ossClient->uploadFile($bucket, $objectName, $localFilePath);
-            $image_url = 'https://singularity-eam.oss-cn-beijing.aliyuncs.com/' . $objectName;
-            $sql = "UPDATE asset SET image='$image_url' WHERE id='$asset_id'";
-            if (!$conn->query($sql)) {
-                $image_operation_status = -1;
-                echo "<script>alert('Update image failed!')</script>";
-            }
-            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=1');
-        } catch (OssException $e) {
-            $image_operation_status = -1;
-            echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
-        }
-    } else {
-        echo "<script>alert('No file selected or an error occurred during file upload.')</script>";
-    }
-}
-
-if (isset($_POST['delete_image'])) {
-    try {
-        $stripped_object_name = substr($asset_image, 52); //remove the bucket and endpoint
-        $ossClient->deleteObject($bucket, $stripped_object_name);
-        $sql = "UPDATE asset SET image=NULL WHERE id='$asset_id'";
-        if (!$conn->query($sql)) {
-            $image_operation_status = -1;
-            echo "<script>alert('Update image failed!')</script>";
-        }
-        header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=2');
-    } catch (OssException $e) {
-        $image_operation_status = -1;
-        echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
-    }
-}
-
-include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -252,45 +96,17 @@ include "includes/header.php";
         <div class="container-fluid pt-5 px-4">
             <div class="card">
                 <div class="card-body">
-                    <!-- TODO: SHOW Image,RTF description input box,Basic info, Financial Info -->
+                    <!-- TODO: SHOW Image-->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
-                            <!-- Asset Image -->
-                            <h1>Image</h1>
-                            <?php
-                                if ($image_operation_status == 1) {
-                                    echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
-                                } else if ($image_operation_status == -1) {
-                                    echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
-                                } else if ($image_operation_status == 2) {
-                                    echo '<div class="alert alert-success" role="alert">Successful Removed!</div>';
-                                }
-                            ?>
-                            <div id="image-container" style="padding: 20px">
-                                <script>
-                                    window.onload = function() {
-                                        var img = document.getElementById('assetImage');
-                                        img.src = "<?=$asset_image?>"; // Set the source of the image
-                                    }
-                                </script>
-                                <img src="" id="assetImage">                            
-                                
-                            </div>
-                            <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
-                                <input type="file" name="file" style="color: white">
-                                <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
-                                <?php
-                                    if ($asset_image != "")
-                                        echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
-                                ?>
-                            </form>
+                            <!-- TODO: Asset Image -->
+                            IMAGE UPLOADER
                         </div>
                         <div class = "col -md-6">
                             <!-- TODO: Asset table -->
                             <div class="card">
                                 <div class="card-header">
                                     <h3> Asset Info
-                                    <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editAssetModal"><i data-feather="edit"></i></button>
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -335,17 +151,14 @@ include "includes/header.php";
                     </div>
 
                     <!-- Description input box -->
-                    <!-- TODO: support RTF -->
                     <form method = "POST" action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" >
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
                                 <textarea class="form-control" id="descriptionTextarea" name="description" rows="20"></textarea>
-                                <button type="submit" name="description_change" class="btn btn-primary text-light float-end" style="background:green; border:none">Change description</button>
                             </div>
                         </div>
                     </form>
-
 
                     <div class = "row mb-3">
 
@@ -354,7 +167,6 @@ include "includes/header.php";
                             <div class="card">
                                 <div class="card-header">
                                     <h3> Basic Info
-                                    <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editBasicInfoModal"><i data-feather="edit"></i></button>
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -385,7 +197,6 @@ include "includes/header.php";
                             <div class="card">
                                 <div class="card-header">
                                     <h3> Financial Info
-                                    <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editFinancialInfoModal"><i data-feather="edit"></i></button>
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -418,31 +229,22 @@ include "includes/header.php";
                                 <div class="card">
                                     <div class="card-header">
                                         <h3> Custom Attributes
-                                        <button type="button" class="btn btn-sm btn-outline-primary float-end" data-bs-toggle="modal" data-bs-target="#editCustomAttributeModal"><i data-feather="edit"></i></button>
                                         </h3>
                                     </div>
                                     <div class="card-body">
                                         <div class = "col">
                                         <table class="table table-hover">
                                             <tbody>
-                                                <?php
-                                                if ($custom_attributes) {
+                                                <?php 
                                                     $custom_attribute_obj = json_decode($custom_attributes);
                                                     foreach ($custom_attribute_obj as $custom_key => $custom_value) {
-                                                        $custom_key_id = substr($custom_key, 3);
-
-                                                        // Get the custom key name
-                                                        $custom_key_name = $conn->query("SELECT * FROM asset_attribute WHERE id = $custom_key_id")->fetch_assoc()['custom_attribute'];
                                                         echo '
                                                             <tr>
-                                                                <th>'. $custom_key_name .'</th>
+                                                                <th>'. $custom_key .'</th>
                                                                 <td>'. $custom_value .'</td>
                                                             </tr>
                                                         ';
                                                     }
-                                                } else {
-                                                    echo '<p class="text-white">No custom attributes available for this asset</p>';
-                                                }
                                                 ?>
                                             </tbody>
                                         </table>
@@ -586,122 +388,6 @@ include "includes/header.php";
         </div>
     </div>
 
-    <!-- Basic info Modal -->
-    <div class="modal fade" id="editBasicInfoModal" tabindex="-1" role="dialog" aria-labelledby="BasicInfoEditLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Basic Info</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <!-- Edit Brand -->
-                        <div class="mb-3">
-                            <label for="basicEditBrand">Brand Name </label>
-                            <input class="form-control" id="basicEditBrand" type="text" name="basic_brand" placeholder="<?php echo $asset_brand; ?>" >
-                        </div>
-                        <!-- Edit Model-->
-                        <div class="mb-3">
-                            <label for="basicEditModel">Model </label>
-                            <input class="form-control" id="basicEditModel" type="text" name="basic_model" placeholder="<?php echo $asset_model; ?>">
-                        </div>
-                        <!-- Edit Serial Number -->
-                        <div class="mb-3">
-                            <label for="basicEditSerialNumber">Serial Number </label>
-                            <input class="form-control" id="basicEditSerialNumber" type="text" name="basic_sn" placeholder="<?php echo $asset_serial_number; ?>">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="edit_basic">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Financial info Modal -->
-    <div class="modal fade" id="editFinancialInfoModal" tabindex="-1" role="dialog" aria-labelledby="FinancialInfoEditLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Financial Info</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <!-- Edit Price -->
-                        <div class="mb-3">
-                            <label for="editOP">Original Price </label>
-                            <input class="form-control" id="financialEditOP" type="text" name="financial_op" placeholder="<?php echo $asset_original_price; ?>" >
-                        </div>
-                        <!-- Edit Model-->
-                        <div class="mb-3">
-                            <label for="editCP">Current Price </label>
-                            <input class="form-control" id="financialEditCP" type="text" name="financial_cp" placeholder="<?php echo $asset_current_price; ?>">
-                        </div>
-                        <!-- Edit Serial Number -->
-                        <div class="mb-3">
-                            <label for="editDeprecationModel">Depreciation Model </label>
-                            <textarea class="form-control" id="financialEditDM" type="text" name="financial_dp" rows = "5" placeholder="<?php echo $asset_deprecation_model; ?>"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="edit_financial">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom attribute Modal -->
-    <div class="modal fade" id="editCustomAttributeModal" tabindex="-1" role="dialog" aria-labelledby="CustomAttributeEditLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Custom</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <?php
-                        // Get the entity of the asset
-                        if (isset($asset_department_id)) {
-                            $sql = "SELECT entity FROM department WHERE id = '$asset_department_id'";
-                            $result = mysqli_query($conn, $sql);
-                            $row = mysqli_fetch_assoc($result);
-                            $entity = $row['entity'];
-
-                            // Get all custom attributes for this entity
-                            $sql = "SELECT * FROM asset_attribute WHERE entity_id = '$entity'";
-                            $result = mysqli_query($conn, $sql);
-                            if ($result -> num_rows > 0) {
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                    $attribute_id = $row['id'];
-                                    $attribute_name = $row['custom_attribute'];
-                                    // Display the attribute name and value
-                                    echo '<div class="mb-3">';
-                                    echo '<label for="customEdit' . $attribute_id . '">' . $attribute_name . '</label>';
-                                    echo '<input class="form-control" id="customEdit' . $attribute_id . '" type="text" name="ca_' . $attribute_id . '" placeholder="Attribute Value">';
-                                    echo '</div>';
-                                }
-                            } else {
-                                echo "No custom attributes found for this asset's entity.";
-                            }
-                        }
-                        ?>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" type="submit" name="edit_custom_attr">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
     <script src="js/scripts.js"></script>
@@ -711,7 +397,7 @@ include "includes/header.php";
         $(document).ready(function() {
             tinymce.init({
             selector: '#descriptionTextarea',
-            plugins: 'searchreplace autolink directionality visualblocks visualchars image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap emoticons autosave',
+            plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
             toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
             skin: "oxide-dark",
             content_css: "dark",

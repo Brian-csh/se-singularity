@@ -1,27 +1,53 @@
 <?php
-require "../db/connect.php";
 
+require "../db/connect.php";
+include "functions.php";
 // Get asset IDs from POST data
 $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 $destination = isset($_POST['destination']) ? $_POST['destination'] : -1;
+//different move task for user and manager
+$user_role = isset($_POST['role_id']) ? intval($_POST['role_id']) : -1;
+$user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : -1;
 
-// Retire assets
-if (empty($assetIds)) {
-    echo json_encode(['success' => false, 'message' => 'No assets selected.']);
-} else if ($destination == -1) {
-    echo json_encode(['success' => false, 'message' => 'Invalid department.']);
-} else {
-    $ids = implode(',', $assetIds);
-    $sql = "UPDATE asset SET department = $destination WHERE id IN ($ids)";
-    $result = $conn->query($sql);
-
-    if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Assets retired successfully.']);
+if($user_role != 4){ // manager move
+    // Move assets
+    if (empty($assetIds)) {
+        echo json_encode(['success' => false, 'message' => 'No assets selected.']);
+    } else if ($destination == -1) {
+        echo json_encode(['success' => false, 'message' => 'Invalid department.']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error retiring assets.']);
-    }
-}
+        $ids = implode(',', $assetIds);
+        $sql = "UPDATE asset SET department = $destination WHERE id IN ($ids)";
+        $result = $conn->query($sql);
 
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Assets moved successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error moving assets.']);
+        }
+    }
 // Close the database connection
 $conn->close();
+} else { // user move
+    // TODO: only can move in use assets
+    if (empty($assetIds)) {
+        echo json_encode(['success' => false, 'message' => 'No assets selected.']);
+    } else if ($destination == -1) {
+        echo json_encode(['success' => false, 'message' => 'Invalid user.']);
+    } else {
+        
+        //MAKE request to manager(leaves log at the same time)
+        $results = make_request($conn,$user_id,$destination,$assetIds,4);
+
+        $responseData = array('result' => $results);
+
+        //Encode the array as JSON
+        $responseJson = json_encode($responseData);
+
+        // Send the response
+        header('Content-Type : application/json');
+        echo $responseJson;
+    }
+    $conn->close();
+}
 ?>
