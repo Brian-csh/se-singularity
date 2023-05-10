@@ -5,10 +5,19 @@ if (isset($_GET['id'])) {
 if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
+if (isset($_GET['success'])) {
+    $image_operation_status = $_GET['success'];
+} else {
+    $image_operation_status = 0;
+}
 
 $active = 'Asset #' . $asset_id . ' Edit';
-include "includes/header.php";
+
+include "includes/db/connect.php";
 include "includes/scripts/functions.php";
+include "includes/oss.php";
+use OSS\Core\OssException;
+
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
 $result_asset = $conn->query($sql_asset);
 
@@ -32,6 +41,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
+        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
 // Fetch Data
@@ -152,6 +162,53 @@ if(isset($_POST['edit_custom_attr'])){
          echo "<script>alert('Custom attribute info update failed!')</script>";
      }
 }
+
+//uploading an image for an asset
+if (isset($_POST['upload_image'])) {
+    if (isset($_FILES['file'])) {
+        $file = $_FILES['file'];
+        $localFilePath = $file['tmp_name']; //path in local machine
+        $originalFilename = $file['name'];
+
+        // Generate a unique object name for the file in OSS
+        $objectName = uniqid() . '-' . $originalFilename;
+
+        try {
+            // Upload the file to OSS
+            $ossClient->uploadFile($bucket, $objectName, $localFilePath);
+            $image_url = 'https://singularity-eam.oss-cn-beijing.aliyuncs.com/' . $objectName;
+            $sql = "UPDATE asset SET image='$image_url' WHERE id='$asset_id'";
+            if (!$conn->query($sql)) {
+                $image_operation_status = -1;
+                echo "<script>alert('Update image failed!')</script>";
+            }
+            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=1');
+        } catch (OssException $e) {
+            $image_operation_status = -1;
+            echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
+        }
+    } else {
+        echo "<script>alert('No file selected or an error occurred during file upload.')</script>";
+    }
+}
+
+if (isset($_POST['delete_image'])) {
+    try {
+        $stripped_object_name = substr($asset_image, 52); //remove the bucket and endpoint
+        $ossClient->deleteObject($bucket, $stripped_object_name);
+        $sql = "UPDATE asset SET image=NULL WHERE id='$asset_id'";
+        if (!$conn->query($sql)) {
+            $image_operation_status = -1;
+            echo "<script>alert('Update image failed!')</script>";
+        }
+        header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=2');
+    } catch (OssException $e) {
+        $image_operation_status = -1;
+        echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
+    }
+}
+
+include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -198,8 +255,35 @@ if(isset($_POST['edit_custom_attr'])){
                     <!-- TODO: SHOW Image,RTF description input box,Basic info, Financial Info -->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
-                            <!-- TODO: Asset Image -->
-                            IMAGE UPLOADER
+                            <!-- Asset Image -->
+                            <h1>Image</h1>
+                            <?php
+                                if ($image_operation_status == 1) {
+                                    echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
+                                } else if ($image_operation_status == -1) {
+                                    echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
+                                } else if ($image_operation_status == 2) {
+                                    echo '<div class="alert alert-success" role="alert">Successful Removed!</div>';
+                                }
+                            ?>
+                            <div id="image-container" style="padding: 20px">
+                                <script>
+                                    window.onload = function() {
+                                        var img = document.getElementById('assetImage');
+                                        img.src = "<?=$asset_image?>"; // Set the source of the image
+                                    }
+                                </script>
+                                <img src="" id="assetImage">                            
+                                
+                            </div>
+                            <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file" style="color: white">
+                                <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
+                                <?php
+                                    if ($asset_image != "")
+                                        echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
+                                ?>
+                            </form>
                         </div>
                         <div class = "col -md-6">
                             <!-- TODO: Asset table -->
