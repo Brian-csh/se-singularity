@@ -386,7 +386,7 @@ $user_id = $_SESSION['user']['id'];
                                                     // fetch asset name
                                                     alert("Asset " + data.result[i][0] + " is not available for RETURN. You can only return assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfuly!.")
+                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -459,7 +459,7 @@ $user_id = $_SESSION['user']['id'];
                                                     // fetch asset name
                                                     alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfuly!")
+                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -504,7 +504,7 @@ $user_id = $_SESSION['user']['id'];
                                                     // fetch asset name
                                                     alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfuly!.")
+                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -544,7 +544,7 @@ $user_id = $_SESSION['user']['id'];
                                                     // fetch asset name
                                                     alert("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfuly!.")
+                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables

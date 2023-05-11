@@ -32,7 +32,7 @@ if (isset($_GET['search']['value'])) {
             }
             $class_condition .= " OR class IN (" . implode(", ", $class_array) . ")";
         }
-        $sql .= " AND (name LIKE '%$search_string%' OR description LIKE '%$search_string%'" . $class_condition . ")";
+        $sql .= " AND (name LIKE '%$search_string%' OR description LIKE '%$search_string%'" . $class_condition . " OR custom_attr LIKE '%$search_string%')";
 
     }
 }
