@@ -33,6 +33,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
+        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
 // Fetch Data
@@ -96,11 +97,23 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
         <div class="container-fluid pt-5 px-4">
             <div class="card">
                 <div class="card-body">
-                    <!-- TODO: SHOW Image-->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
                             <!-- TODO: Asset Image -->
-                            IMAGE UPLOADER
+                            <div class="card-header">
+                                    <h3> Asset Image
+                                    </h3>
+                                </div>
+                            <div id="image-container" style="padding: 20px">
+                                <script>
+                                    window.onload = function() {
+                                        var img = document.getElementById('assetImage');
+                                        img.src = "<?=$asset_image?>"; // Set the source of the image
+                                    }
+                                </script>
+                                <img src="" id="assetImage">                            
+                                
+                            </div>
                         </div>
                         <div class = "col -md-6">
                             <!-- TODO: Asset table -->
@@ -397,7 +410,7 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
         $(document).ready(function() {
             tinymce.init({
             selector: '#descriptionTextarea',
-            plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
+            plugins: 'searchreplace autolink directionality visualblocks visualchars image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap emoticons autosave',
             toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
             skin: "oxide-dark",
             content_css: "dark",

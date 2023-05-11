@@ -368,14 +368,14 @@ $user_id = $_SESSION['user']['id'];
                                     assets: assetIds,
                                     user_id: <?=$_SESSION['user']['id']?>
                                 },
-                                <?php if ($user_role_id ==4 ) { ?>
-                                success: function(response) {
+                                <?php if ($user_role_id !=4 ) { ?>
+                                success: function(response) { // manager handle request success
                                     console.log(response);
                                     // Perform any additional actions on success
                                     dt.ajax.reload(); // Refresh the DataTables
                                 },
                                 <?php } else {?>
-                                sucess: function(response){
+                                success: function(response){ // user handle request success
                                     console.log(response);
                                             // Perform any additional actions on success
                                             var data = JSON.parse(response);
@@ -384,9 +384,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for RETURN. You can only return assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfuly!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -457,9 +457,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for move.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " is moved.")
+                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfuly!")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -475,7 +475,7 @@ $user_id = $_SESSION['user']['id'];
                         }
                     }
                     <?php if($user_role_id == 4){?>
-                    , { // TODO : request and repair
+                    , { 
                         text: "Request",
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
@@ -502,9 +502,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfuly!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -515,8 +515,8 @@ $user_id = $_SESSION['user']['id'];
                             });
                         }
                     },
-                    {
-                        text:"Repair",
+                    { // TODO : handle requests
+                        text:"Repair", 
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -527,15 +527,27 @@ $user_id = $_SESSION['user']['id'];
 
                             // Perform AJAX request
                             $.ajax({
-                                url: "includes/scripts/repair_request_assets.php",
+                                url: "includes/scripts/repair_assets.php",
                                 method: "POST",
                                 data: {
-                                    assets: assetIds
+                                    assets: assetIds,
+                                    user_id: <?=$_SESSION['user']['id']?>
                                 },
                                 success: function(response) {
                                     console.log(response);
-                                    // Perform any additional actions on success
-                                    dt.ajax.reload(); // Refresh the DataTables
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfuly!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
                                 },
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     console.error(textStatus, errorThrown);
@@ -556,4 +568,3 @@ $user_id = $_SESSION['user']['id'];
     <?php
     include "includes/footer.php";
     ?>
-
