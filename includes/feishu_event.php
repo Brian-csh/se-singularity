@@ -4,9 +4,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['token'];
     $type = $_POST['type'];
 
+    // Debugging: Output the received values to the console or log
+    var_dump($challenge, $token, $type);
+
     if ($type === 'url_verification') {
         // Send a response back to the source with the challenge value
-        echo json_encode(['challenge' => $challenge]);
+        $response = ['challenge' => $challenge];
+        header('Content-Type: application/json');
+        $json = json_encode($response);
+        echo $json;
+        var_dump($json);
         exit;
     }
 }
