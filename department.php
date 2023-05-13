@@ -30,11 +30,27 @@ if (isset($_POST['edit_details'])) {
         $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$department_id'";
     }
     if ($conn->query($sql)) {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name);
+        header('Location: department.php?id=' . $department_id);
     } else {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name . '&insert_error');
+        header('Location: department.php?id=' . $department_id . '&insert_error');
     }
 }
+
+if (isset($_POST['define_tag'])) {
+    // Retrieve the selected checkboxes
+    $selectedOptions = $_POST['checkboxOptions'];
+    $department_id = $_POST['department_id'];
+
+    $template = json_encode($selectedOptions);
+    $sql = "UPDATE department SET template = '$template' WHERE id = '$department_id'";
+
+    if ($conn->query($sql)) {
+        header('Location: department.php?id=' . $department_id);
+    } else {
+        header('Location: department.php?id=' . $department_id .'&insert_error');
+    }
+}
+
 $active = $department_name;
 include "includes/header.php";
 ?>
@@ -78,7 +94,8 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers" style="margin-right: 10px">Manage Users</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
                         </div>
                     </div>
@@ -162,10 +179,55 @@ include "includes/header.php";
 
 
                     </div>
-                    <input type="hidden" name="department_id" value="<?php echo $department_id ?>">
+                    <input type="hidden" name="department_id" value="<?=$department_id?>">
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="defineAssetTags" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Define Asset Tags</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="department.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <h6>Additional Contents</h6>
+                            <?php
+                                $checkboxOptions = array(
+                                    'Description',
+                                    'Entity',
+                                    'Department',
+                                    'Position',
+                                    'Expire',
+                                    'Serial Number',
+                                    'Brand',
+                                    'Model',
+                                    'User'
+                                );
+                                // Generate checkboxes dynamically
+                                foreach ($checkboxOptions as $option) {
+                                    echo '<label>';
+                                    echo '<input type="checkbox" name="checkboxOptions[]" value="' . $option . '"> ' . $option;
+                                    echo '</label><br>';
+                                }
+                            ?>
+                        </div>
+
+
+                    </div>
+                    <input type="hidden" name="department_id" value="<?=$department_id?>">
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="define_tag">Submit</button>
                     </div>
                 </form>
             </div>
