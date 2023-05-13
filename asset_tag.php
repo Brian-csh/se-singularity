@@ -20,18 +20,14 @@
     if (isset($_GET['expire'])) {
         $expire = $_GET['expire'];
     }
-    if (isset($_GET['serialnumber'])) {
-        $serialnumber = $_GET['serialnumber'];
+    if (isset($_GET['serial number'])) {
+        $serialnumber = $_GET['serial number'];
     }
     if (isset($_GET['brand'])) {
         $brand = $_GET['brand'];
     }
     if (isset($_GET['model'])) {
         $model = $_GET['model'];
-    }
-    if (isset($_GET['user'])) {
-        $user = $_GET['user'];
-        // $user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$userid' LIMIT 1"))['name'];
     }
 ?>
 
@@ -116,31 +112,34 @@
         <h2 class="asset-name"><?=$name?></h2>
         <p class="asset-id">Asset ID: <?=$id?></p>
         <p class="asset-category">Category: <?=$class?></p>
-        <p class="asset-description">Description: <?=$description?></p>
+        
         <?php
+            if (isset($description)) {
+                echo '<p class="asset-description">Description: ' . $description . '<br></p>';
+            }
             if (isset($entity)) {
-                echo '<p class="asset-description">Entity: ' . $entity . '</p>';
+                echo '<p class="asset-description">Entity: ' . $entity . '<br></p>';
             }
             if (isset($department)) {
-                echo '<p class="asset-description">Department: ' . $department . '</p>';
+                echo '<p class="asset-description">Department: ' . $department . '<br></p>';
             }
             if (isset($position)) {
-                echo '<p class="asset-description">Position: ' . $position . '</p>';
+                echo '<p class="asset-description">Position: ' . $position . '<br></p>';
             }
             if (isset($expire)) {
-                echo '<p class="asset-description">Expire: ' . $expire . '</p>';
+                echo '<p class="asset-description">Expire: ' . $expire . '<br></p>';
             }
             if (isset($serialnumber)) {
-                echo '<p class="asset-description">Serial Number: ' . $serialnumber . '</p>';
+                echo '<p class="asset-description">Serial Number: ' . $serialnumber . '<br></p>';
             }
             if (isset($brand)) {
-                echo '<p class="asset-description">Brand: ' . $brand . '</p>';
+                echo '<p class="asset-description">Brand: ' . $brand . '<br></p>';
             }
             if (isset($model)) {
-                echo '<p class="asset-description">Model: ' . $model . '</p>';
+                echo '<p class="asset-description">Model: ' . $model . '<br></p>';
             }
             if (isset($user)) {
-                echo '<p class="asset-description">User: ' . $user . '</p>';
+                echo '<p class="asset-description">User: ' . $user . '<br></p>';
             }
         ?>
         <div class="card-footer">

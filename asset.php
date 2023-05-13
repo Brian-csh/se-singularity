@@ -1,9 +1,43 @@
 <?php
+include "includes/db/connect.php";
+
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
 if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
+}
+if (isset($_POST['print'])) {
+    $tag_url = "asset_tag.php?";
+    $sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
+    $result = $conn->query($sql);
+
+    $row = $result->fetch_assoc();
+
+    $tag_url .= "id=" . $row['id'];
+    $tag_url .= "&name=" . $row['name'];
+    if (isset($row['class'])) {
+        $class_id = $row['class'];
+        $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
+    } else {
+        $class = "N/A";
+    }
+    $tag_url .= "&class=" . $class;
+
+    $department_id = $row['department'];
+    $sql_dept = "SELECT * FROM department WHERE id = $department_id LIMIT 1";
+    $result_dept = $conn->query($sql_dept);
+
+    $row_dept = $result_dept->fetch_assoc();
+    $template_field = json_decode($row_dept["template"]);
+
+    foreach ($template_field as $field) {
+        $tag_url .= "&" . $field . $row[$field];
+    }
+    //fetch asset
+    //fetch department
+    //form the url
+    header("Location: " . $tag_url);
 }
 
 $active = $asset_name;
@@ -116,6 +150,9 @@ include "includes/header.php";
                             ?>
                         </tbody>
                     </table>
+                    <form method="post" action="asset.php?id=<?=$asset_id?>">
+                        <button type="submit" name="print" class="btn btn-primary btn-xs float-end">Asset Tag</a>
+                    </form>
                 </div>
             </div>
         </div>

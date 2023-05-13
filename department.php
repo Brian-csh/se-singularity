@@ -210,8 +210,7 @@ include "includes/header.php";
                                     'Expire',
                                     'Serial Number',
                                     'Brand',
-                                    'Model',
-                                    'User'
+                                    'Model'
                                 );
                                 // Generate checkboxes dynamically
                                 foreach ($checkboxOptions as $option) {
