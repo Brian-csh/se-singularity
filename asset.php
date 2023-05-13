@@ -7,13 +7,15 @@ if (isset($_GET['id'])) {
 if (isset($_GET['name'])) {
     $asset_name = $_GET['name'];
 }
-if (isset($_POST['print'])) {
+if (isset($_POST['print'])) { //print asset tag
     $tag_url = "asset_tag.php?";
+
+    //fetch the asset entry
     $sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
     $result = $conn->query($sql);
-
     $row = $result->fetch_assoc();
 
+    //build the url with GET request
     $tag_url .= "id=" . $row['id'];
     $tag_url .= "&name=" . $row['name'];
     if (isset($row['class'])) {
@@ -24,6 +26,7 @@ if (isset($_POST['print'])) {
     }
     $tag_url .= "&class=" . $class;
 
+    //custom template
     $department_id = $row['department'];
     $sql_dept = "SELECT * FROM department WHERE id = $department_id LIMIT 1";
     $result_dept = $conn->query($sql_dept);
@@ -31,12 +34,18 @@ if (isset($_POST['print'])) {
     $row_dept = $result_dept->fetch_assoc();
     $template_field = json_decode($row_dept["template"]);
 
-    foreach ($template_field as $field) {
-        $tag_url .= "&" . $field . $row[$field];
+
+    if (isset($template_field) and !empty($template_field)) {
+        foreach ($template_field as $field) {
+            if (isset($row[$field]) and !empty($row[$field])) {
+                $tag_url .= "&" . $field . "=" .$row[$field];
+            } else {
+                $tag_url .= "&" . $field . "=N/A";
+            }
+        }
     }
-    //fetch asset
-    //fetch department
-    //form the url
+
+    //redirect to asset tag page
     header("Location: " . $tag_url);
 }
 

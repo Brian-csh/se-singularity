@@ -203,14 +203,13 @@ include "includes/header.php";
                             <h6>Additional Contents</h6>
                             <?php
                                 $checkboxOptions = array(
-                                    'Description',
-                                    'Entity',
-                                    'Department',
-                                    'Position',
-                                    'Expire',
-                                    'Serial Number',
-                                    'Brand',
-                                    'Model'
+                                    'description',
+                                    'department',
+                                    'position',
+                                    'expire',
+                                    'serial number',
+                                    'brand',
+                                    'model'
                                 );
                                 // Generate checkboxes dynamically
                                 foreach ($checkboxOptions as $option) {
