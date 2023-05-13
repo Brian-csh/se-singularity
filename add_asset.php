@@ -1,5 +1,6 @@
 <?php
 include "includes/db/connect.php";
+use OSS\Core\OssException;
 session_start();
 $session_info = $_SESSION;
 
@@ -46,7 +47,6 @@ if (isset($_POST['add_custom_attribute'])) {
 }
 
 if (isset($_POST['submit_asset'])) {
-
     $name = $_POST['name'];
     $asset_parent = $_POST['asset_parent'];
     if (empty($asset_parent)) {
@@ -60,6 +60,23 @@ if (isset($_POST['submit_asset'])) {
     $position = $_POST['asset_location'];
     $expire = date("Y-m-d",strtotime($_POST['expiration']));
     // $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));
+    $image_url = "";
+    if (isset($_FILES['image'])) {
+        $file = $_FILES['image'];
+        $localFilePath = $file['tmp_name']; //path in local machine
+        $originalFilename = $file['name'];
+
+        // Generate a unique object name for the file in OSS
+        $objectName = uniqid() . '-' . $originalFilename;
+
+        try {
+            // Upload the file to OSS
+            $ossClient->uploadFile($bucket, $objectName, $localFilePath);
+            $image_url = 'https://singularity-eam.oss-cn-beijing.aliyuncs.com/' . $objectName;
+        } catch (OssException $e) {
+            echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
+        }
+    }
 
     if(isset($_POST['entity'])) {
         $custom_entity_id = $_POST['entity'];
@@ -87,8 +104,8 @@ if (isset($_POST['submit_asset'])) {
         $ca_json = json_encode($ca_obj);
     }
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created,status) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1')";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created, status, image) 
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1', $image_url)";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
@@ -371,32 +388,41 @@ if (isset($_POST['submit_asset'])) {
                                         <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                     </div>
                                 </div>
-                                <div class="card-subheader d-inline">Custom Asset Attributes</div>
+                                
+                                <input type="file" name="image" id="imageInput" style="color: white">
+                                <button onclick="clearFileInput()" class="btn btn-primary text-light float-end" style="background:red; border:none">Clear</button>
+                                <script>
+                                    function clearFileInput() {
+                                        document.getElementById('imageInput').value = '';
+                                    }
+                                </script>
+
+                                <div class="card-subheader">Custom Asset Attributes</div>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
                                 <!-- process json stuff -->
                                 <div class="row gx-3 mb-3">
                                     <?php 
-                                        if(!isset($entity_id)) {
-                                            $entity_id = $session_info['user']['entity'];
-                                        }
-                                        #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
-                                        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
-                                        $result = $conn->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            $row = $result->fetch_assoc();
-                                            $custom_attribute_array = json_decode($row["custom_attribute"]);
-                                            $custom_attribute_amt = count($custom_attribute_array);
-                                            if($custom_attribute_amt > 0) {
-                                                foreach ($custom_attribute_array as $string) {
-                                                    echo '
-                                                        <div class="col-md-5">
-                                                            <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
-                                                            <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
-                                                        </div>
-                                                    ';
-                                                }
-                                            }
-                                        }
+                                        // if(!isset($entity_id)) {
+                                        //     $entity_id = $session_info['user']['entity'];
+                                        // }
+                                        // #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
+                                        // $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
+                                        // $result = $conn->query($sql);
+                                        // if ($result->num_rows > 0) {
+                                        //     $row = $result->fetch_assoc();
+                                        //     $custom_attribute_array = json_decode($row["custom_attribute"]);
+                                        //     $custom_attribute_amt = count($custom_attribute_array);
+                                        //     if($custom_attribute_amt > 0) {
+                                        //         foreach ($custom_attribute_array as $string) {
+                                        //             echo '
+                                        //                 <div class="col-md-5">
+                                        //                     <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
+                                        //                     <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
+                                        //                 </div>
+                                        //             ';
+                                        //         }
+                                        //     }
+                                        // }
                                     ?>
                                 </div>
                                 <!-- Form Row -->
