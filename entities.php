@@ -35,7 +35,7 @@ if(isset($_GET['sync_error'])) {
     </div>
 <?php elseif ($sync_result == 1 && $added_amount <= 0):?>
     <div class='alert alert-primary alert-dismissible fade show' role='alert'>
-        <strong>No change</strong> There were no users to add.
+        <strong>No change</strong> There were no new users to add.
         <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
     </div>
 <?php elseif ($sync_result == 2):?>
