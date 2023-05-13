@@ -1,5 +1,5 @@
 <?php
-$sql = "SELECT * FROM asset ORDER BY id DESC";
+// $sql = "SELECT * FROM asset ORDER BY id DESC";
 $active = "Assets";
 
 include "includes/header.php";
@@ -11,16 +11,26 @@ Item Asset: 0
 Value Asset: 1
 */
 
+if (isset($_GET['departmentid'])) {
+    $departmentid = $_GET['departmentid'];
+} else {
+    $departmentid = -1;
+}
+
+if (isset($_GET['userid'])) {
+    $userid = $_GET['userid'];
+} else {
+    $userid = -1;
+}
+
 if (isset($_POST['add_class'])) {
 
     $name = $_POST['class_name'];
-    if($_POST['class_type'] == "ItemAsset") {
+    if ($_POST['class_type'] == "ItemAsset") {
         $class_type = 0;
-    }
-    else if($_POST['class_type'] == "ValueAsset") {
+    } else if ($_POST['class_type'] == "ValueAsset") {
         $class_type = 1;
-    }
-    else {
+    } else {
         $class_type = -1;
     }
     if (isset($_POST['class_parent']) && $_POST['class_parent']) {
@@ -34,11 +44,22 @@ if (isset($_POST['add_class'])) {
     if ($conn->query($sql_add_class)) {
         // TODO: create a popup for success
     } else {
-        echo "Pain in my assholes.";
+        echo "Error.";
     }
 }
-
+$user_role_id = $_SESSION['user']['role'];
+$entity_id = $_SESSION['user']['entity'];
+$user_id = $_SESSION['user']['id'];
 ?>
+<link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<!-- DataTables Select CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css" />
+
+<!-- DataTables Buttons CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" />
+
+
 
 <div id="layoutSidenav_content">
     <main>
@@ -49,9 +70,9 @@ if (isset($_POST['add_class'])) {
                         <div class="col-auto mb-3 d-inline w-100">
                             <h1 class="page-header-title text-white d-inline">
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
-                                <?=$active?>
+                                <?= $active ?>
                             </h1>
-                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a>
+                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                         </div>
                     </div>
@@ -62,44 +83,31 @@ if (isset($_POST['add_class'])) {
         <div class="container-fluid px-4">
             <div class="card">
                 <div class="card-body">
-                    <div id="tablePreloader">
-                        <p class="text-white p-3">Loading...</p>
-                    </div>
-                    <table id="datatablesSimple" style="display: none">
+                    <table id="myTable">
                         <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Parent</th>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>User</th>
-                            <th>Price</th>
-                            <th>Description</th>
-                            <th>Position</th>
-                            <th>Expiration Date</th>
-                        </tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Parent</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>User</th>
+                                <th>Price</th>
+                                <th>Description</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
-                        <tfoot>
-                        <tr>
-                        <th>ID</th>
-                            <th>Parent</th>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>User</th>
-                            <th>Price</th>
-                            <th>Description</th>
-                            <th>Position</th>
-                            <th>Expiration Date</th>
-                        </tr>
-                        </tfoot>
                         <tbody>
-                        <?php
+                            <?php
 
+                            /*
 
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
+                                if($row['name']=='NULL') continue;
                                 $asset_id = $row['id'];
                                 $asset_name = $row['name'];
 
@@ -118,11 +126,11 @@ if (isset($_POST['add_class'])) {
                                 $asset_price = $row['price'];
                                 $asset_description = $row['description'];
                                 $asset_position = $row['position'];
-                                $asset_expire = $row['expire'];
-                                
-                                echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='asset.php?id=$asset_id'>" . $asset_name . "</a></td>
-                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_description</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"user.php?id=".$row['id']."\">
+                                $asset_expire = date("Y-m-d", strtotime($row['expire']));
+
+                                echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='/asset.php?id=$asset_id&name=$asset_name'>" . $asset_name . "</a></td>
+                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
+                                        <a title=\"Edit asset\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
                                         <i data-feather=\"edit\"></i>
                                         </a>
                                         
@@ -130,8 +138,8 @@ if (isset($_POST['add_class'])) {
                             }
                         }
 
-
-                        ?>
+*/
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -167,20 +175,20 @@ if (isset($_POST['add_class'])) {
 
                         <div class="mb-3">
                             <label for="classAddName">Parent Class<label>
-                                <select class="form-control ms-2" id="inputParentClass" name="class_parent">
-                                    <option value="">Select a Parent Class</option>
+                                    <select class="form-control ms-2" id="inputParentClass" name="class_parent">
+                                        <option value="">Select a Parent Class</option>
                                         <?php
-                                            $results = $conn->query("SELECT id, name FROM asset_class");
-                                            while ($row = $results->fetch_assoc()) {
-                                                if ($row['name']) {
-                                                    unset($id, $parent);
-                                                    $id = $row['id'];
-                                                    $parent = $row['name'];
-                                                    echo '<option value="' . $id . '">' . $parent . '</option>';
-                                                }
+                                        $results = $conn->query("SELECT id, name FROM asset_class");
+                                        while ($row = $results->fetch_assoc()) {
+                                            if ($row['name']) {
+                                                unset($id, $parent);
+                                                $id = $row['id'];
+                                                $parent = $row['name'];
+                                                echo '<option value="' . $id . '">' . $parent . '</option>';
                                             }
-                                            ?>
-                                </select>
+                                        }
+                                        ?>
+                                    </select>
                         </div>
 
                     </div>
@@ -193,17 +201,359 @@ if (isset($_POST['add_class'])) {
         </div>
     </div>
 
+    <!-- MODAL -->
+    <!-- User Move Modal -->
+    <div class="modal fade" id="chooseUserModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Move to Another User</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- User -->
+                        <div class ="mb-3">
+                            <label for="destinationUser">Destination User Name</label>
+                            <select class="form-control" id="destinationUser">
+                                <!-- <option value=""> N/A </option> -->
+                                <?php
+                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE entity = '$entity_id' and role = '4' and id != '$user_id'");
+                                    while ($row = $results->fetch_assoc() ) {
+                                        unset($id, $name);
+                                        $id = $row['id'];
+                                        $name = $row['name'];
+                                        $department_id = $row['department'];
+                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
+                                        echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
+                                    }
+                                    ?>
+                                </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" id="confirmButton">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manager move Modal -->
+        <div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Move to Another Department</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="destinationDepartment">Destination Department Name</label>
+                            <select class="form-control" id="destinationDepartment">
+                                <option value="">N/A</option>
+                                <?php
+                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id"); // where entity=$entity_id of the admin?
+                                while ($row = $results->fetch_assoc()) {
+                                    unset($id, $name);
+                                    $id = $row['id'];
+                                    $name = $row['name'];
+                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" id="confirmButton">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- handleRequestModal -->
+        <!-- <div class="modal fade" id="handleRequestModal" tabindex="-1" role="dialog" aria-labelledby="BasicInfoEditLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            </div>
+        </div> -->
+
+<!-- Request Modal -->
     <script>
-        if ( window.history.replaceState ) {
-            window.history.replaceState( null, null, window.location.href );
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
         }
     </script>
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <!-- DataTables Select JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+
+    <!-- DataTables Buttons JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                ordering: true,
+                searching: true,
+                processing: true,
+                serverSide: true,
+                searchDelay: 500,
+                ajax: {
+                    url: "includes/scripts/datatables_assets.php",
+                    data: function(d) {
+                        d.departmentid = <?= $departmentid ?>;
+                        d.userid = <?= $userid ?>;
+                        d.role_id = <?= $_SESSION['user']['role'] ?>;
+                    }
+                },
+                columns: [{
+                        "data": "id"
+                    },
+                    {
+                        "data": "parent"
+                    },
+                    {
+                        "data": "name"
+                    },
+                    {
+                        "data": "class"
+                    },
+                    {
+                        "data": "user"
+                    },
+                    {
+                        "data": "price"
+                    },
+                    {
+                        "data": "description"
+                    },
+                    {
+                        "data": "position"
+                    },
+                    {
+                        "data": "status"
+                    },
+                    {
+                        "data": "actions"
+                    }
+                ],
+                select: {
+                    style: 'multi'
+                },
+                buttons: [
+                    {
+                        text: <?php if($user_role_id == 4) { ?> 'Return',
+                                <?php } else { ?> 'Retire', <?php }?>
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: <?php if($user_role_id == 4) { ?> 'includes/scripts/return_assets.php',
+                                        <?php } else { ?> "includes/scripts/retire_assets.php", <?php }?>
+                                method: "POST",
+                                data: {
+                                    assets: assetIds,
+                                    user_id: <?=$_SESSION['user']['id']?>
+                                },
+                                <?php if ($user_role_id ==4 ) { ?>
+                                success: function(response) {
+                                    console.log(response);
+                                    // Perform any additional actions on success
+                                    dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                <?php } else {?>
+                                sucess: function(response){
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                }, 
+                                <?php }?>
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: 'Move',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+                            if(<?= $_SESSION['user']['role'] ?> != 4){ // manager move
+                                $('#chooseDepartmentModal').modal('show');
+
+                                $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
+                                    var departmentId = $('#destinationDepartment').val()
+                                    // Perform AJAX request
+                                    $.ajax({
+                                        url: "includes/scripts/move_assets.php",
+                                        method: "POST",
+                                        data: {
+                                            assets: assetIds,
+                                            destination: departmentId,
+                                            role_id: <?= $_SESSION['user']['role'] ?>
+                                        }, // TODO : handle requests
+                                        success: function(response) {
+                                            console.log(response);
+                                            // Perform any additional actions on success
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            console.error(textStatus, errorThrown);
+                                        }
+                                    });
+
+                                    $('#chooseDepartmentModal').modal('hide');
+                                });
+                            } else { // user move
+                                $('#chooseUserModal').modal('show');
+
+                                $('#chooseUserModal').on('click', '#confirmButton', function () {
+                                    var userId = $('#destinationUser').val()
+                                    // Perform AJAX request
+                                    $.ajax({
+                                        url: "includes/scripts/move_assets.php",
+                                        method: "POST",
+                                        data: {
+                                            assets: assetIds,
+                                            destination: userId,
+                                            role_id: <?=$user_role_id?>,
+                                            user_id: <?=$_SESSION['user']['id']?>
+                                        },
+                                        success: function(response) {
+                                            console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for move.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " is moved.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown) {
+                                            console.error(textStatus, errorThrown);
+                                        }
+                                    });
+
+                                    $('#chooseUserModal').modal('hide');
+                                });
+                            }
+                        }
+                    }
+                    <?php if($user_role_id == 4){?>
+                    , { // TODO : request and repair
+                        text: "Request",
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/request_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds,
+                                    user_id: <?=$_SESSION['user']['id']?>
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text:"Repair",
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/repair_request_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                    // Perform any additional actions on success
+                                    dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    }
+                    <?php } ?>
+                ],
+                dom: 'Bfrtip' // Add this line to display buttons
+            });
+        });
+    </script>
+    
+    <!-- For Request Modal -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
     <?php
     include "includes/footer.php";
-    ?> 
+    ?>
+

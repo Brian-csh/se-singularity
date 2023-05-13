@@ -1,5 +1,5 @@
 <?php
-include "includes/db/connect.php";
+include "../db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
@@ -10,13 +10,12 @@ $active = 'Create User';
 // Insert info
 if (isset($_POST['submit_changes'])) {
     $name = $_POST['Entityname'];
-    $date_created = time();
 
-    $sql = "INSERT INTO entity (name, date_created) VALUES
-    ('$name', '$date_created')";
+    $sql = "INSERT INTO entity (name) VALUES
+    ('$name')";
 
     if ($conn->query($sql)) {
-        header('Location: entities.php?id=' . $conn->insert_id);
+        header('Location: ../../entities.php?id=' . $conn->insert_id);
     } else {
         header('Location: new_entity.php?insert_error');
     }
@@ -32,8 +31,8 @@ if (isset($_POST['submit_changes'])) {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title><?= $active ?> - Singularity EAM</title>
-    <link href="css/styles.css" rel="stylesheet" />
-    <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
+    <link href="../../css/styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="../../assets/img/favicon.png" />
     <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
 
@@ -44,7 +43,7 @@ if (isset($_POST['submit_changes'])) {
         <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 me-2 ms-lg-2 me-lg-0" id="sidebarToggle" onclick="document.body.classList.toggle('sidenav-toggled');localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sidenav-toggled'));
 "><i data-feather="menu"></i></button>
         <!-- Navbar Brand-->
-        <a class="navbar-brand pe-3 ps-4 ps-lg-2 text-primary" href="index.php">Singularity EAM</a>
+        <a class="navbar-brand pe-3 ps-4 ps-lg-2 text-primary" href="../../index.php">Singularity EAM</a>
 
         <!-- Navbar Items-->
         <ul class="navbar-nav align-items-center ms-auto">
@@ -70,7 +69,7 @@ if (isset($_POST['submit_changes'])) {
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">Are you sure you want to log out?</div>
-                <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button><a href="logout.php" class="btn btn-danger">Log out</a></div>
+                <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button><a href="../../logout.php" class="btn btn-danger">Log out</a></div>
             </div>
         </div>
     </div>
@@ -127,11 +126,11 @@ if (isset($_POST['submit_changes'])) {
     </main>
 
 
-    <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
-    <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script src="../../js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="../../js/scripts.js"></script>
+    <script src="../../js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
+    <script src="../../js/datatables/datatables-simple-demo.js"></script>
 </div>
 
 </html>

@@ -1,15 +1,61 @@
 <?php
 session_start();
 $session_info = $_SESSION;
+$active = 'Entity #' . $_GET['id'];
+
+include "includes/header.php";
+
 if (isset($_GET['id'])) {
     $entity_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $entity_name = $_GET['name'];
+
+// Fetch entity values
+$sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
+$result = $conn->query($sql);
+if ($result -> num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $entity_name = $row['name'];
+    }
+} else {
+    exit("No entity found with that ID.");
 }
 
-$active = $entity_name;
-include "includes/header.php";
+// Delete attribute function
+if (isset($_GET['delete_attribute_id']) and $_GET['delete_attribute_id'] != "") {
+    $attribute_deletion_id = $_GET['delete_attribute_id'];
+
+    // Get data about this attribute
+    $sql = "SELECT * FROM asset_attribute WHERE id = '$attribute_deletion_id' LIMIT 1";
+    $result = $conn->query($sql);
+    if ($result -> num_rows > 0) {
+        while ($row_delete = $result->fetch_assoc()) {
+            $attribute_entity_id = $row_delete['entity_id'];
+
+            // Delete the attribute
+            $sql = "DELETE FROM asset_attribute WHERE id = '$attribute_deletion_id' LIMIT 1";
+            $conn->query($sql);
+            echo "<script type='text/javascript'>alert('Attribute deleted successfully.');</script>";
+        }
+    }
+}
+
+// Create attribute
+if (isset($_POST['create_asset_attribute'])) {
+    // Get the input data for the new attribute
+    $attribute_name = $_POST['attribute_name'];
+
+    // Insert the new attribute into the database
+    $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$entity_id', '$attribute_name')";
+    $result = $conn->query($sql);
+
+    if ($result) {
+        echo "<script type='text/javascript'>alert('Attribute created successfully.');</script>";
+    } else {
+        echo "<script type='text/javascript'>alert('Error creating attribute: ". $conn->error ."');</script>";
+    }
+}
+
+
 ?>
 
 <div id="layoutSidenav_content">
@@ -66,7 +112,8 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Departments
                             </h1>
-                            <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end">+ Add</a>
+                            <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end ms-2">+ Add Department</a>
+                            <a href="#" class="btn btn-secondary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttrModal">+ Add Asset Attribute</a>
                             <?php if($entity_id == $_SESSION['user']['entity']) {
                                 echo "<a href='includes/entity_sync.php?entity_id=$entity_id' class='btn btn-primary btn-xs float-end me-2'>
                                         Sync Feishu
@@ -118,7 +165,7 @@ include "includes/header.php";
                                         $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
 
                                         echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='department.php?id=$department_id&name=$department_name'>$department_name</a></td><td>$parent_name</td></tr>";
+                                                "<td><a class='text-primary' href='department.php?id=$department_id'>$department_name</a></td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }
@@ -128,7 +175,60 @@ include "includes/header.php";
                 </div>
             </div>
         </div>
+        <div class="container p-3 pt-5">
+            <h1>
+                Custom Attributes:
+            </h1>
+            <p class="text-white ">
+                <?php
+                $sql = "SELECT * FROM asset_attribute WHERE entity_id = '$entity_id'";
+                $result = $conn->query($sql);
+
+                if ($result) {
+                    if (mysqli_num_rows($result) > 0) {
+                        echo "<ul class='text-white'>";
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<li>" . $row['custom_attribute'] . " | <a class='text-danger' href='entity.php?id=" . $entity_id . "&delete_attribute_id=" . $row['id'] . "'>Delete</a></li>";
+                        }
+                        echo "</ul>";
+                    } else {
+                        echo "No custom attributes";
+                    }
+                }
+                ?>
+            </p>
+        </div>
+
     </main>
+
+
+    <!-- Add Attribute Modal -->
+    <div class="modal fade" id="addAttrModal" tabindex="-1" role="dialog" aria-labelledby="attrAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Asset Attribute</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="entity.php?id=<?=$entity_id?>" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="classAddName">Attribute Name *</label>
+                            <input class="form-control" id="classAddName" type="text" name="attribute_name" placeholder="Size" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="create_asset_attribute">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
 
 
 

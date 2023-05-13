@@ -25,7 +25,7 @@ if (isset($_POST['submit_changes'])) {
         VALUES ('$name', '$entity_id', '$parent')";
     }
     if ($conn->query($sql)) {
-        header('Location: entity.php?id='.$entity_id.'&name='.$entity_name);
+        header('Location: entity.php?id='.$entity_id);
     } else {
         header('Location: new_user.php?insert_error');
     }
