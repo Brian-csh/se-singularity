@@ -1,62 +1,79 @@
 <?php
 require 'db/connect.php';
-include '../includes/scripts/functions.php';
-session_start();
-
-// request access token
-// TODO: make request access token a separate function
-
-// API creds
+include '../functions.php';
+// get tenant access token
 $feishu_app_id = "cli_a4a8e931cd79900e";
 $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
 
-$token_url = "https://passport.feishu.cn/suite/passport/oauth/token";
-if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'localhost') {
-    $singularity_redirect = "http://localhost:8000/includes/entity_sync.php";
-}
-else {
-    $singularity_redirect = "https://singularity-eam-singularity.app.secoder.net/includes/entity_sync.php";
-}
-
-$url_components = parse_url($_SERVER['REQUEST_URI']);
-parse_str($url_components['query'], $params);
-
-$post_fields = 'grant_type=authorization_code'.'&client_id=' . $feishu_app_id.'&client_secret=' . $feishu_app_secret . '&code=' . $params['code'] . '&redirect_uri=' . $singularity_redirect;
+$token_url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/";
+$post_fields = 'app_id=' . $feishu_app_id.'&app_secret=' . $feishu_app_secret;
 
 $ch = curl_init( $token_url );
 curl_setopt( $ch, CURLOPT_POST, 1);
 curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields);
-curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0);
 curl_setopt( $ch, CURLOPT_HEADER, 0);
 curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
 $response = curl_exec( $ch );
+curl_close($ch);
+$response_json = json_decode($response, false);
+$tenant_access_token = $response_json->tenant_access_token;
 
-$arr = json_decode($response, false);
+// import all users who are in feishu but not alrealdy in singularity
+$users_url = "https://open.feishu.cn/open-apis/ehr/v1/employees/";
+$header = 'Authorization: Bearer '.$tenant_access_token;
+$ch = curl_init( $users_url );
+curl_setopt( $ch, CURLOPT_HTTPHEADER, array($header));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 
-var_dump($arr);
+$users_response = curl_exec( $ch );
+var_dump($users_response);
+curl_close($ch);
 
-echo "<br></br>";
 
-$info_url = "https://open.feishu.cn/open-apis/tenant/v2/tenant/query";
+$users = json_decode($users_response, true)['data']['items'];
 
-// if succesful in getting the access token, request for entity information
-if(isset($arr->access_token)){
-    $header = array();
-    $header[] = 'Content-length: 0';
-    $header[] = 'Content-type: application/json';
-    $header[] = 'Bearer '.$arr->access_token;
+// user details
+$hashed_password = password_hash("12345678", PASSWORD_DEFAULT);
+$entity_head = 0;
+$role_id = 4;
+$date_created = time();
 
-    curl_setopt($ch, CURLOPT_POST, 0);
-    curl_setopt($ch, CURLOPT_HTTPGET, 1);
-    curl_setopt($ch, CURLOPT_URL, $info_url);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt( $ch, CURLOPT_HTTPHEADER, $header);
-    $entity_info_str = curl_exec( $ch );
-    $entity_info = json_decode($entity_info_str, true);
-
-    var_dump($entity_info);
+if(isset($_GET['entity_id'])) {
+    $entity_id = $_GET['entity_id'];
+}
+else {
+    $entity_id = 1;
 }
 
+$contacts_added = 0;
 
+foreach ($users as $user) {
+    $user_id = $user['user_id']; // The feishu_id to search for
+    $user_name = $user['system_fields']['name'];
+
+    $sql = "SELECT COUNT(*) FROM user WHERE feishu_id = '$user_id'";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
+        $row_count = mysqli_fetch_row($result)[0];
+        if ($row_count <= 0) {
+            $contacts_added++;
+            // A row with the feishu_id does not exists in the table
+            $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role, feishu_id) 
+            VALUES ('$date_created', '$user_name', '$hashed_password', '$entity_id', NULL, '$entity_head', '$role_id', '$user_id')";
+
+            if ($conn->query($sql)) {
+            } else {
+                header('Location: ../entities.php?sync_error=4000');
+            }
+        }
+    }
+    else {
+        header('Location: ../entities.php?sync_error=4001');
+    }
+}
+
+header('Location: ../entities.php?sync_success='.$contacts_added);
 ?>

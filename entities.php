@@ -4,7 +4,46 @@ $active = "Entities";
 
 include "includes/header.php";
 include "includes/navbar.php";
+
+$sync_result = 0;
+// Handle sync success/error messages
+if(isset($_GET['sync_success'])) {
+    $sync_result = 1;
+    $added_amount = $_GET['sync_success'];
+}
+
+if(isset($_GET['sync_error'])) {
+    $sync_result = 2;
+    $error = $_GET['sync_error'];
+}
 ?>
+
+<style>
+  .alert {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+  }
+</style>
+
+<?php if ($sync_result == 1 && $added_amount > 0):?>
+    <div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Sync success!</strong> <?php echo $added_amount?> user(s) added.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+<?php elseif ($sync_result == 1 && $added_amount <= 0):?>
+    <div class='alert alert-primary alert-dismissible fade show' role='alert'>
+        <strong>No change</strong> There were no new users to add.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+<?php elseif ($sync_result == 2):?>
+    <div class='alert alert-danger alert-dismissible fade show' role='alert'>
+        <strong>Sync error!</strong> $error
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+<?php endif;?>
 
 <div id="layoutSidenav_content">
     <main>
@@ -73,9 +112,6 @@ include "includes/navbar.php";
             </div>
         </div>
     </main>
-
-
-
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
