@@ -60,57 +60,6 @@ if (isset($_GET['departmentid'])) {
                             <th>Actions</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <?php
-
-
-                        // $result = $conn->query($sql);
-
-                        // if ($result->num_rows > 0) {
-                        //     while ($row = $result->fetch_assoc()) {
-                        //         $date = gmdate("Y.m.d \ | H:i:s", $row['date_created']);
-
-                        //         $user_id = $row['id'];
-                        //         $name = $row['name'];
-                        //         $entity_super = $row['entity_super'];
-
-                        //         // Fetch entity name
-                        //         $entity_id = $row['entity'];
-                        //         $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
-
-                        //         // Fetch department name
-                        //         $department_id = $row['department'];
-                        //         $department_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
-
-                        //         // Fetch role name
-                        //         $role_id = $row['role'];
-                        //         $role_name = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
-
-
-
-                        //         if ($entity_super == '1') {
-                        //             $entity = '<span class="badge bg-warning text-white">' . $entity_name . '</span>';
-                        //         } else {
-                        //             $entity = '<span class="badge bg-primary text-white">' . $entity_name . '</span>';
-                        //         }
-                        //         $role = '<span class="">' . $role_name .'</span>';
-
-
-
-                        //         echo "<tr data-id='$user_id' ><td>$user_id</td><td>$date</td><td><a class='text-primary' href='edit_user.php?id=$user_id'>" . $name . "</a></td><td>$entity</td>
-                        //     <td>$department_name</td><td>$role</td><td>" . "
-                        //                 <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_user.php?id=".$row['id']."\">
-                        //                 <i data-feather=\"edit\"></i>
-                        //                 </a>
-                  
-                                        
-                        //                 " ."</td></tr>";
-                        //     }
-                        // }
-
-
-                        ?>
-                        </tbody>
                     </table>
                 </div>
             </div>

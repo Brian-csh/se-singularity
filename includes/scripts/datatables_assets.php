@@ -6,18 +6,40 @@ require "../db/connect.php";
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
-$user_role = strval($_GET['role_id']);
 
 $departmentid = intval($_GET['departmentid']);
 $userid = intval($_GET['userid']);
+$user_role_id = strval($_GET['user_role_id']);
+$entity_id = intval($_GET['entity_id']);
 
 // Fetch data from your database table
-if ($userid != -1)
-    $sql = "SELECT * FROM asset WHERE user = $userid";
-else if ($departmentid != -1)
-    $sql = "SELECT * FROM asset WHERE department = $departmentid";  
-else
-    $sql = "SELECT * FROM asset WHERE 1=1"; 
+// if ($userid != -1)
+    // $sql = "SELECT * FROM asset WHERE user = $userid";
+// else if ($departmentid != -1)
+    // $sql = "SELECT * FROM asset WHERE department = $departmentid";  
+// else
+    // $sql = "SELECT * FROM asset WHERE 1=1";
+
+// TODO : for resource manager, load assets in the departmetn and sub-department
+// TODO : for user, just load assets in teh department
+switch ($user_role_id){
+    case 1: // super admin can't see any asset
+        break;
+    case 2: // admin can't see any asset
+        break;
+    case 3: // for resource manager, load assets in the department and sub-department
+        //TODO : 树的遍历 - iteration or recursion
+        // $sql = traverse_department($conn,$departmentid);
+        $sql = "SELECT * FROM asset WHERE department = $departmentid"; // not gonna use this one
+
+        break;
+    case 4: // for user, just load assets in the department
+        // TO-IMPROVE : also load assets in the sub-departments
+        $sql = "SELECT * FROM asset WHERE department = $departmentid";
+        break;
+    default:
+        break;
+}
 
 if (isset($_GET['search']['value'])) {
     $search_string = $_GET['search']['value'];
@@ -73,7 +95,7 @@ while($row = $result->fetch_assoc()) {
 
 
     //TODO : add link to descpription (modal or sth)
-if( $user_role != '4'){
+if( $user_role_id != '4'){
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -91,7 +113,7 @@ if( $user_role != '4'){
         Info
         </a>"
     );
-} else { // user_role == 4 (user)
+} else { // user_role_id == 4 (user)
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,

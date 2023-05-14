@@ -6,11 +6,11 @@ $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 
 // Retire assets 
 if (!empty($assetIds)) {
-    $ids = implode(',', $assetIds);
-    //set status to retired
-    foreach($assetIds as $asset_id){
-        $sql = "UPDATE asset SET status = 4 WHERE id IN ($ids)";
-    }
+    $ids = implode(',', $assetIds); // [1,2,3,4] => "1,2,3,4"
+    //set status to retired 
+    //TODO : add constraints, can only retire IDLE assets
+    $sql = "UPDATE asset SET status = 4 WHERE id IN ($ids)";
+
     $result = $conn->query($sql);
 
     if ($result) {

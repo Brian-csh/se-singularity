@@ -5,17 +5,13 @@ $active = "Assets";
 include "includes/header.php";
 include "includes/navbar.php";
 
-/*
-Parent: class
-Item Asset: 0
-Value Asset: 1
-*/
 
-if (isset($_GET['departmentid'])) {
-    $departmentid = $_GET['departmentid'];
-} else {
-    $departmentid = -1;
-}
+// if (isset($_GET['departmentid'])) {
+    // $departmentid = $_GET['departmentid'];
+// } else {
+    // $departmentid = -1;
+// }
+$departmentid = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
 
 if (isset($_GET['userid'])) {
     $userid = $_GET['userid'];
@@ -24,7 +20,6 @@ if (isset($_GET['userid'])) {
 }
 
 if (isset($_POST['add_class'])) {
-
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {
         $class_type = 0;
@@ -47,9 +42,11 @@ if (isset($_POST['add_class'])) {
         echo "Error.";
     }
 }
+
 $user_role_id = $_SESSION['user']['role'];
 $entity_id = $_SESSION['user']['entity'];
 $user_id = $_SESSION['user']['id'];
+$entity_id = $_SESSION['user']['entity'];
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -100,45 +97,6 @@ $user_id = $_SESSION['user']['id'];
                         </thead>
                         <tbody>
                             <?php
-
-                            /*
-
-                        $result = $conn->query($sql);
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                if($row['name']=='NULL') continue;
-                                $asset_id = $row['id'];
-                                $asset_name = $row['name'];
-
-                                //Fetch Parent 
-                                //Who is the parent of asset?
-                                $asset_parent = $row['parent'];
-
-                                //Fetch Class
-                                $asset_class_id = $row['class'];
-                                $asset_class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$asset_class_id'"))['name'];
-                                
-                                //Fetch User
-                                $asset_user_id = $row['user'];
-                                $asset_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id'"))['name'];
-
-                                $asset_price = $row['price'];
-                                $asset_description = $row['description'];
-                                $asset_position = $row['position'];
-                                $asset_expire = date("Y-m-d", strtotime($row['expire']));
-
-                                echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='/asset.php?id=$asset_id&name=$asset_name'>" . $asset_name . "</a></td>
-                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
-                                        <a title=\"Edit asset\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
-                                        <i data-feather=\"edit\"></i>
-                                        </a>
-                                        
-                                        " ."</td></tr>";
-                            }
-                        }
-
-*/
                             ?>
                         </tbody>
                     </table>
@@ -310,7 +268,8 @@ $user_id = $_SESSION['user']['id'];
                     data: function(d) {
                         d.departmentid = <?= $departmentid ?>;
                         d.userid = <?= $userid ?>;
-                        d.role_id = <?= $_SESSION['user']['role'] ?>;
+                        d.user_role_id = <?= $user_role_id ?>;
+                        d.entity_id = <?= $entity_id ?>;
                     }
                 },
                 columns: [{
@@ -366,7 +325,7 @@ $user_id = $_SESSION['user']['id'];
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    user_id: <?=$_SESSION['user']['id']?>
+                                    user_id: <?= $user_id?>
                                 },
                                 <?php if ($user_role_id !=4 ) { ?>
                                 success: function(response) { // manager handle request success
@@ -446,7 +405,7 @@ $user_id = $_SESSION['user']['id'];
                                             assets: assetIds,
                                             destination: userId,
                                             role_id: <?=$user_role_id?>,
-                                            user_id: <?=$_SESSION['user']['id']?>
+                                            user_id: <?=$user_id?>
                                         },
                                         success: function(response) {
                                             console.log(response);
@@ -491,7 +450,7 @@ $user_id = $_SESSION['user']['id'];
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    user_id: <?=$_SESSION['user']['id']?>
+                                    user_id: <?=$user_id?>
                                 },
                                 success: function(response) {
                                     console.log(response);
@@ -524,14 +483,13 @@ $user_id = $_SESSION['user']['id'];
                             var assetIds = selectedRows.map(function(row) {
                                 return row.id;
                             });
-
                             // Perform AJAX request
                             $.ajax({
                                 url: "includes/scripts/repair_assets.php",
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    user_id: <?=$_SESSION['user']['id']?>
+                                    user_id: <?=$user_id?>
                                 },
                                 success: function(response) {
                                     console.log(response);

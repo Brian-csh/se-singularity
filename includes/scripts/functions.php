@@ -1,6 +1,6 @@
 <?php
 
-// Logging functions
+/* -------------------------------- Logging functions -------------------------------------------*/
 function insert_log_login($conn,$row,$type_id)
 {                  
     /*  BEGIN INSERT LOG */
@@ -32,6 +32,7 @@ function insert_log_login($conn,$row,$type_id)
     }
 }
 
+// log for editting asset
 function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
 {
     /*  BEGIN INSERT LOG */
@@ -83,6 +84,7 @@ function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
     }
 }
 
+// log for requesting asset (user)
 function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$request_type,$time) // TODO: finish this
 {
     $text = '';
@@ -91,8 +93,6 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
             $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
             $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
             $text= "Asset ". $asset_name."was requested (use) from " . $user_name;
-            break;
-        case 8 :
             break;
         case 9 : // asset_request_move
 
@@ -104,7 +104,7 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
 
             $text= "Asset ". $asset_name." was requested (move) from " . $user_name . " to " . $participant_name;
             break;
-        case 10:
+        case 10: // asset_approve_move
             break;
         case 11: // asset_request_return
             $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
@@ -134,7 +134,35 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
     }
 }
 
-// Request functions
+// log for handling asset (manager)
+function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$request_type,$time){
+    switch($request_type){
+        case 8 : // approve request use
+            // fetch asset name
+            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+            // fetch user name
+            $manager_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
+            $text = "Request use of asset ". $asset_name." approved by " . $manager_name;
+            break;
+        case 10: // arppove request move
+            break;
+        case 12: // approve request return
+            break;
+        case 14:// approve request repair
+            break;
+        default:
+            break;
+    }
+    $sql = "INSERT INTO log(date,text,log_type,subject,`By`) VALUES
+            ('$time','$text','$request_type','$asset_id','$manager_id')";
+    // if ($conn->query($sql)){
+    //     return "Record inserted successfully.";
+    // } else {
+    //     return "ERROR: Could not able to execute $sql. " . $conn->error;
+    // }
+}
+
+/* ------------------------- Request functions-------------------------------------*/
 function make_request($conn,$initiator,$participant = null,$asset_ids,$request_type){
     $time = time();
     $results = [];
@@ -144,13 +172,14 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
             foreach($asset_ids as $asset_id){
                 //fetch status of asset                
                 $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+                $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 if($asset_status == 1){ // IN IDLE
-                    $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time) VALUES 
-                            ('$initiator',null,'$asset_id','$request_type','$time')";
+                    $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time,department) VALUES 
+                            ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
                     array_push($results,[$asset_name,$conn->query($sql)]);
                     //Make log
-                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,11,$time);
+                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
 
                     $sql = "UPDATE asset SET status =6 WHERE id = '$asset_id'";
                     $conn->query($sql);
@@ -164,15 +193,16 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
             //only can request IN USE assets and user is initiator
             foreach($asset_ids as $asset_id){
                 //fetch user
-                $user = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $user_id = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
-                if($user == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
-                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
-                            ('$initiator',null,'$asset_id','$request_type','$time')";
+                if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
+                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
+                            ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
                     array_push($results,[$asset_name,$conn->query($sql)]);
                     //make log
-                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
+                    insert_log_asset_user($conn,$initiator,$participant,$asset_id,11,$time);
 
                     $sql = "UPDATE asset SET status = 7 WHERE id = '$asset_id'";
                     $conn->query($sql);
@@ -185,13 +215,14 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
         case 3: // request repair
             //only can request IN USE assets and user is initiator
             foreach($asset_ids as $asset_id){
-                //fetch user
-                $user = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                //fetch data
+                $user_id = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
-                if($user == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
-                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
-                            ('$initiator',null,'$asset_id','$request_type','$time')";
+                if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
+                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
+                            ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
                     array_push($results,[$asset_name,$conn->query($sql)]);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,13,$time);
@@ -207,12 +238,13 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
             //only can request IN USE assets and user is initiator
             foreach($asset_ids as $asset_id){
                 //fetch user
-                $user = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $user_id = mysqli_fetch_array($conn->query("SELECT user FROM asset WHERE id = '$asset_id'"))['user'];
+                $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
                 if($user == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
-                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time) VALUES
-                            ('$initiator','$participant','$asset_id','$request_type','$time')";
+                    $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
+                            ('$initiator','$participant','$asset_id','$request_type','$time','$department_id')";
                     array_push($results,[$asset_name,$conn->query($sql)]);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
@@ -227,6 +259,55 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
         default :
             echo "";
         }
+    return $results;
+}
+
+//TODO : 树的遍历 - iteration
+function traverse_department($conn, $departmentid){
+    
+    return $sql;
+}
+
+// HANDLE REQUESTS
+function approve_request($conn, $manager_id,$requestIds){
+    $time = time();
+    $results = [];
+    foreach($requestIds as $request_id){
+        //fetch request type
+        $request_type = mysqli_fetch_array($conn->query("SELECT type FROM pending_requests WHERE id = '$request_id'"))['type'];
+        //fetch initiator
+        $initiator = mysqli_fetch_array($conn->query("SELECT initiator FROM pending_requests WHERE id = '$request_id'"))['initiator'];
+        //fetch asset_id
+        $asset_id = mysqli_fetch_array($conn->query("SELECT asset FROM pending_requests WHERE id = '$request_id'"))['asset'];
+        switch ($request_type){
+            case 1://request use
+                // check if request is valid
+                $request_status = mysqli_fetch_array($conn->query("SELECT result FROM pending_requests WHERE id = '$request_id'"))['result'];
+                if($request_status != 0){
+                    array_push($results,[$request_id,false]);
+                    break;
+                }
+                //set user as user_id and asset status to IN uSE
+                $sql = "UPDATE asset SET user = '$initiator',status = 2 WHERE id = '$asset_id'";
+                $conn->query($sql);
+                // leave log
+                insert_log_handle_request($conn,$manager_id,$request_id,$aset_id,8);
+                // set request as done in pending request and record review time
+                $sql = "UPDATE pending_requests SET result = 1, review_time = $time WHERE id = '$request_id'";
+
+                array_push($results,[$request_id,$conn->query($sql)]);
+                break;
+            case 2:// request return
+
+                break;
+            case 3:// request repair
+                break;
+            case 4:// request move
+                break;
+            default:
+                break;
+        }
+    }
     return $results;
 }
 ?>

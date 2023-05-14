@@ -19,6 +19,7 @@
             <div class="sidenav-menu">
                 <div class="nav accordion" id="accordionSidenav">
                     <!-- Sidenav Menu Heading (Core)-->
+
                     <div class="sidenav-menu-heading">Main</div>
                     <a class="nav-link" href="/index.php">
                         <div class="nav-link-icon"><i data-feather="activity"></i></div>
@@ -44,6 +45,12 @@
                     <a class="nav-link" href="/assets.php">
                         <div class="nav-link-icon"><i data-feather="package"></i></div>
                         Assets
+                    </a>
+
+                    <!-- Sidenav Heading (Requests)-->
+                    <a class="nav-link" href="/requests.php">
+                        <div class="nav-link-icon"><i data-feather="git-pull-request"></i></div>
+                        Requests
                     </a>
                 </div>
             </div>
