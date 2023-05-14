@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require 'db/connect.php';
 include 'scripts/functions.php';
 
@@ -29,7 +30,6 @@ curl_setopt( $ch, CURLOPT_HTTPHEADER, array($header));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 
 $users_response = curl_exec( $ch );
-var_dump($users_response);
 curl_close($ch);
 
 
@@ -86,4 +86,5 @@ if($contacts_added > 0){
     insert_log_feishu_sync($conn, $entity_id, $initiator);
 }
 header('Location: ../entities.php?sync_success='.$contacts_added);
+ob_end_flush();
 ?>
