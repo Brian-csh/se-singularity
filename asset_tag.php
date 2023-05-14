@@ -2,7 +2,8 @@
     $id = $_GET['id'];
     $name = $_GET['name'];
     $class = $_GET['class'];
-    // $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$classid' LIMIT 1"))['name']; 
+    $qr_url = $_GET['qr'];
+
     if (isset($_GET['description'])) {
         $description = $_GET['description'];
     }
@@ -112,7 +113,6 @@
         <h2 class="asset-name"><?=$name?></h2>
         <p class="asset-id">Asset ID: <?=$id?></p>
         <p class="asset-category">Category: <?=$class?></p>
-        
         <?php
             if (isset($description)) {
                 echo '<p class="asset-description">Description: ' . $description . '<br></p>';
@@ -143,9 +143,20 @@
             }
         ?>
         <div class="card-footer">
-            <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=12345&choe=UTF-8" alt="QR Code" />
+            <div id="qrcode"></div>
             <button class="print-button" onclick="window.print()">Print</button>
         </div>
     </div>
+    <script src="js/qrcode.min.js"></script>
+    <script>
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: "<?=$qr_url?>",
+            width: 128,
+            height: 128,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
 </body>
 </html>

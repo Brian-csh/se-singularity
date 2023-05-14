@@ -2,9 +2,6 @@
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $asset_name = $_GET['name'];
-}
 
 // $active = $edit_name;
 include "includes/header.php";
