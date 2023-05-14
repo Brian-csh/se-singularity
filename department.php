@@ -198,9 +198,25 @@ include "includes/header.php";
                 </div>
                 <form action="department.php" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
-
                         <div class="mb-3">
-                            <h6>Additional Contents</h6>
+                            <h6>Current template</h6>
+                            <?php
+                                //obtain the existing template
+                                $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
+                                $result = $conn->query($sql);
+                                if ($result) {
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $row = $result->fetch_assoc();
+                                        $template_string = isset($row['template']) ? $row['template'] : "";
+                                    }
+                                } else {
+                                    exit("No department found with that ID.");
+                                }
+                                $template = json_decode($template_string);
+                                echo "<p>id, name, class, " . implode(", ", $template) . "<br></p>";
+
+                            ?>
+                            <h6>Select contents to be included</h6>
                             <?php
                                 $checkboxOptions = array(
                                     'description',
@@ -219,8 +235,6 @@ include "includes/header.php";
                                 }
                             ?>
                         </div>
-
-
                     </div>
                     <input type="hidden" name="department_id" value="<?=$department_id?>">
                     <div class="modal-footer">
