@@ -30,6 +30,7 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
+        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
 // Fetch Data
@@ -96,8 +97,16 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
                     <!-- TODO: SHOW Image-->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
-                            <!-- TODO: Asset Image -->
-                            IMAGE UPLOADER
+                            <!-- Asset Image -->
+                            <div id="image-container" style="padding: 20px">
+                                <script>
+                                    window.onload = function() {
+                                        var img = document.getElementById('assetImage');
+                                        img.src = "<?=$asset_image?>"; // Set the source of the image
+                                    }
+                                </script>
+                                <img src="" id="assetImage">                            
+                            </div>
                         </div>
                         <div class = "col -md-6">
                             <!-- TODO: Asset table -->
@@ -152,7 +161,9 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
-                                <textarea class="form-control" id="descriptionTextarea" name="description" rows="20"></textarea>
+                                <div style="color: white; border: 1px solid white; padding: 10px">
+                                    <?=$asset_description?>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -391,20 +402,22 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <script>
-        $(document).ready(function() {
-            tinymce.init({
-            selector: '#descriptionTextarea',
-            plugins: 'powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave',
-            toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
-            skin: "oxide-dark",
-            content_css: "dark",
-            setup: function (editor) {
-            editor.on('init', function (e) {
-                editor.setContent('<?php echo preg_replace("/\s+/"," ",$asset_description);?>');
-            });
-            }
-        });
-        });
+        // $(document).ready(function() {
+        //     tinymce.init({
+        //     selector: '#descriptionTextarea',
+        //     plugins: 'searchreplace autolink directionality visualblocks visualchars image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap emoticons autosave',
+        //     toolbar: 'undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat',
+        //     skin: "oxide-dark",
+        //     content_css: "dark",
+        //     setup: function (editor) {
+        //     editor.on('init', function (e) {
+                // editor.setContent('<?php //echo preg_replace("/\s+/"," ",$asset_description);?>');
+        //     });
+        //     // tinymce.activeEditor.mode.set("readonly");
+        //     // tinymce.activeEditor.setMode('readonly');
+        //     },
+        // });
+        // });
     </script>
     <?php
     include "includes/footer.php";
