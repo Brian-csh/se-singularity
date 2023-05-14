@@ -1,11 +1,13 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $challenge = $_POST['challenge'];
-    $token = $_POST['token'];
-    $type = $_POST['type'];
+    $payload = file_get_contents('php://input');
+    // Convert the JSON string into a PHP object
+    $data = json_decode($payload);
 
-    // Debugging: Output the received values to the console or log
-    var_dump($challenge, $token, $type);
+    // Access the individual values
+    $challenge = $data->challenge;
+    $token = $data->token;
+    $type = $data->type;
 
     if ($type === 'url_verification') {
         // Send a response back to the source with the challenge value
@@ -13,7 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Content-Type: application/json');
         $json = json_encode($response);
         echo $json;
-        var_dump($json);
+        exit;
+    }
+    else {
+        echo "Failed\n";
+        var_dump($challenge, $token, $type);
         exit;
     }
 }
