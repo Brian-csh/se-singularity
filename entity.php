@@ -2,6 +2,7 @@
 session_start();
 $session_info = $_SESSION;
 $active = 'Entity #' . $_GET['id'];
+$initiator_id = $session_info['user']['id'];
 
 include "includes/header.php";
 
@@ -115,7 +116,7 @@ if (isset($_POST['create_asset_attribute'])) {
                             <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end ms-2">+ Add Department</a>
                             <a href="#" class="btn btn-secondary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttrModal">+ Add Asset Attribute</a>
                             <?php if($entity_id == $_SESSION['user']['entity']) {
-                                echo "<a href='includes/entity_sync.php?entity_id=$entity_id' class='btn btn-primary btn-xs float-end me-2'>
+                                echo "<a href='includes/entity_sync.php?entity_id=$entity_id&initiator=$initiator_id' class='btn btn-primary btn-xs float-end me-2'>
                                         Sync Feishu
                                     </a>";
                             } ?>

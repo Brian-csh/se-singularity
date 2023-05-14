@@ -138,10 +138,12 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
 function insert_log_feishu_sync($conn, $entity_id, $initiator_id)
 {
     $time_now = time();
+    $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator_id'"))['name'];
     $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
-    $text = "Synced entity " . $entity_name. "to Feishu by " . $initiator_id;
-    $sql = "INSERT INTO log (date, text, log_type, subject,`By`) VALUES
-            ('$time_now','$text','50','$entity_id','$initiator_id')";
+    $text = "Synced entity " . $entity_name. " to Feishu by " . $initiator_name;
+    $type_id = 50;
+    $sql = "INSERT INTO log (date, text, log_type,`By`) VALUES
+            ('$time_now','$text','$type_id','$initiator_id')";
     if ($conn->query($sql)){
         return "Record inserted successfully.";
     } else {
@@ -176,7 +178,7 @@ function insert_log_new_feishu_user($conn, $row)
 
     $entity = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
     $role = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
-    $text = $username." joined Singularity through Feishu! ".$role." in ".$entity;
+    $text = $username." joined Singularity through Feishu! They are a ".$role." in ".$entity;
     $sql = "INSERT INTO log (date, text,log_type, subject) VALUES 
     ('$time_now','$text','$type_id','$user_id')";
     if( $conn->query($sql)){

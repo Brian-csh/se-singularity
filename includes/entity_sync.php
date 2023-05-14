@@ -1,6 +1,7 @@
 <?php
 require 'db/connect.php';
-include '../functions.php';
+include 'scripts/functions.php';
+
 // get tenant access token
 $feishu_app_id = "cli_a4a8e931cd79900e";
 $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
@@ -47,13 +48,20 @@ else {
     $entity_id = 1;
 }
 
+if(isset($_GET['initiator'])) {
+    $initiator = $_GET['initiator'];
+}
+else {
+    $initiator = NULL;
+}
+
 $contacts_added = 0;
 
 foreach ($users as $user) {
     $user_id = $user['user_id']; // The feishu_id to search for
     $user_name = $user['system_fields']['name'];
 
-    $sql = "SELECT COUNT(*) FROM user WHERE feishu_id = '$user_id'";
+    $sql = "SELECT COUNT(*) FROM user WHERE feishu_id = '$user_id' OR name = '$user_name'";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -74,6 +82,8 @@ foreach ($users as $user) {
         header('Location: ../entities.php?sync_error=4001');
     }
 }
-
+if($contacts_added > 0){
+    insert_log_feishu_sync($conn, $entity_id, $initiator);
+}
 header('Location: ../entities.php?sync_success='.$contacts_added);
 ?>
