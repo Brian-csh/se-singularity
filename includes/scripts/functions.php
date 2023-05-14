@@ -32,46 +32,45 @@ function insert_log_login($conn,$row,$type_id)
     }
 }
 
-// log for editting asset
+// log for editting asset - other cases should be deleted
 function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
 {
-    /*  BEGIN INSERT LOG */
     $time_now = time();
     $asset_id = $row['id'];
     $text = '';
     $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
 
-    if( $type_id ==4){
-    } else if ( $type_id ==5){
-        $text = "Asset ". $row['name']." created by " . $user_name;
-    } else if ( $type_id ==6){
-        $text = "Asset ". $row['name']." info changed by " . $user_name;
-    } else if ( $type_id ==7){
-        $text = "Asset ". $row['name']." registered (use) from " . $user_name;
-    } else if ( $type_id ==8){
-        $text = "Asset ". $row['name']." register(use) approved by " . $user_name;
-    } else if ( $type_id ==9){ // move user to user, $row from pending_requests
+    // if( $type_id ==4){
+    // } else if ( $type_id ==5){
+    //     $text = "Asset ". $row['name']." created by " . $user_name;
+    // } else if ( $type_id ==6){
+    $text = "Asset ". $row['name']." info changed by " . $user_name;
+    // } else if ( $type_id ==7){
 
-        //asset_id could be more than once
-        // $asset_id = $row['asset'];
-        // $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+    // } else if ( $type_id ==8){
+    //     $text = "Asset ". $row['name']." register(use) approved by " . $user_name;
+    // } else if ( $type_id ==9){ // move user to user, $row from pending_requests
 
-        // $user_id = $row['initiator'];
-        // $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
+    //     //asset_id could be more than once
+    //     // $asset_id = $row['asset'];
+    //     // $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
 
-        // $participant_id = $row['participant'];
-        // $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant_id'"))['name'];
+    //     // $user_id = $row['initiator'];
+    //     // $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
 
-        $text = "Asset ". $asset_name." requested 'move' from " . $user_name . " to " . $participant_name;
-    } else if ( $type_id ==10){
-        $text = "Asset ". $row['name']." registered (move) approved by" . $user_name;
-    } else if ( $type_id ==11){
-        $text = "Asset ". $row['name']." registered (repair) from " . $user_name;
-    } else if ( $type_id ==12){
-        $text = "Asset ". $row['name']." registered (repair) approved by " . $user_name;
-    } else if ( $type_id ==13){
-        $text = "Asset ". $row['name']." deleted by " . $user_name;
-    }
+    //     // $participant_id = $row['participant'];
+    //     // $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant_id'"))['name'];
+
+    //     $text = "Asset ". $asset_name." requested 'move' from " . $user_name . " to " . $participant_name;
+    // } else if ( $type_id ==10){
+    //     $text = "Asset ". $row['name']." registered (move) approved by" . $user_name;
+    // } else if ( $type_id ==11){
+    //     $text = "Asset ". $row['name']." registered (repair) from " . $user_name;
+    // } else if ( $type_id ==12){
+    //     $text = "Asset ". $row['name']." registered (repair) approved by " . $user_name;
+    // } else if ( $type_id ==13){
+    //     $text = "Asset ". $row['name']." deleted by " . $user_name;
+    // }
     /* TODO: delete cases where user initiates*/
 
     $sql = "INSERT INTO log (date, text,log_type, subject,`By`) VALUES
@@ -88,37 +87,21 @@ function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
 function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$request_type,$time) // TODO: finish this
 {
     $text = '';
+    $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+    $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
     switch ($request_type){
         case 7 :  // asset_request_use
-            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-            $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
-            $text= "Asset ". $asset_name."was requested (use) from " . $user_name;
+            $text= "Asset ". $asset_name." was requested (use) from " . $user_name;
             break;
         case 9 : // asset_request_move
-
-            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-
-            $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
-
             $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant'"))['name'];
-
             $text= "Asset ". $asset_name." was requested (move) from " . $user_name . " to " . $participant_name;
             break;
-        case 10: // asset_approve_move
-            break;
         case 11: // asset_request_return
-            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-
-            $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
-
-            $text= "Asset ". $asset_name."was requested (return) from " . $user_name;
+            $text= "Asset ". $asset_name." was requested (return) from " . $user_name;
             break;
         case 13: // asset_reqeust_repair
-            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-
-            $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
-
-            $text= "Asset ". $asset_name."was requested (repair) from " . $user_name;
+            $text= "Asset ". $asset_name." was requested (repair) from " . $user_name;
             break;
         default :
             break;
@@ -136,30 +119,33 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
 
 // log for handling asset (manager)
 function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$request_type,$time){
+    // fetch asset name
+    $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+    // fetch user name
+    $manager_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$manager_id'"))['name'];
     switch($request_type){
         case 8 : // approve request use
-            // fetch asset name
-            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-            // fetch user name
-            $manager_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
             $text = "Request use of asset ". $asset_name." approved by " . $manager_name;
             break;
         case 10: // arppove request move
+            $text = "Request move of asset ". $asset_name." approved by " . $manager_name;
             break;
         case 12: // approve request return
+            $text = "Request return of asset ". $asset_name." approved by " . $manager_name;
             break;
         case 14:// approve request repair
+            $text = "Request repair of asset ". $asset_name." approved by " . $manager_name;
             break;
         default:
             break;
     }
     $sql = "INSERT INTO log(date,text,log_type,subject,`By`) VALUES
             ('$time','$text','$request_type','$asset_id','$manager_id')";
-    // if ($conn->query($sql)){
-    //     return "Record inserted successfully.";
-    // } else {
-    //     return "ERROR: Could not able to execute $sql. " . $conn->error;
-    // }
+    if ($conn->query($sql)){
+        return "Record inserted successfully.";
+    } else {
+        return "ERROR: Could not able to execute $sql. " . $conn->error;
+    }
 }
 
 /* ------------------------- Request functions-------------------------------------*/
@@ -279,34 +265,45 @@ function approve_request($conn, $manager_id,$requestIds){
         $initiator = mysqli_fetch_array($conn->query("SELECT initiator FROM pending_requests WHERE id = '$request_id'"))['initiator'];
         //fetch asset_id
         $asset_id = mysqli_fetch_array($conn->query("SELECT asset FROM pending_requests WHERE id = '$request_id'"))['asset'];
+        $request_status = mysqli_fetch_array($conn->query("SELECT result FROM pending_requests WHERE id = '$request_id'"))['result'];
+        // check if request is valid
+        if($request_status != 0){ 
+            array_push($results,[$request_id,false]);
+            break;
+        }
         switch ($request_type){
             case 1://request use
-                // check if request is valid
-                $request_status = mysqli_fetch_array($conn->query("SELECT result FROM pending_requests WHERE id = '$request_id'"))['result'];
-                if($request_status != 0){
-                    array_push($results,[$request_id,false]);
-                    break;
-                }
                 //set user as user_id and asset status to IN uSE
-                $sql = "UPDATE asset SET user = '$initiator',status = 2 WHERE id = '$asset_id'";
-                $conn->query($sql);
+                $sql = "UPDATE asset SET user = '$initiator',status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
                 // leave log
-                insert_log_handle_request($conn,$manager_id,$request_id,$aset_id,8);
-                // set request as done in pending request and record review time
-                $sql = "UPDATE pending_requests SET result = 1, review_time = $time WHERE id = '$request_id'";
-
-                array_push($results,[$request_id,$conn->query($sql)]);
+                insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,8,$time);
                 break;
             case 2:// request return
-
+                //set user as N/A and asset status to IDLE
+                $sql = "UPDATE asset SET user = null,status = 1 WHERE id = '$asset_id'"; $conn->query($sql);
+                // leave log
+                insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,12,$time);
                 break;
             case 3:// request repair
+                //set user as N/A and asset status to IN MAINTAIN
+                $sql = "UPDATE asset SET user = null,status = 3 WHERE id = '$asset_id'"; $conn->query($sql);
+                // leave log
+                insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$time);
                 break;
             case 4:// request move
+                //fetch participant
+                $participant_id = mysqli_fetch_array($conn->query("SELECT participant FROM pending_requests WHERE id = '$request_id'"))['participant'];
+                //set user as partiicpant and asset status to IN USE
+                $sql = "UPDATE asset SET user = $participant_id,status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
+                // leave log
+                insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$time);
                 break;
             default:
                 break;
         }
+        // set request as done in pending request and record review time
+        $sql = "UPDATE pending_requests SET result = 1, review_time = $time WHERE id = '$request_id'";
+        array_push($results,[$request_id,$conn->query($sql)]);
     }
     return $results;
 }
