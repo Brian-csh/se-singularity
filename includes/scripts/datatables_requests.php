@@ -75,7 +75,7 @@ while($row = $result->fetch_assoc()) {
         "participant" => $participant,
         "asset" => $asset,
         "type" => $type,
-        "result" => ($row['result'] == 0) ? "Pending" : (($row['result'] == 1) ? "Approved" : "Rejected"),
+        "result" => ($row['result'] == 0) ? "Pending" : (($row['result'] == 1) ? "Approved" : "Rejected"), // 0 -> pending, 1 -> approved, 2->rejected
         "request_time" => date("H:i:s m-d",$row['request_time']),
         "review_time" => $row['review_time']
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,

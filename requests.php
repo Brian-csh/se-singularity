@@ -23,8 +23,6 @@ $entity_id = $_SESSION['user']['entity'];
 <!-- DataTables Buttons CSS -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" />
 
-
-
 <div id="layoutSidenav_content">
     <main>
         <header class="page-header page-header-compact page-header-light border-bottom bg-black mb-4">
@@ -84,6 +82,21 @@ $entity_id = $_SESSION['user']['entity'];
     <!-- DataTables Select JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
 
+
+    <!-- Styles for DataTables buttons -->
+    <style>
+        button.dt-button.approve-button {
+            color: white !important;
+            background: green !important;
+            border-radius: 20px !important;
+        }
+        button.dt-button.reject-button {
+            color: white !important;
+            background: red !important;
+            border-radius: 20px !important;
+        }
+    </style>
+
     <!-- DataTables Buttons JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script>
@@ -134,6 +147,7 @@ $entity_id = $_SESSION['user']['entity'];
                 buttons: [
                     {
                         text : 'Approve',
+                        className: 'approve-button',
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -143,11 +157,12 @@ $entity_id = $_SESSION['user']['entity'];
                             });
                             // console.log($_SESSION);
                             $.ajax({
-                                url: "includes/scripts/approve_requests.php",
+                                url: "includes/scripts/handle_requests.php",
                                 method: "POST",
                                 data: {
                                     requestIds: requestIds,
-                                    user_id : <?=$user_id?>
+                                    user_id : <?=$user_id?>,
+                                    handle_type : 1
                                 },
                                 success: function(response) {
                                     console.log(response);
@@ -160,6 +175,46 @@ $entity_id = $_SESSION['user']['entity'];
                                                     alert("Request " + data.result[i][0] + " is not available for approve. You can only approve pending requests.");
                                                 } else { // Succeess
                                                     alert("Request " + data.result[i][0] + " approved successfully!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text : 'Reject',
+                        className : 'reject-button',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var requestIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+                            // console.log($_SESSION);
+                            $.ajax({
+                                url: "includes/scripts/handle_requests.php",
+                                method: "POST",
+                                data: {
+                                    requestIds: requestIds,
+                                    user_id : <?=$user_id?>,
+                                    handle_type : 2
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Request " + data.result[i][0] + " is not available for reject. You can only reject pending requests.");
+                                                } else { // Succeess
+                                                    alert("Request " + data.result[i][0] + " rejected successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables

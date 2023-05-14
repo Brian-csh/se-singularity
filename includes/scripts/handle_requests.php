@@ -3,19 +3,16 @@ require "../db/connect.php";
 include "functions.php";
 // Get asset IDs from POST data
 
-// $requestTypes = isset($_POST['requestTypes']) ? $_POST['requestTypes'] : [];
-// $assetIds = isset($_POST['assetIds']) ? $_POST['assetIds'] : [];
-
-// $department_id = isset($_POST['department_id']) ? intval($_POST['department_id']) : -1;
 $requestIds = isset($_POST['requestIds']) ? $_POST['requestIds'] : [];
 $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : -1;
+$handle_type = isset($_POST['handle_type']) ? intval($_POST['handle_type']) : -1;// 1 -> approve, 2 -> reject
 
 // user request - use
 if (empty($requestIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 } else {
-    //MAKE request to manager(leaves log at the same time)
-    $results = approve_request($conn,$user_id,$requestIds); // can only IDLE assets
+
+    $results = handle_request($conn,$user_id,$requestIds,$handle_type);
 
     $responseData = array('result' => $results);
 

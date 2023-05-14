@@ -435,7 +435,7 @@ $entity_id = $_SESSION['user']['entity'];
                     }
                     <?php if($user_role_id == 4){?>
                     , { 
-                        text: "Request",
+                        text: "Use",
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
