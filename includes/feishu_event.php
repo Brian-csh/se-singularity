@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($event_type) {
         case 'contact.user.created_v3':
             // Handle new user event
-            $ou_id = $data->event->user->open_id;
-            $name = $data->event->user->name;
+            $ou_id = $data->event->object->user->open_id;
+            $name = $data->event->object->user->name;
             $hashed_password = password_hash("12345678", PASSWORD_DEFAULT);
             $entity_head = 0;
             $role_id = 4;
