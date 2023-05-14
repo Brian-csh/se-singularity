@@ -45,7 +45,7 @@ if (isset($_POST['print'])) { //print asset tag
         }
     }
 
-    $tag_url .= "&qr=https://singularity-eam-singularity.app.secoder.net/assets.php?id=" . $row['id'];
+    $tag_url .= "&qr=https://singularity-eam-singularity.app.secoder.net/asset_info.php?id=" . $row['id'];
 
     //redirect to asset tag page
     header("Location: " . $tag_url);
