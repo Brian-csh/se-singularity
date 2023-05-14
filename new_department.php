@@ -122,7 +122,7 @@ if (isset($_POST['submit_changes'])) {
                                     <!-- Form Group (name)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
-                                        <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Username">
+                                        <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Department Name">
                                     </div>
                                     <!-- Form Group (entity)-->
                                     <div class="col-md-6">
