@@ -1,33 +1,10 @@
 <?php
-// if (isset($_GET['id'])) {
-//     $user_id = $_GET['id'];
-// } else {
-//     $user_id = -1;
-// }
-
-// if (isset($_GET['role'])) {
-//     $role_id = $_GET['role'];
-// } else {
-//     $role_id = -1;
-// }
-
-// if (isset($_GET['entityid'])) {
-//     $entity_id = $_GET['entityid'];
-// } else {
-//     $entity_id = -1;
-// }
-
-// if (isset($_GET['departmentid'])) {
-//     $department_id = $_GET['departmentid'];
-// } else{
-//     $department_id = -1;
-// }
-
 $user_id = $_SESSION['user']['id'];
 $user_name = $_SESSION['user']['name'];
 $role_id = $_SESSION['user']['role'];
-$entity_id = $_SESSION['user']['entity'];
-$department_id = $_SESSION['user']['department'];
+$entity_id = $_SESSION['user']['entity'] ? $_SESSION['user']['entity'] : -1;
+$department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
+// $department_id = 2;
 
 // fetch user role
 
@@ -54,7 +31,7 @@ $department_id = $_SESSION['user']['department'];
                     <?php if($role_id == 1) { ?>
                         <!-- Sidenav Menu Heading (Core)-->
                         <div class="sidenav-menu-heading">Main</div>
-                        <a class="nav-link" href=<?="/index.php?id=".$user_id."&role=".$role_id."&entityid=".$entity_id."&departmentid=".$department_id?>>
+                        <a class="nav-link" href="/index.php">
                             <div class="nav-link-icon"><i data-feather="activity"></i></div>
                             Dashboard
                         </a> 
@@ -70,15 +47,15 @@ $department_id = $_SESSION['user']['department'];
                             Users
                         </a>          
                     <?php } else if($role_id == 2){?>
-                            <!-- Admin -->
-                    <div class="sidenav-menu-heading">Main</div>
-                    <a class="nav-link" href=<?="/index.php?id=".$user_id."&role=".$role_id."&entityid=".$entity_id."&departmentid=".$department_id?>>
+                    <!-- Admin -->
+                        <div class="sidenav-menu-heading">Main</div>
+                        <a class="nav-link" href="/index.php">
                             <div class="nav-link-icon"><i data-feather="activity"></i></div>
                             Dashboard
-                        </a>       
+                        </a>
                         <!-- Sidenav Heading (Entities)-->
                         <div class="sidenav-menu-heading">Data</div>
-                        <a class="nav-link" href= <?="/entity.php?id=".$entity_id?>>
+                        <a class="nav-link" href= <?="/entity.php"?>>
                             <div class="nav-link-icon"><i data-feather="home"></i></div>
                             Departments
                         </a>   
@@ -128,7 +105,7 @@ $department_id = $_SESSION['user']['department'];
                     <?php } else {  ?>
                         <!-- Sidenav Menu Heading (Core)-->
                         <div class="sidenav-menu-heading">Main</div>
-                        <a class="nav-link" href=<?="/index.php?id=".$user_id."&role=".$role_id."&entityid=".$entity_id."&departmentid=".$department_id?>>
+                        <a class="nav-link" href="/index.php">
                             <div class="nav-link-icon"><i data-feather="activity"></i></div>
                             Dashboard
                         </a>

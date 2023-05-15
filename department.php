@@ -5,6 +5,10 @@ include "includes/header.php";
 include "includes/navbar.php";
 
 
+// if($department_id == -1){ // admin or superadmin
+    // $departmentid = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
+// } else { // resoure manager, do nothing
+// }
 // if (isset($_GET['id'])) {
     // $department_id = $_GET['id'];
 // } else {
@@ -182,7 +186,7 @@ $active = $department_name;
     <script>
     var btn = document.getElementById('manageUsers');
     btn.addEventListener('click', function() {
-      document.location.href = 'users.php?departmentid=<?= $department_id ?>';
+      document.location.href = '/users.php?departmentid=<?= $department_id ?>';
     });
     </script>
 

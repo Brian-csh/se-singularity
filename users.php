@@ -5,17 +5,6 @@ $active = "Users";
 include "includes/header.php";
 include "includes/navbar.php";
 
-// if (isset($_GET['entityid'])) {
-//     $entityid = $_GET['entityid'];
-// } else {
-//     $entityid = -1;
-// }
-
-// if (isset($_GET['departmentid'])) {
-//     $departmentid = $_GET['departmentid'];
-// } else {
-//     $departmentid = -1;
-// }
 ?>
 
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
