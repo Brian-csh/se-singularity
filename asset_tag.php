@@ -109,6 +109,19 @@
 </head>
 <body>
     <div class="asset-card">
+        <?php
+            if (in_array("entity", $template)) {
+                $entity_id = $row_dept['entity'];
+                $sql_entity = "SELECT * from entity WHERE id='$entity_id' LIMIT 1";
+                $result_entity = $conn->query($sql_entity);
+                $row_entity = $result_entity->fetch_assoc();
+                $entity = $row_entity["name"];
+                echo '<h2 class="asset-description">' . $entity . '</h2>';
+            }
+            if (in_array("department", $template)) {
+                echo '<p class="asset-description">' . $row_dept['name'] . '<br></p>';
+            }
+        ?>
         <h2 class="asset-name"><?=$name?></h2>
         <p class="asset-id">Asset ID: <?=$id?></p>
         <p class="asset-category">Category: <?=$class?></p>
@@ -116,17 +129,6 @@
             if (in_array("description", $template)) {
                 $description = isset($row['description']) ? $row['description'] : "N/A";
                 echo '<p class="asset-description">Description: ' . $description . '<br></p>';
-            }
-            if (in_array("entity", $template)) {
-                $entity_id = $row_dept['entity'];
-                $sql_entity = "SELECT * from entity WHERE id='$entity_id' LIMIT 1";
-                $result_entity = $conn->query($sql_entity);
-                $row_entity = $result_entity->fetch_assoc();
-                $entity = $row_entity["name"];
-                echo '<p class="asset-description">' . $entity . '<br></p>';
-            }
-            if (in_array("department", $template)) {
-                echo '<p class="asset-description">' . $row_dept['name'] . '<br></p>';
             }
             if (in_array("position", $template)) {
                 $position = isset($row['position']) ? $row['position'] : "N/A";
