@@ -93,7 +93,7 @@ if($role_id != 4){
         "class" => $class,
         "user" => $user,
         "price" => $row['price'],
-        "description" => strip_tags(substr($row['description'],0,30)) . "...",
+        "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
         "position" => $row['position'],
         "expire" => $row['expire'], 
         // add Modal for the requests?
