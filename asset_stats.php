@@ -1,6 +1,7 @@
 <?php
 require 'includes/db/connect.php';
 include 'includes/get_subdepartments.php';
+include 'includes/calculate_price.php';
 
 // get all assets in this department, including in subdepartments
 $subdepartmentIds = getAllSubdepartmentIds($department, $conn);
@@ -86,7 +87,32 @@ foreach($asset_results as $asset) {
 $asset_department_counts_json = json_encode($asset_department_counts);
 echo "<script> var department_counts = JSON.parse('". $asset_department_counts_json ."'); </script>";
 
-// total asset value graph
+// total asset value graph, default 5 years?
+$asset_value_over_time = array();
+$years_to_check = 5;
+// for loop over n years
+for($i = 0; $i < $years_to_check; $i++) {
+  // get unix time of year end
+  $current_year = date('Y');
+  $target_year = $current_year - $i;
+  $unix_time = strtotime("December 31, $target_year 23:59:59");
+
+  // get all assets that were created before this time
+  $sql = "SELECT * FROM asset WHERE department IN ($department_list) AND date_created < '$unix_time'";
+  $stmt = $conn->prepare($sql);
+  $stmt->execute();
+  $asset_results = $stmt->get_result();
+  $stmt->close();
+
+  // get total value of all assets
+  $total_value = 0;
+  foreach($asset_results as $asset) {
+    $total_value += calculate_price($asset, $unix_time);
+  }
+  $asset_value_over_time[$target_year] = $total_value;
+}
+$asset_value_over_time_json = json_encode($asset_value_over_time);
+echo "<script> var asset_value_over_time = JSON.parse('". $asset_value_over_time_json ."'); </script>";
 ?>
 
 <html>
@@ -121,13 +147,15 @@ echo "<script> var department_counts = JSON.parse('". $asset_department_counts_j
             </div>
             <div class="row mt-3">
               <h6 class="text-white m-1 mb-4">
-                Value Over Time
+                Total Value Over Time
               </h6>
-</div>
+              <div class="chart-area mb-4 mb-lg-0" style="height: 20rem"><canvas id="valueLineChart" width="100%" height="30"></canvas></div>
+            </div>
           </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" crossorigin="anonymous"></script>
         <script src="assets/charts/asset_status_pie.js"></script>
         <script src="assets/charts/asset_department_pie.js"></script>
+        <script src="assets/charts/asset_value_line_chart.js"></script>
     </body>
 </html>
