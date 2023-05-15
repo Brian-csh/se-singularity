@@ -1,35 +1,34 @@
 <?php
+    include "includes/db/connect.php";
     $id = $_GET['id'];
-    $name = $_GET['name'];
-    $class = $_GET['class'];
-    $qr_url = $_GET['qr'];
 
-    if (isset($_GET['description'])) {
-        $description = $_GET['description'];
+    //fetch the asset entry
+    $sql = "SELECT * FROM asset WHERE id = $id LIMIT 1";
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        exit ("No asset found with that ID.");
     }
-    if (isset($_GET['entity'])) {
-        $entity = $_GET['entity'];
-        // $entity = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entityid' LIMIT 1"))['name']; 
+
+    $row = $result->fetch_assoc();
+
+    //obtain the basic information of the asset
+    $name = $row['name'];
+    if (isset($row['class'])) {
+        $class_id = $row['class'];
+        $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
+    } else {
+        $class = "N/A";
     }
-    if (isset($_GET['department'])) {
-        $department = $_GET['department'];
-        // $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$departmentid' LIMIT 1"))['name']; 
-    }
-    if (isset($_GET['position'])) {
-        $position = $_GET['position'];
-    }
-    if (isset($_GET['expire'])) {
-        $expire = $_GET['expire'];
-    }
-    if (isset($_GET['serial number'])) {
-        $serialnumber = $_GET['serial number'];
-    }
-    if (isset($_GET['brand'])) {
-        $brand = $_GET['brand'];
-    }
-    if (isset($_GET['model'])) {
-        $model = $_GET['model'];
-    }
+    $qr_url = "https://singularity-eam-singularity.app.secoder.net/asset_info.php?id=" . $row['id'];
+
+    //custom template
+    $department_id = $row['department'];
+    $sql_dept = "SELECT * FROM department WHERE id = $department_id LIMIT 1";
+    $result_dept = $conn->query($sql_dept);
+
+    $row_dept = $result_dept->fetch_assoc();
+    $template = json_decode($row_dept["template"]);
 ?>
 
 <!DOCTYPE html>
@@ -114,32 +113,40 @@
         <p class="asset-id">Asset ID: <?=$id?></p>
         <p class="asset-category">Category: <?=$class?></p>
         <?php
-            if (isset($description)) {
+            if (in_array("description", $template)) {
+                $description = isset($row['description']) ? $row['description'] : "N/A";
                 echo '<p class="asset-description">Description: ' . $description . '<br></p>';
             }
-            if (isset($entity)) {
-                echo '<p class="asset-description">Entity: ' . $entity . '<br></p>';
+            if (in_array("entity", $template)) {
+                $entity_id = $row_dept['entity'];
+                $sql_entity = "SELECT * from entity WHERE id='$entity_id' LIMIT 1";
+                $result_entity = $conn->query($sql_entity);
+                $row_entity = $result_entity->fetch_assoc();
+                $entity = $row_entity["name"];
+                echo '<p class="asset-description">' . $entity . '<br></p>';
             }
-            if (isset($department)) {
-                echo '<p class="asset-description">Department: ' . $department . '<br></p>';
+            if (in_array("department", $template)) {
+                echo '<p class="asset-description">' . $row_dept['name'] . '<br></p>';
             }
-            if (isset($position)) {
+            if (in_array("position", $template)) {
+                $position = isset($row['position']) ? $row['position'] : "N/A";
                 echo '<p class="asset-description">Position: ' . $position . '<br></p>';
             }
-            if (isset($expire)) {
+            if (in_array("expire", $template)) {
+                $expire = isset($row['expire']) ? $row['expire'] : "N/A";
                 echo '<p class="asset-description">Expire: ' . $expire . '<br></p>';
             }
-            if (isset($serialnumber)) {
+            if (in_array("serialnumber", $template)) {
+                $serialnumber = isset($row['serialnumber']) ? $row['serialnumber'] : "N/A";
                 echo '<p class="asset-description">Serial Number: ' . $serialnumber . '<br></p>';
             }
-            if (isset($brand)) {
+            if (in_array("brand", $template)) {
+                $brand = isset($row['brand']) ? $row['brand'] : "N/A";
                 echo '<p class="asset-description">Brand: ' . $brand . '<br></p>';
             }
-            if (isset($model)) {
+            if (in_array("model", $template)) {
+                $model = isset($row['model']) ? $row['model'] : "N/A";
                 echo '<p class="asset-description">Model: ' . $model . '<br></p>';
-            }
-            if (isset($user)) {
-                echo '<p class="asset-description">User: ' . $user . '<br></p>';
             }
         ?>
         <div class="card-footer">

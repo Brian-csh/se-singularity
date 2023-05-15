@@ -220,6 +220,7 @@ include "includes/header.php";
                             <?php
                                 $checkboxOptions = array(
                                     'description',
+                                    'entity',
                                     'department',
                                     'position',
                                     'expire',

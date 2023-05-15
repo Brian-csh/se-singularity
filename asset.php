@@ -4,51 +4,22 @@ include "includes/db/connect.php";
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $asset_name = $_GET['name'];
-}
+
 if (isset($_POST['print'])) { //print asset tag
-    $tag_url = "asset_tag.php?";
-
-    //fetch the asset entry
-    $sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-
-    //build the url with GET request
-    $tag_url .= "id=" . $row['id'];
-    $tag_url .= "&name=" . $row['name'];
-    if (isset($row['class'])) {
-        $class_id = $row['class'];
-        $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
-    } else {
-        $class = "N/A";
-    }
-    $tag_url .= "&class=" . $class;
-
-    //custom template
-    $department_id = $row['department'];
-    $sql_dept = "SELECT * FROM department WHERE id = $department_id LIMIT 1";
-    $result_dept = $conn->query($sql_dept);
-
-    $row_dept = $result_dept->fetch_assoc();
-    $template_field = json_decode($row_dept["template"]);
-
-
-    if (isset($template_field) and !empty($template_field)) {
-        foreach ($template_field as $field) {
-            if (isset($row[$field]) and !empty($row[$field])) {
-                $tag_url .= "&" . $field . "=" .$row[$field];
-            } else {
-                $tag_url .= "&" . $field . "=N/A";
-            }
-        }
-    }
-
-    $tag_url .= "&qr=https://singularity-eam-singularity.app.secoder.net/asset_info.php?id=" . $row['id'];
+    $tag_url = "asset_tag.php?id=".$asset_id;
 
     //redirect to asset tag page
-    header("Location: " . $tag_url);
+    header("Location: ".$tag_url);
+}
+
+//fetch the asset entry
+$sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
+$result = $conn->query($sql);
+if ($result) {
+    $row = $result->fetch_assoc();
+    $asset_name = $row['name'];
+} else {
+    exit("No asset found with that ID.");
 }
 
 $active = $asset_name;
