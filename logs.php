@@ -4,6 +4,7 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
+//TODO : show different log for different user
 $sql = "SELECT * FROM log ORDER BY id DESC";
 
 ?>

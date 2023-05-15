@@ -1,8 +1,14 @@
 <?php
+
 include "includes/db/connect.php";
-if (isset($_GET['id'])) {
-    $department_id = $_GET['id'];
-}
+include "includes/header.php";
+include "includes/navbar.php";
+
+
+// if (isset($_GET['id'])) {
+    // $department_id = $_GET['id'];
+// } else {
+// }
 
 //get the department name given the id from database using mysql
 $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
@@ -36,7 +42,6 @@ if (isset($_POST['edit_details'])) {
     }
 }
 $active = $department_name;
-include "includes/header.php";
 ?>
 
 
@@ -78,8 +83,10 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
+                            <?php if($role_id <= 2 && $role_id >=1) {?>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
+                            <?php }?>
                         </div>
                     </div>
                 </div>

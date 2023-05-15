@@ -7,35 +7,27 @@ $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$departmentid = intval($_GET['departmentid']);
-$userid = intval($_GET['userid']);
-$user_role_id = strval($_GET['user_role_id']);
-$entity_id = intval($_GET['entity_id']);
+$userid = intval($_GET['userid']); // login user id
+$role_id = intval($_GET['roleid']);
+$entity_id = intval($_GET['entityid']);
+$department_id = intval($_GET['departmentid']);
 
-// Fetch data from your database table
-// if ($userid != -1)
-    // $sql = "SELECT * FROM asset WHERE user = $userid";
-// else if ($departmentid != -1)
-    // $sql = "SELECT * FROM asset WHERE department = $departmentid";  
-// else
-    // $sql = "SELECT * FROM asset WHERE 1=1";
-
-// TODO : for resource manager, load assets in the departmetn and sub-department
+// TODO : for resource manager, load assets in the department and sub-department
 // TODO : for user, just load assets in teh department
-switch ($user_role_id){
-    case 1: // super admin can't see any asset
+switch ($role_id){
+    case 1: // super admin can't see any asset?
         break;
-    case 2: // admin can't see any asset
+    case 2: // admin can't see any asset?
         break;
     case 3: // for resource manager, load assets in the department and sub-department
         //TODO : 树的遍历 - iteration or recursion
         // $sql = traverse_department($conn,$departmentid);
-        $sql = "SELECT * FROM asset WHERE department = $departmentid"; // not gonna use this one
-
+        // $department_id = intval($_GET['departmentid']);
+        $sql = "SELECT * FROM asset WHERE department = $department_id"; // not gonna use this one
         break;
     case 4: // for user, just load assets in the department
         // TO-IMPROVE : also load assets in the sub-departments
-        $sql = "SELECT * FROM asset WHERE department = $departmentid";
+        $sql = "SELECT * FROM asset WHERE department = $department_id";
         break;
     default:
         break;
@@ -58,13 +50,12 @@ if (isset($_GET['search']['value'])) {
 
     }
 }
-$sql .= " LIMIT $start, $length";
+$sql .= " ORDER BY status ASC LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
 $data = array();
 while($row = $result->fetch_assoc()) {
-
     if(isset($row['status'])){
         $status_id = $row['status'];
         $status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$status_id'"))['status'];
@@ -73,7 +64,7 @@ while($row = $result->fetch_assoc()) {
     }
 
     if (isset($row['user'])) {
-        $user_id = $row['user'];
+        $user_id = $row['user']; // asset user id
         $user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
     } else {
         $user = "N/A";
@@ -94,8 +85,7 @@ while($row = $result->fetch_assoc()) {
     }
 
 
-    //TODO : add link to descpription (modal or sth)
-if( $user_role_id != '4'){
+if($role_id != 4){
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -143,7 +133,10 @@ $response = array(
     "draw" => $draw,
     "recordsTotal" => $total,
     "recordsFiltered" => $total,
-    "data" => $data
+    "data" => $data,
+    "role" => $role_id,
+    "entity" => $entity_id,
+    "department"=> $department_id
 );
 
 // Send the JSON response

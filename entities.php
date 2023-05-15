@@ -1,9 +1,8 @@
 <?php
-$sql = "SELECT * FROM entity ORDER BY id DESC";
-$active = "Entities";
-
+$active = 'Entities';
 include "includes/header.php";
 include "includes/navbar.php";
+$sql = "SELECT * FROM entity ORDER BY id DESC";
 ?>
 
 <div id="layoutSidenav_content">
@@ -59,12 +58,10 @@ include "includes/navbar.php";
                                         <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entity_id'>
                                         <i data-feather=\"edit\"></i>
                                         </a>
-                  
                                         
                                         " ."</td></tr>";
                             }
                         }
-
 
                         ?>
                         </tbody>

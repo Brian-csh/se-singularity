@@ -5,20 +5,6 @@ $active = "Assets";
 include "includes/header.php";
 include "includes/navbar.php";
 
-
-// if (isset($_GET['departmentid'])) {
-    // $departmentid = $_GET['departmentid'];
-// } else {
-    // $departmentid = -1;
-// }
-$departmentid = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
-
-if (isset($_GET['userid'])) {
-    $userid = $_GET['userid'];
-} else {
-    $userid = -1;
-}
-
 if (isset($_POST['add_class'])) {
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {
@@ -42,11 +28,6 @@ if (isset($_POST['add_class'])) {
         echo "Error.";
     }
 }
-
-$user_role_id = $_SESSION['user']['role'];
-$entity_id = $_SESSION['user']['entity'];
-$user_id = $_SESSION['user']['id'];
-$entity_id = $_SESSION['user']['entity'];
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -104,8 +85,6 @@ $entity_id = $_SESSION['user']['entity'];
             </div>
         </div>
     </main>
-
-    <!-- TODO: Hide this from non Project Manager roles. -->
 
     <!-- Add Class Modal -->
     <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
@@ -180,8 +159,8 @@ $entity_id = $_SESSION['user']['entity'];
                                         unset($id, $name);
                                         $id = $row['id'];
                                         $name = $row['name'];
-                                        $department_id = $row['department'];
-                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
+                                        $departmentid = $row['department'];
+                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$departmentid'"))['name'];
                                         echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
                                     }
                                     ?>
@@ -211,7 +190,7 @@ $entity_id = $_SESSION['user']['entity'];
                             <select class="form-control" id="destinationDepartment">
                                 <option value="">N/A</option>
                                 <?php
-                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id"); // where entity=$entity_id of the admin?
+                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id");
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
@@ -237,7 +216,6 @@ $entity_id = $_SESSION['user']['entity'];
             </div>
         </div> -->
 
-<!-- Request Modal -->
     <script>
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
@@ -266,10 +244,10 @@ $entity_id = $_SESSION['user']['entity'];
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
-                        d.departmentid = <?= $departmentid ?>;
-                        d.userid = <?= $userid ?>;
-                        d.user_role_id = <?= $user_role_id ?>;
-                        d.entity_id = <?= $entity_id ?>;
+                        d.userid = <?= $user_id ?>;
+                        d.roleid = <?= $role_id ?>;
+                        d.entityid = <?= $entity_id ?>;
+                        d.departmentid = <?= $department_id ?>;
                     }
                 },
                 columns: [{
@@ -308,8 +286,7 @@ $entity_id = $_SESSION['user']['entity'];
                 },
                 buttons: [
                     {
-                        text: <?php if($user_role_id == 4) { ?> 'Return',
-                                <?php } else { ?> 'Retire', <?php }?>
+                        text: <?php if($role_id == 4) { ?> 'Return', <?php } else { ?> 'Retire', <?php }?>
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -320,14 +297,14 @@ $entity_id = $_SESSION['user']['entity'];
 
                             // Perform AJAX request
                             $.ajax({
-                                url: <?php if($user_role_id == 4) { ?> 'includes/scripts/return_assets.php',
+                                url: <?php if($role_id == 4) { ?> 'includes/scripts/return_assets.php',
                                         <?php } else { ?> "includes/scripts/retire_assets.php", <?php }?>
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
                                     user_id: <?= $user_id?>
                                 },
-                                <?php if ($user_role_id !=4 ) { ?>
+                                <?php if ($role_id !=4 ) { ?>
                                 success: function(response) { // manager handle request success
                                     console.log(response);
                                     // Perform any additional actions on success
@@ -366,7 +343,7 @@ $entity_id = $_SESSION['user']['entity'];
                             var assetIds = selectedRows.map(function(row) {
                                 return row.id;
                             });
-                            if(<?= $_SESSION['user']['role'] ?> != 4){ // manager move
+                            if(<?= $role_id ?> != 4){ // manager move
                                 $('#chooseDepartmentModal').modal('show');
 
                                 $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
@@ -404,7 +381,7 @@ $entity_id = $_SESSION['user']['entity'];
                                         data: {
                                             assets: assetIds,
                                             destination: userId,
-                                            role_id: <?=$user_role_id?>,
+                                            role_id: <?=$role_id?>,
                                             user_id: <?=$user_id?>
                                         },
                                         success: function(response) {
@@ -433,7 +410,7 @@ $entity_id = $_SESSION['user']['entity'];
                             }
                         }
                     }
-                    <?php if($user_role_id == 4){?>
+                    <?php if($role_id == 4){?>
                     , { 
                         text: "Use",
                         action: function(e, dt, node, config) {

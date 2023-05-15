@@ -1,7 +1,7 @@
 <?php
-$active = 'Entity #' . $_GET['id'];
-
+$active = 'Entity #'.$_GET['id'];
 include "includes/header.php";
+include "includes/navbar.php";
 
 if (isset($_GET['id'])) {
     $entity_id = $_GET['id'];
@@ -220,12 +220,6 @@ if (isset($_POST['create_asset_attribute'])) {
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>

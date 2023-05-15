@@ -5,6 +5,21 @@ $active = "Dashboard";
 
 include "includes/header.php";
 include "includes/navbar.php";
+if (isset($_GET['id'])) {
+    $user_id = $_GET['id'];
+}
+
+if (isset($_GET['role'])) {
+    $user_role = $_GET['role'];
+}
+
+if (isset($_GET['entityid'])) {
+    $entity_id = $_GET['entityid'];
+}
+if (isset($_GET['departmentid'])) {
+    $department_id = $_GET['departmentid'];
+}
+
 ?>
 
 <div id="layoutSidenav_content">

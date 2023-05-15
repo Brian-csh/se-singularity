@@ -1,19 +1,39 @@
 <?php
 // $sql = "SELECT * FROM asset ORDER BY id DESC";
-$active = "Assets";
+$active = "Requests";
 
 include "includes/header.php";
 include "includes/navbar.php";
 
-if (isset($_GET['departmentid'])) {
-    $departmentid = $_GET['departmentid'];
-} else {
-    $departmentid = -1;
-}
-$department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
-$user_id = $_SESSION['user']['id'];
-$user_role_id = $_SESSION['user']['role'];
-$entity_id = $_SESSION['user']['entity'];
+// if (isset($_GET['departmentid'])) {
+//     $department_id = $_GET['departmentid'];
+// } else {
+//     $department_id = -1;
+// }
+// $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
+
+
+// if (isset($_GET['id'])) {
+//     $user_id = $_GET['id'];
+// } else {
+//     $user_id = -1;
+// }
+// $user_id = $_SESSION['user']['id'];
+
+// if (isset($_GET['role'])) {
+//     $role_id = $_GET['role'];
+// } else {
+//     $role_id = -1;
+// }
+// $role_id = $_SESSION['user']['role'];
+
+// if (isset($_GET['entityid'])) {
+//     $entity_id = $_GET['entityid'];
+// } else {
+//     $entity_id = -1;
+// }
+// $entity_id = $_SESSION['user']['entity'];
+
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -111,9 +131,9 @@ $entity_id = $_SESSION['user']['entity'];
                     url: "includes/scripts/datatables_requests.php",
                     data: function(d) {
                         d.department_id = <?=  $department_id ?>;
-                        d.user_id = <?= $_SESSION['user']['id'] ?>;
-                        d.user_role_id = <?= $_SESSION['user']['role'] ?>;
-                        d.entity_id = <?= $_SESSION['user']['entity']?>;
+                        d.user_id = <?= $user_id ?>;
+                        d.user_role_id = <?= $role_id ?>;
+                        d.entity_id = <?= $entity_id?>;
                     }
                 },
                 columns: [{
