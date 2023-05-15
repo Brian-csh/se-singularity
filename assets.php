@@ -73,7 +73,9 @@ $user_id = $_SESSION['user']['id'];
                                 <?= $active ?>
                             </h1>
                             <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <button type="button" class="btn btn-primary btn-xs float-end ms-2" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <button type="button" class="btn btn-warning btn-xs float-end ms-2" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
+                            <a href="includes/scripts/export_assets.php" class="btn btn-success btn-xs float-end">Export</a>
                         </div>
                     </div>
                 </div>
