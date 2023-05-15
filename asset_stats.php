@@ -79,15 +79,21 @@ echo "<script> var department_counts = JSON.parse('". $asset_department_counts_j
 <html>
     <body>
         <div>
-          <h3 class="text-left m-4">Asset Statistics</h3>
+          <h2 class="m-4">Asset Statistics</h2>
           <div class="container">
-            <div class="row mt-4">
+            <div class="row mt-3">
               <div class="col-lg-6">
                 <!-- sub header -->
+                <h4 class="text-white m-1 mb-4 ml-1">
+                  Status Distribution
+                </h4>
                 <div class="chart-pie w-20 mb-4"><canvas id="assetStatusPieChart"></canvas></div>
               </div>
 
               <div class="col-lg-6">
+                <h4 class="text-white m-1 mb-4">
+                  Department Distribution
+                </h4>
                 <div class="chart-pie w-20 mb-4"><canvas id="assetDepartmentPieChart"></canvas></div>
               </div>
             </div>

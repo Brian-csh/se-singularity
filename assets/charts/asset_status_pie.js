@@ -55,7 +55,7 @@ var assetStatusPieChart = new Chart(ctx, {
             display: true,
             position: 'right',
             labels: {
-                fontColor: 'white'
+                fontColor: 'white',
             }
         },
         cutoutPercentage: 80
