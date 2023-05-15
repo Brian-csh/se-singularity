@@ -50,12 +50,12 @@ $sql = "SELECT * FROM entity ORDER BY id DESC";
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $entity_id = $row['id'];
+                                $entityid = $row['id'];
                                 $name = $row['name'];
 
-                                echo "<tr data-id='$entity_id' ><td>$entity_id</td><td><a class='text-primary' href='entity.php?id=$entity_id'>" . $name . "</a></td>
+                                echo "<tr data-id='$entityid' ><td>$entityid</td><td><a class='text-primary' href='entity.php?id=$entityid'>" . $name . "</a></td>
                                         <td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entity_id'>
+                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entityid'>
                                         <i data-feather=\"edit\"></i>
                                         </a>
                                         

@@ -3,9 +3,15 @@ $active = 'Entity #'.$_GET['id'];
 include "includes/header.php";
 include "includes/navbar.php";
 
-// if (isset($_GET['id'])) {
-    // $entity_id = $_GET['id'];
-// }
+if($role_id == 1){
+    if (isset($_GET['id'])) {
+        $entity_id = $_GET['id'];
+    }
+} else if ($role_id == 2){ // no department_id
+
+} else if ($role_id == 3){
+
+}
 
 // Fetch entity values
 $sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
@@ -149,7 +155,7 @@ if (isset($_POST['create_asset_attribute'])) {
                             if ($result) {
                                 if (mysqli_num_rows($result) > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $department_id = $row['id'];
+                                        $departmentid = $row['id'];
                                         $department_name = $row['name'];
                                         $department_parent = $row['parent'];
 
@@ -158,8 +164,8 @@ if (isset($_POST['create_asset_attribute'])) {
                                         $parent_assoc = $parent_name_result->fetch_assoc();
                                         $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='/department.php'>$department_name</a></td><td>$parent_name</td></tr>";
+                                        echo "<tr data-id='$departmentid' ><td>$departmentid</td>".
+                                                "<td><a class='text-primary' href='/department.php?departmentid=$departmentid'>$department_name</a></td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }

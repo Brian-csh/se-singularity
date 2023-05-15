@@ -4,6 +4,8 @@ $active = "Users";
 
 include "includes/header.php";
 include "includes/navbar.php";
+//TODO:
+//set department id for cases when admin access users page by manage-user -> department id should be the id of department not the department id of admin
 
 ?>
 
@@ -81,8 +83,9 @@ include "includes/navbar.php";
                 ajax: {
                     url: "includes/scripts/datatables_users.php",
                     data: function(d) {
-                        d.departmentid = <?= $department_id ?>;
+                        d.roleid = <?= $role_id ?>;
                         d.entityid = <?= $entity_id ?>;
+                        d.departmentid = <?= $department_id ?>;
                     }
                 },
                 columns: [{

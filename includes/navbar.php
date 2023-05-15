@@ -4,11 +4,6 @@ $user_name = $_SESSION['user']['name'];
 $role_id = $_SESSION['user']['role'];
 $entity_id = $_SESSION['user']['entity'] ? $_SESSION['user']['entity'] : -1;
 $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
-// $department_id = 2;
-
-// fetch user role
-
-
 ?>
 
 <style>

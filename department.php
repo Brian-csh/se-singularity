@@ -4,15 +4,15 @@ include "includes/db/connect.php";
 include "includes/header.php";
 include "includes/navbar.php";
 
-
-// if($department_id == -1){ // admin or superadmin
-    // $departmentid = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
-// } else { // resoure manager, do nothing
-// }
-// if (isset($_GET['id'])) {
-    // $department_id = $_GET['id'];
-// } else {
-// }
+if($role_id == 1){
+    
+} else if ($role_id == 2){
+    $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
+} else if ($role_id == 3){// resource manager
+    //do nothing. 
+} else { //user
+    //do nothing. user can't see this page
+}
 
 //get the department name given the id from database using mysql
 $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
@@ -28,26 +28,27 @@ if ($result) {
     exit("No department found with that ID.");
 }
 
+echo "<script>document.title = '" . $department_name . "';</script>";
+
+
 if (isset($_POST['edit_details'])) {
     //update the name and parent
-    $department_id = $_POST['department_id'];
+    $departmentid = $_POST['department_id_'];
     $updated_department_name = $_POST['department_name'];
     $updated_department_parent = $_POST['parent'];
 
     if ($updated_department_parent === "") {
-        $sql = "UPDATE department SET name = '$updated_department_name', parent = NULL WHERE id = '$department_id'";
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = NULL WHERE id = '$departmentid'";
     } else {
-        $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$department_id'";
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$departmentid'";
     }
     if ($conn->query($sql)) {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name);
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "&name=" . $updated_department_name . "'</script>";
     } else {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name . '&insert_error');
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "&name=" . $updated_department_name . "&insert_error'</script>";
     }
 }
-$active = $department_name;
 ?>
-
 
 <div id="layoutSidenav_content">
     <main>
@@ -89,7 +90,7 @@ $active = $department_name;
                             </h1>
                             <?php if($role_id <= 2 && $role_id >=1) {?>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" style="margin-right: 10px">Edit</a>
                             <?php }?>
                         </div>
                     </div>
@@ -142,8 +143,8 @@ $active = $department_name;
 
 
 
-    <!-- Add Class Modal -->
-    <div class="modal fade" id="addDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+    <!-- Edit Department Modal -->
+    <div class="modal fade" id="editDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -170,10 +171,8 @@ $active = $department_name;
                                 ?>
                             </select>
                         </div>
-
-
                     </div>
-                    <input type="hidden" name="department_id" value="<?php echo $department_id ?>">
+                    <input type="hidden" name="department_id_" value="<?php echo $department_id ?>">
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
@@ -195,6 +194,12 @@ $active = $department_name;
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        // Get the element by its href attribute
+        var element = document.querySelector('a[href="/entity.php"]');
+        // Toggle the "active" class
+        element.classList.toggle('active');
+    </script>
     <?php
     include "includes/footer.php";
     ?>
