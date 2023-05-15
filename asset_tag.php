@@ -26,9 +26,12 @@
     $department_id = $row['department'];
     $sql_dept = "SELECT * FROM department WHERE id = $department_id LIMIT 1";
     $result_dept = $conn->query($sql_dept);
-
     $row_dept = $result_dept->fetch_assoc();
-    $template = json_decode($row_dept["template"]);
+    if (isset($row_dept["template"]) && !empty($row_dept["template"])) {
+        $template = json_decode($row_dept["template"]);
+    } else {
+        $template = [];
+    }
 ?>
 
 <!DOCTYPE html>
@@ -116,7 +119,7 @@
                 $result_entity = $conn->query($sql_entity);
                 $row_entity = $result_entity->fetch_assoc();
                 $entity = $row_entity["name"];
-                echo '<h2 class="asset-description">' . $entity . '</h2>';
+                echo '<h2 class="asset-description"><u>' . $entity . '</u></h2>';
             }
             if (in_array("department", $template)) {
                 echo '<p class="asset-description">' . $row_dept['name'] . '<br></p>';
@@ -127,27 +130,27 @@
         <p class="asset-category">Category: <?=$class?></p>
         <?php
             if (in_array("description", $template)) {
-                $description = isset($row['description']) ? $row['description'] : "N/A";
+                $description = (isset($row['description']) && !empty($row['description'])) ? $row['description'] : "N/A";
                 echo '<p class="asset-description">Description: ' . $description . '<br></p>';
             }
             if (in_array("position", $template)) {
-                $position = isset($row['position']) ? $row['position'] : "N/A";
+                $position = (isset($row['position']) && !empty($row['position'])) ? $row['position'] : "N/A";
                 echo '<p class="asset-description">Position: ' . $position . '<br></p>';
             }
             if (in_array("expire", $template)) {
-                $expire = isset($row['expire']) ? $row['expire'] : "N/A";
+                $expire = (isset($row['expire']) && !empty($row['expire'])) ? $row['expire'] : "N/A";
                 echo '<p class="asset-description">Expire: ' . $expire . '<br></p>';
             }
-            if (in_array("serialnumber", $template)) {
-                $serialnumber = isset($row['serialnumber']) ? $row['serialnumber'] : "N/A";
+            if (in_array("serial number", $template)) {
+                $serialnumber = (isset($row['serial number']) && !empty($row['serial number'])) ? $row['serial number'] : "N/A";
                 echo '<p class="asset-description">Serial Number: ' . $serialnumber . '<br></p>';
             }
             if (in_array("brand", $template)) {
-                $brand = isset($row['brand']) ? $row['brand'] : "N/A";
+                $brand = (isset($row['brand']) && !empty($row['brand'])) ? $row['brand'] : "N/A";
                 echo '<p class="asset-description">Brand: ' . $brand . '<br></p>';
             }
             if (in_array("model", $template)) {
-                $model = isset($row['model']) ? $row['model'] : "N/A";
+                $model = (isset($row['model']) && !empty($row['model'])) ? $row['model'] : "N/A";
                 echo '<p class="asset-description">Model: ' . $model . '<br></p>';
             }
         ?>
