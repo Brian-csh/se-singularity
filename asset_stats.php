@@ -22,8 +22,21 @@ $asset_results = $stmt->get_result();
 
 $stmt->close();
 
-// amount of assets
-$num_rows = mysqli_num_rows($asset_results);
+// basic information
+$num_assets = mysqli_num_rows($asset_results);
+$sql = "SELECT * FROM entity WHERE id = '$entity'";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$entity_results = $stmt->get_result();
+$stmt->close();
+$entity_name = $entity_results->fetch_assoc()["name"];
+
+$sql = "SELECT * FROM department WHERE id = '$department'";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$department_results = $stmt->get_result();
+$stmt->close();
+$department_name = $department_results->fetch_assoc()["name"];
 
 // split by asset state (pie chart)
 $sql = "SELECT * FROM asset_status_class";
@@ -78,25 +91,39 @@ echo "<script> var department_counts = JSON.parse('". $asset_department_counts_j
 
 <html>
     <body>
-        <div>
-          <h2 class="m-4">Asset Statistics</h2>
+        <div class="m-4">
+          <h2>Asset Statistics</h2>
           <div class="container">
+            <div class="row mt-3">
+              <h6 class="text-white m-1 mb-4">Current Entity: <?php echo $entity_name ?></h6>
+            <div>
+            <div class="row">
+              <h6 class="text-white m-1 mb-4">Current Department: <?php echo $department_name ?></h6>
+            <div>
+            <div class="row">
+              <h6 class="text-white m-1 mb-4">Total asset count: <?php echo $num_assets ?></h6>
+            <div>
             <div class="row mt-3">
               <div class="col-lg-6">
                 <!-- sub header -->
-                <h4 class="text-white m-1 mb-4 ml-1">
+                <h6 class="text-white m-1 mb-4 ml-1">
                   Status Distribution
-                </h4>
+                </h6>
                 <div class="chart-pie w-20 mb-4"><canvas id="assetStatusPieChart"></canvas></div>
               </div>
 
               <div class="col-lg-6">
-                <h4 class="text-white m-1 mb-4">
+                <h6 class="text-white m-1 mb-4">
                   Department Distribution
-                </h4>
+                </h6>
                 <div class="chart-pie w-20 mb-4"><canvas id="assetDepartmentPieChart"></canvas></div>
               </div>
             </div>
+            <div class="row mt-3">
+              <h6 class="text-white m-1 mb-4">
+                Value Over Time
+              </h6>
+</div>
           </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" crossorigin="anonymous"></script>
