@@ -32,7 +32,9 @@ if(isset($_GET['departmentid'])) {
                                 <div class="page-header-icon text-white"><i data-feather="user"></i></div>
                                 <?=$active?>
                             </h1>
+                            <?php if($role_id <=2){ ?>
                             <a href="new_user.php" class="btn btn-primary btn-xs float-end">+ Add</a>
+                            <?php }?>
                         </div>
                     </div>
                 </div>

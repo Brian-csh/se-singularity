@@ -9,7 +9,11 @@ if($role_id == 1){
 } else if ($role_id == 2){
     $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
 } else if ($role_id == 3){// resource manager
-    //do nothing. 
+    if(isset($_GET['departmentid'])){
+        $department_id = $_GET['departmentid'];
+    } else {
+        $department_id = $department_id;
+    }
 } else { //user
     //do nothing. user can't see this page
 }
@@ -129,7 +133,7 @@ if (isset($_POST['edit_details'])) {
                                         $id = $row['id'];
                                         $name = $row['name'];
 
-                                        echo "<tr data-id='$id' ><td>$id</td><td>$name</td></tr>";
+                                        echo "<tr data-id='$id'><td>$id</td><td><a href='/department.php?departmentid=$id'>$name</a></td></tr>";
                                     }
                                 }
                             }

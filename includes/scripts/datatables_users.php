@@ -1,7 +1,7 @@
 <?php
 
 require "../db/connect.php";
-
+include "../get_subdepartments.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
@@ -19,7 +19,9 @@ if($roleid == 1){
     // TODO : 
     // $departments = getALLSubdepartmentIds($departmentid,$conn);
     // $sql = "SELECT * FROM user WHERE department = $departmentid in $departments";
-    $sql = "SELECT * FROM user WHERE department = $departmentid";
+    $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+    $subdepartmentids = implode(',',$subdepartmentids);
+    $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";
 }
 
 if (isset($_GET['search']['value'])) {
