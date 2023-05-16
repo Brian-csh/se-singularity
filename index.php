@@ -1,34 +1,34 @@
 <?php
 $active = "Dashboard";
+// 
 
-include "includes/header.php";
-include "includes/navbar.php";
-if(!isset($_SESSION)) 
-{ 
-    session_start(); 
-} 
+//header("Location: users.php"); // TODO: uncommment when the dashboard will be ready
 
-$role = $_SESSION['user']['role'];
-$department = $_SESSION['user']['department'];
-$entity = $_SESSION['user']['entity'];
+// temp variables
+// $role = $_SESSION['user']['role'];
+// $department = $_SESSION['user']['department'];
+// $entity = $_SESSION['user']['entity'];
 
 
 include "includes/header.php";
 include "includes/navbar.php";
-if (isset($_GET['id'])) {
-    $user_id = $_GET['id'];
-}
+$role = $role_id;
+$department = $department_id;
+$entity = $entity_id;
+// if (isset($_GET['id'])) {
+//     $user_id = $_GET['id'];
+// }
 
-if (isset($_GET['role'])) {
-    $user_role = $_GET['role'];
-}
+// if (isset($_GET['role'])) {
+//     $user_role = $_GET['role'];
+// }
 
-if (isset($_GET['entityid'])) {
-    $entity_id = $_GET['entityid'];
-}
-if (isset($_GET['departmentid'])) {
-    $department_id = $_GET['departmentid'];
-}
+// if (isset($_GET['entityid'])) {
+//     $entity_id = $_GET['entityid'];
+// }
+// if (isset($_GET['departmentid'])) {
+//     $department_id = $_GET['departmentid'];
+// }
 
 ?>
 
@@ -54,7 +54,7 @@ if (isset($_GET['departmentid'])) {
     <!-- Stats content (for admin and resource manager only) -->
     <div>
         <?php 
-        if($role == 2 || $role == 3)
+        if($role == 3) // admin don't need to see that stats
             include('asset_stats.php'); 
         ?>
     </div>

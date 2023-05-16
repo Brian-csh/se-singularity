@@ -2,22 +2,25 @@
 
 require "../db/connect.php";
 include "../get_subdepartments.php";
+include "functions.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$userid = intval($_GET['userid']); // login user id
-$role_id = intval($_GET['roleid']);
-$entity_id = intval($_GET['entityid']);
-$department_id = intval($_GET['departmentid']);
+$userid = intval($_GET['userid']);
+$roleid = intval($_GET['roleid']);
+$entityid = intval($_GET['entityid']);
+$department_id = intval($_GET['departmentid']); //-1 for superadmin and admin
 
-// TODO : for resource manager, load assets in the department and sub-department
-// TODO : for user, just load assets in teh department
-switch ($role_id){
-    case 1: // super admin can't see any asset?
+switch ($roleid){
+    case 1: // super admin 
+        $sql = "SELECT * FROM asset WHERE 1=1";
         break;
-    case 2: // admin can't see any asset?
+    case 2: // admin
+        $departmentids = getAllDepartmentIds($entityid,$conn);
+        $departmentids = implode(',',$departmentids);
+        $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
         break;
     case 3: // for resource manager, load assets in the department and sub-department
         $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
@@ -59,39 +62,39 @@ while($row = $result->fetch_assoc()) {
         $status_id = $row['status'];
         $status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$status_id'"))['status'];
     } else {
-        $status = "N/A";
+        $status = "--";
     }
 
     if (isset($row['user'])) {
         $user_id = $row['user']; // asset user id
         $user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
     } else {
-        $user = "N/A";
+        $user = "--";
     }
 
     if (isset($row['parent'])) {
         $parent_id = $row['parent'];
         $parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$parent_id'"))['name'];
     } else {
-        $parent = "N/A";
+        $parent = "--";
     }
 
     if (isset($row['class'])) {
         $class_id = $row['class'];
         $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
     } else {
-        $class = "N/A";
+        $class = "--";
     }
 
     if(isset($row['department'])){
         $department_id_ = $row['department'];
         $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
     }else {
-        $department = "N/A";
+        $department = "--";
     }
 
 
-if($role_id != 4){
+if($roleid < 4){ // super admin, admin, resource manager
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -109,7 +112,7 @@ if($role_id != 4){
             Edit
         </a>" // TODO: put icon here
     );
-} else { // user_role_id == 4 (user)
+} else { // user
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -129,6 +132,8 @@ if($role_id != 4){
 }
 
 // Get the total number of records in the table
+
+// TODO: change this 
 $sql = "SELECT COUNT(*) as total FROM asset";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();

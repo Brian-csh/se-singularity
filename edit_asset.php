@@ -82,7 +82,7 @@ if(isset($_POST['edit_asset'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Asset info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -98,7 +98,7 @@ if(isset($_POST['description_change'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Description updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -115,7 +115,7 @@ if(isset($_POST['edit_basic'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Basic info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -130,7 +130,7 @@ if(isset($_POST['edit_financial'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Financial info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
         // TODO: Update current asset value
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
@@ -156,7 +156,7 @@ if(isset($_POST['edit_custom_attr'])){
     $sql = "UPDATE asset SET custom_attr='$custom_attributes' WHERE id='$asset_id'";
      if($conn->query($sql)){
          echo "<script>alert('Custom attribute info updated successfully!')</script>";
-//         insert_log_asset($conn,$asset_data,6);
+//         insert_log_edit_asset($conn,$asset_data,6);
 //         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
      }
      else{

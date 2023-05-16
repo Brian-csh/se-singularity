@@ -2,7 +2,7 @@
 $active = 'Entities';
 include "includes/header.php";
 include "includes/navbar.php";
-
+// ONLY ACCESSABLE BY SUPER ADMIN
 $sql = "SELECT * FROM entity ORDER BY id DESC";
 
 $sync_result = 0;

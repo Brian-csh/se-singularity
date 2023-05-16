@@ -3,14 +3,15 @@
 include "includes/header.php";
 include "includes/navbar.php";
 $initiator_id = $user_id; 
+
+//ONLY SUPERADMIN and ADMIN CAN ACCESS THIS PAGE
 if($role_id == 1){
+    // TODO: access entity page from entities.php
     if (isset($_GET['id'])) {
         $entity_id = $_GET['id'];
     }
 } else if ($role_id == 2){ // no department_id
-
-} else if ($role_id == 3){
-
+    // TODO: access entity page from navbar -> no get request
 }
 
 echo "<script>document.title = '" . 'Entity #'. $entity_id . ' - Singularity EAM'."';</script>";
@@ -238,6 +239,12 @@ if (isset($_POST['create_asset_attribute'])) {
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        // Get the element by its href attribute
+        var element = document.querySelector('a[href="/entities.php"]');
+        // Toggle the "active" class
+        element.classList.toggle('active');
+    </script>
     <?php
     include "includes/footer.php";
     ?>

@@ -5,7 +5,7 @@ include "includes/header.php";
 include "includes/navbar.php";
 
 if($role_id == 1){
-    
+    //TODO: access department page from entities.php
 } else if ($role_id == 2){
     $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
 } else if ($role_id == 3){// resource manager

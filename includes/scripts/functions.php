@@ -10,21 +10,29 @@ function insert_log_login($conn,$row,$type_id)
     //Fetch Entity, Role, Department
     $entity_id = $row['entity'];
     $role_id = $row['role'];
-    $department_id = $row['department'];
+    $department_id = $row['department']? $row['department'] : -1;
 
     $entity = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
     $role = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
     $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
 
     if( $type_id == 1){
-        $text = $username." logged in! ".$role." of ".$department." in ".$entity;
+        if($role_id == 1)
+            $text = $username." logged in! Super Admin of Singularity";
+        else if($role_id == 2)
+            $text = $username." logged in! Admin of ".$entity;
+        else if($role_id == 3)
+            $text = $username." logged in! Resource Manager of ".$department." in ".$entity;
+        else
+            $text = $username." logged in! User of ".$department." in ".$entity;
+
     } else if ($type_id == 2){
         $text = $username." logged in through feishu! ".$role." of ".$department." in ".$entity;
     } else if ($type_id == 3){
         $text = $username." bound account to feishu! ".$role." of ".$department." in ".$entity;
     }
-    $sql = "INSERT INTO log (date, text,log_type, subject) VALUES 
-    ('$time_now','$text','$type_id','$user_id')";
+    $sql = "INSERT INTO log (date, text,log_type, `By`,department) VALUES 
+    ('$time_now','$text','$type_id','$user_id','$department_id')";
     if( $conn->query($sql)){
         return "Record inserted successfully.";
     } else{
@@ -33,48 +41,19 @@ function insert_log_login($conn,$row,$type_id)
 }
 
 // log for editting asset - other cases should be deleted
-function insert_log_asset($conn,$row,$user_id,$type_id,$time = null)
+function insert_log_edit_asset($conn,$row,$user_id,$type_id,$time = null)
 {
     $time_now = time();
     $asset_id = $row['id'];
     $text = '';
     $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
+    $department_id = $row['department']? $row['department'] : -1; // row(asset)
 
-    // if( $type_id ==4){
-    // } else if ( $type_id ==5){
-    //     $text = "Asset ". $row['name']." created by " . $user_name;
-    // } else if ( $type_id ==6){
+
     $text = "Asset ". $row['name']." info changed by " . $user_name;
-    // } else if ( $type_id ==7){
 
-    // } else if ( $type_id ==8){
-    //     $text = "Asset ". $row['name']." register(use) approved by " . $user_name;
-    // } else if ( $type_id ==9){ // move user to user, $row from pending_requests
-
-    //     //asset_id could be more than once
-    //     // $asset_id = $row['asset'];
-    //     // $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-
-    //     // $user_id = $row['initiator'];
-    //     // $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
-
-    //     // $participant_id = $row['participant'];
-    //     // $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant_id'"))['name'];
-
-    //     $text = "Asset ". $asset_name." requested 'move' from " . $user_name . " to " . $participant_name;
-    // } else if ( $type_id ==10){
-    //     $text = "Asset ". $row['name']." registered (move) approved by" . $user_name;
-    // } else if ( $type_id ==11){
-    //     $text = "Asset ". $row['name']." registered (repair) from " . $user_name;
-    // } else if ( $type_id ==12){
-    //     $text = "Asset ". $row['name']." registered (repair) approved by " . $user_name;
-    // } else if ( $type_id ==13){
-    //     $text = "Asset ". $row['name']." deleted by " . $user_name;
-    // }
-    /* TODO: delete cases where user initiates*/
-
-    $sql = "INSERT INTO log (date, text,log_type, subject,`By`) VALUES
-    ('$time_now','$text','$type_id','$asset_id','$user_id')";
+    $sql = "INSERT INTO log (date, text,log_type, subject,`By`,department) VALUES
+    ('$time_now','$text','$type_id','$asset_id','$user_id','$department_id')";
 
     if ($conn->query($sql)){
         return "Record inserted successfully.";
@@ -89,6 +68,7 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
     $text = '';
     $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
     $user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+    $department_id = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$initiator'"))['department'];
     switch ($request_type){
         case 7 :  // asset_request_use
             $text= "Asset ". $asset_name." was requested (use) from " . $user_name;
@@ -107,8 +87,8 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
             break;
     }
 
-    $sql = "INSERT INTO log (date, text, log_type, subject,`By`) VALUES
-            ('$time','$text','$request_type','$asset_id','$initiator')";
+    $sql = "INSERT INTO log (date, text, log_type, subject,`By`,department) VALUES
+            ('$time','$text','$request_type','$asset_id','$initiator','$department_id')";
 
     if ($conn->query($sql)){
         return "Record inserted successfully.";
@@ -122,6 +102,9 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
 function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$request_type,$handle_type,$time){
         // fetch asset name
         $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+
+        // fetch department_id
+        $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
         // fetch user name
         $manager_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$manager_id'"))['name'];
         switch($request_type){
@@ -156,8 +139,8 @@ function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$req
             default:
                 break;
         }
-        $sql = "INSERT INTO log(date,text,log_type,subject,`By`) VALUES
-                ('$time','$text','$request_type','$asset_id','$manager_id')";
+        $sql = "INSERT INTO log(date,text,log_type,subject,`By`,department) VALUES
+                ('$time','$text','$request_type','$asset_id','$manager_id','$department_id')";
         if ($conn->query($sql)){
             return "Record inserted successfully.";
         } else {
@@ -406,4 +389,50 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
         }
     return $results;
 }
+
+/**
+ * Gets all departments in an array, given an entity ID.
+ *
+ * @param int $entityId - The ID of the requested entity.
+ * @param mysqli $mysqli - The database connection object.
+ * @return array - An array of department IDs.
+ */
+function getAllDepartmentIds($entityId, $mysqli) {
+    // Prepare the SQL statement
+    $sql = "SELECT id FROM department WHERE entity = ?";
+
+    // Prepare the statement
+    $stmt = $mysqli->prepare($sql);
+
+    if ($stmt) {
+        // Bind the entity ID parameter
+        $stmt->bind_param("i", $entityId);
+
+        // Execute the statement
+        $stmt->execute();
+
+        // Bind the result
+        $stmt->bind_result($departmentId);
+
+        // Create an array to store the department IDs
+        $departmentIds = array();
+
+        // Fetch the results
+        while ($stmt->fetch()) {
+            // Add the department ID to the array
+            $departmentIds[] = $departmentId;
+        }
+
+        // Close the statement
+        $stmt->close();
+
+        // Return the department IDs
+        return $departmentIds;
+    } else {
+        // Handle the error if the statement preparation fails
+        // You can customize this based on your error handling needs
+        return null;
+    }
+}
+
 ?>

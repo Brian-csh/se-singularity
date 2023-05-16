@@ -2,26 +2,39 @@
 
 require "../db/connect.php";
 require "../get_subdepartments.php";
+include "functions.php";
+
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$department_id = intval($_GET['department_id']);
-$userid = intval($_GET['user_id']);
-$roleid = intval($_GET['role_id']);
+$userid = intval($_GET['userid']);
+$roleid = intval($_GET['roleid']);
+$entityid = intval($_GET['entityid']);
+$departmentid = intval($_GET['departmentid']);
 
-if($roleld < 4){ // manager
-    $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
-    $subdepartmentids = implode(',',$subdepartmentids);
-    $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
-} else { // user
-    // Fetch data from database table - pending_requests
-    $sql = "SELECT * FROM pending_requests WHERE department = $department_id";
+
+switch ($roleid){
+    case 1: // show all the requests? yes 
+        $sql = "SELECT * FROM pending_requests WHERE 1=1";
+        break;
+    case 2: // show all the requests in entity
+        $departmentids = getAllDepartmentIds($entityid,$conn);
+        $departmentids = implode(',',$departmentids);
+        $sql = "SELECT * FROM pending_requests WHERE department IN ($departmentids)";
+        break;
+    case 3:
+        $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+        $subdepartmentids = implode(',',$subdepartmentids);
+        $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
+        break;
+    case 4:
+        $sql = "SELECT * FROM pending_requests WHERE department = $departmentid";
+        break;
+    default:
+        break;
 }
-
-
-
 
 //TODO : searching 
 if (isset($_GET['search']['value'])) {
@@ -41,7 +54,7 @@ if (isset($_GET['search']['value'])) {
     }
 }
 
-$sql .= " LIMIT $start, $length";
+$sql .= " ORDER BY result LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
@@ -52,7 +65,7 @@ while($row = $result->fetch_assoc()) {
         $initiator_id = $row['initiator'];
         $initiator = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator_id'"))['name'];
     } else {
-        $initiator = "N/A";
+        $initiator = "--";
     }
 
     if (isset($row['participant'])) {
@@ -66,14 +79,14 @@ while($row = $result->fetch_assoc()) {
         $asset_id = $row['asset'];
         $asset = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
     } else {
-        $asset = "N/A";
+        $asset = "--";
     }
 
     if (isset($row['type'])) {
         $type_id = $row['type'];
         $type = mysqli_fetch_array($conn->query("SELECT name FROM request_type WHERE id = '$type_id'"))['name'];
     } else {
-        $type = "N/A";
+        $type = "--";
     }
 
 
@@ -94,7 +107,8 @@ while($row = $result->fetch_assoc()) {
 }
 
 // Get the total number of records in the table
-$sql = "SELECT COUNT(*) as total FROM asset";
+//TODO : change this
+$sql = "SELECT COUNT(*) as total FROM pending_requests";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $total = $row['total'];

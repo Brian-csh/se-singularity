@@ -100,10 +100,10 @@ include "includes/navbar.php";
                 ajax: {
                     url: "includes/scripts/datatables_requests.php",
                     data: function(d) {
-                        d.department_id = <?=  $department_id ?>;
-                        d.user_id = <?= $user_id ?>;
-                        d.role_id = <?= $role_id ?>;
-                        d.entity_id = <?= $entity_id?>;
+                        d.userid = <?= $user_id ?>;
+                        d.roleid = <?= $role_id ?>;
+                        d.entityid = <?= $entity_id?>;
+                        d.departmentid = <?=  $department_id ?>;
                     }
                 },
                 columns: [{
@@ -131,9 +131,11 @@ include "includes/navbar.php";
                         "data": "review_time"
                     }
                 ],
+                <?php if($role_id == 3){?>
                 select: {
                     style: 'multi'
-                },
+                }, 
+                <?php }?>
                 buttons: [
                     <?php if($role_id == 3){?>
                     {
@@ -218,7 +220,10 @@ include "includes/navbar.php";
                     }
                     <?php }?>
                 ],
-                dom: 'Bfrtip' // Add this line to display buttons
+                <?php if($role_id == 3){?>
+                    dom: 'Bfrtip' // Add this line to display buttons
+                <?php }?>
+
             });
         });
     </script>
