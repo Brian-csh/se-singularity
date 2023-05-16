@@ -1,6 +1,9 @@
 <?php
 $active = "Dashboard";
-session_start();
+if(!isset($_SESSION)) 
+{ 
+    session_start(); 
+} 
 
 //header("Location: users.php"); // TODO: uncommment when the dashboard will be ready
 
