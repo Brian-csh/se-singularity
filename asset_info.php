@@ -3,8 +3,7 @@ if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
 
-// $active = $edit_name;
-include "includes/header.php";
+include "includes/db/connect.php";
 include "includes/scripts/functions.php";
 
 $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
@@ -36,14 +35,20 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
 // Fetch Data
 
 // Fetch parent name
-$asset_parent = mysqli_fetch_array($conn->query("SELECT * FROM asset WHERE id = '$asset_parent_id' LIMIT 1"))['name'];
+if (isset($asset_parent_id))
+    $asset_parent = mysqli_fetch_array($conn->query("SELECT * FROM asset WHERE id = '$asset_parent_id' LIMIT 1"))['name'];
+else
+    $asset_parent = "N/A";
 
 // Fetch class name
 $asset_class_name = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['name'];
 $asset_class_type = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['class_type'];
 
 // Fetch user name
-$asset_user_name = mysqli_fetch_array($conn->query("SELECT * FROM user WHERE id = '$asset_user_id' LIMIT 1"))['name'];
+if (isset($asset_user_id))
+    $asset_user_name = mysqli_fetch_array($conn->query("SELECT * FROM user WHERE id = '$asset_user_id' LIMIT 1"))['name'];
+else
+    $asset_user_name = "N/A";
 
 // Fetch Status
 $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"))['status'];
@@ -51,6 +56,8 @@ $asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_clas
 // Fetch deaprtment
 $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WHERE id = '$asset_department_id' LIMIT 1"))['name'];
 
+$active = $asset_name;
+include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,10 +109,10 @@ $asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WH
                                 <script>
                                     window.onload = function() {
                                         var img = document.getElementById('assetImage');
-                                        img.src = "<?=$asset_image?>"; // Set the source of the image
+                                        img.src = "<?php echo ($asset_image === "") ? "assets/img/asset_placeholder.png" : $asset_image; ?>"; // Set the source of the image
                                     }
                                 </script>
-                                <img src="" id="assetImage">                            
+                                <img src="" id="assetImage" alt="image not available">                            
                             </div>
                         </div>
                         <div class = "col -md-6">
