@@ -1,9 +1,6 @@
 <?php
-// $active = "Dashboard";
-// if(!isset($_SESSION)) 
-// { 
-//     session_start(); 
-// } 
+$active = "Dashboard";
+// 
 
 //header("Location: users.php"); // TODO: uncommment when the dashboard will be ready
 
@@ -15,6 +12,9 @@
 
 include "includes/header.php";
 include "includes/navbar.php";
+$role = $role_id;
+$department = $department_id;
+$entity = $entity_id;
 // if (isset($_GET['id'])) {
 //     $user_id = $_GET['id'];
 // }
