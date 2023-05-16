@@ -16,7 +16,7 @@ $departmentid = intval($_GET['departmentid']);
 
 
 switch ($roleid){
-    case 1: // show all the requests?
+    case 1: // show all the requests? yes 
         $sql = "SELECT * FROM pending_requests WHERE 1=1";
         break;
     case 2:
@@ -107,6 +107,7 @@ while($row = $result->fetch_assoc()) {
 }
 
 // Get the total number of records in the table
+//TODO : change this
 $sql = "SELECT COUNT(*) as total FROM pending_requests";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();

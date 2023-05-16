@@ -13,16 +13,12 @@ $roleid = intval($_GET['roleid']);
 $entityid = intval($_GET['entityid']);
 $department_id = intval($_GET['departmentid']); //-1 for superadmin and admin
 
-// TODO : for resource manager, load assets in the department and sub-department
-// TODO : for user, just load assets in teh department
 switch ($roleid){
     case 1: // super admin 
-        //TODO : fetch all the assets
         $sql = "SELECT * FROM asset WHERE 1=1";
         break;
     case 2: // admin
         $departmentids = getAllDepartmentIds($entityid,$conn);
-
         $departmentids = implode(',',$departmentids);
         $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
         break;
@@ -136,6 +132,8 @@ if($roleid < 4){ // super admin, admin, resource manager
 }
 
 // Get the total number of records in the table
+
+// TODO: change this 
 $sql = "SELECT COUNT(*) as total FROM asset";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
