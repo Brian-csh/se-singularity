@@ -1,7 +1,11 @@
 <?php
 require 'includes/db/connect.php';
-include 'includes/get_subdepartments.php';
-include 'includes/calculate_price.php';
+if(!function_exists('getAllSubdepartmentIds')) {
+    include 'includes/get_subdepartments.php';
+}
+if(!function_exists('calculate_price')) {
+    include 'includes/calculate_price.php';
+}
 
 // get all assets in this department, including in subdepartments
 $subdepartmentIds = getAllSubdepartmentIds($department, $conn);

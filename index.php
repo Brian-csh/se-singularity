@@ -1,15 +1,5 @@
 <?php
 $active = "Dashboard";
-// 
-
-//header("Location: users.php"); // TODO: uncommment when the dashboard will be ready
-
-// temp variables
-// $role = $_SESSION['user']['role'];
-// $department = $_SESSION['user']['department'];
-// $entity = $_SESSION['user']['entity'];
-
-
 include "includes/header.php";
 include "includes/navbar.php";
 $role = $role_id;
@@ -23,13 +13,9 @@ $entity = $entity_id;
 //     $user_role = $_GET['role'];
 // }
 
-// if (isset($_GET['entityid'])) {
-//     $entity_id = $_GET['entityid'];
-// }
-// if (isset($_GET['departmentid'])) {
-//     $department_id = $_GET['departmentid'];
-// }
-
+$role = $_SESSION['user']['role'];
+$department = $_SESSION['user']['department'];
+$entity = $_SESSION['user']['entity'];
 ?>
 
 <div id="layoutSidenav_content">

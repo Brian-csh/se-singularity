@@ -61,6 +61,8 @@ if(isset($_GET['bind_err'])) {
 
     <!-- Navbar Items-->
     <ul class="navbar-nav align-items-center ms-auto">
+        <!-- Notifications -->
+        <?php include "header_notifications.php" ?>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
             <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" aria-expanded="false" onclick="toggleDropdownMenu()">
