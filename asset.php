@@ -2,12 +2,12 @@
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
-if (isset($_GET['name'])) {
-    $asset_name = $_GET['name'];
-}
 
-$active = $asset_name;
+$active = "Asset";
 include "includes/header.php";
+
+// Fetch asset name
+$asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
 
 ?>
 
@@ -92,7 +92,9 @@ include "includes/header.php";
                                                                 
                                 //Fetch Log Type
                                 $type_id = $row["log_type"];
-                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
+                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"));
+                                if(isset($type['type']))
+                                    $type = $type['type'];
                                 if($type_id>=1 && $type_id <=3)continue;
 
                                 $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
@@ -102,8 +104,11 @@ include "includes/header.php";
                                 // Fetch user name
                                 $user_id = $row["By"];
                                 $by = "";
-                                if ($user_id != '') $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
-
+                                if ($user_id != '') {
+                                    $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"));
+                                    if(isset($by['name']))
+                                        $by = $by['name'];
+                                }
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
