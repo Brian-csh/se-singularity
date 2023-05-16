@@ -131,9 +131,11 @@ include "includes/navbar.php";
                         "data": "review_time"
                     }
                 ],
+                <?php if($role_id == 3){?>
                 select: {
                     style: 'multi'
                 },
+                <?php }?>
                 buttons: [
                     <?php if($role_id == 3){?>
                     {

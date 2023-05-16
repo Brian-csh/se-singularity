@@ -62,35 +62,35 @@ while($row = $result->fetch_assoc()) {
         $status_id = $row['status'];
         $status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$status_id'"))['status'];
     } else {
-        $status = "N/A";
+        $status = "--";
     }
 
     if (isset($row['user'])) {
         $user_id = $row['user']; // asset user id
         $user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
     } else {
-        $user = "N/A";
+        $user = "--";
     }
 
     if (isset($row['parent'])) {
         $parent_id = $row['parent'];
         $parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$parent_id'"))['name'];
     } else {
-        $parent = "N/A";
+        $parent = "--";
     }
 
     if (isset($row['class'])) {
         $class_id = $row['class'];
         $class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$class_id'"))['name'];
     } else {
-        $class = "N/A";
+        $class = "--";
     }
 
     if(isset($row['department'])){
         $department_id_ = $row['department'];
         $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
     }else {
-        $department = "N/A";
+        $department = "--";
     }
 
 

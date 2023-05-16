@@ -14,11 +14,14 @@ $departmentid = intval($_GET['departmentid']);
 if($roleid == 1){
     $sql = "SELECT * FROM user WHERE 1=1";
 } else if ($roleid == 2){
-    $sql = $departmentid != -1? "SELECT * FROM user WHERE entity = $entityid AND department = $departmentid" : "SELECT * FROM user WHERE entity = $entityid";
+    if($departmentid == -1){//access through navbar
+        $sql = "SELECT * FROM user WHERE entity = $entityid";
+    } else {//access through manage user
+        $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+        $subdepartmentids = implode(',',$subdepartmentids);
+        $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids) AND entity = $entityid";
+    }
 } else if ($roleid == 3){
-    // TODO : 
-    // $departments = getALLSubdepartmentIds($departmentid,$conn);
-    // $sql = "SELECT * FROM user WHERE department = $departmentid in $departments";
     $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
     $subdepartmentids = implode(',',$subdepartmentids);
     $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";

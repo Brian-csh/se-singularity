@@ -54,7 +54,7 @@ if (isset($_GET['search']['value'])) {
     }
 }
 
-$sql .= " LIMIT $start, $length";
+$sql .= " ORDER BY result LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
@@ -65,7 +65,7 @@ while($row = $result->fetch_assoc()) {
         $initiator_id = $row['initiator'];
         $initiator = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator_id'"))['name'];
     } else {
-        $initiator = "N/A";
+        $initiator = "--";
     }
 
     if (isset($row['participant'])) {
@@ -79,14 +79,14 @@ while($row = $result->fetch_assoc()) {
         $asset_id = $row['asset'];
         $asset = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
     } else {
-        $asset = "N/A";
+        $asset = "--";
     }
 
     if (isset($row['type'])) {
         $type_id = $row['type'];
         $type = mysqli_fetch_array($conn->query("SELECT name FROM request_type WHERE id = '$type_id'"))['name'];
     } else {
-        $type = "N/A";
+        $type = "--";
     }
 
 
