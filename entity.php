@@ -1,11 +1,19 @@
 <?php
-$active = 'Entity #' . $_GET['id'];
 
 include "includes/header.php";
+include "includes/navbar.php";
+$initiator_id = $user_id; 
+if($role_id == 1){
+    if (isset($_GET['id'])) {
+        $entity_id = $_GET['id'];
+    }
+} else if ($role_id == 2){ // no department_id
 
-if (isset($_GET['id'])) {
-    $entity_id = $_GET['id'];
+} else if ($role_id == 3){
+
 }
+
+echo "<script>document.title = '" . 'Entity #'. $entity_id . ' - Singularity EAM'."';</script>";
 
 // Fetch entity values
 $sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
@@ -55,7 +63,6 @@ if (isset($_POST['create_asset_attribute'])) {
 
 
 ?>
-
 
 <div id="layoutSidenav_content">
     <main>
@@ -113,6 +120,11 @@ if (isset($_POST['create_asset_attribute'])) {
                             </h1>
                             <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end ms-2">+ Add Department</a>
                             <a href="#" class="btn btn-secondary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttrModal">+ Add Asset Attribute</a>
+                            <?php if($entity_id == $_SESSION['user']['entity']) {
+                                echo "<a href='includes/entity_sync.php?entity_id=$entity_id&initiator=$initiator_id' class='btn btn-primary btn-xs float-end me-2'>
+                                        Sync Feishu
+                                    </a>";
+                            } ?>
                         </div>
                     </div>
                 </div>
@@ -149,7 +161,7 @@ if (isset($_POST['create_asset_attribute'])) {
                             if ($result) {
                                 if (mysqli_num_rows($result) > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $department_id = $row['id'];
+                                        $departmentid = $row['id'];
                                         $department_name = $row['name'];
                                         $department_parent = $row['parent'];
 
@@ -158,8 +170,8 @@ if (isset($_POST['create_asset_attribute'])) {
                                         $parent_assoc = $parent_name_result->fetch_assoc();
                                         $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='department.php?id=$department_id'>$department_name</a></td><td>$parent_name</td></tr>";
+                                        echo "<tr data-id='$departmentid' ><td>$departmentid</td>".
+                                                "<td><a class='text-primary' href='/department.php?departmentid=$departmentid'>$department_name</a></td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }
@@ -220,12 +232,6 @@ if (isset($_POST['create_asset_attribute'])) {
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>

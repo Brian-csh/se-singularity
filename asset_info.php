@@ -101,10 +101,13 @@ include "includes/header.php";
         <div class="container-fluid pt-5 px-4">
             <div class="card">
                 <div class="card-body">
-                    <!-- TODO: SHOW Image-->
                     <div class = "row mb-3">
                         <div class = "col -md-6">
-                            <!-- Asset Image -->
+                            <!-- TODO: Asset Image -->
+                            <div class="card-header">
+                                    <h3> Asset Image
+                                    </h3>
+                                </div>
                             <div id="image-container" style="padding: 20px">
                                 <script>
                                     window.onload = function() {

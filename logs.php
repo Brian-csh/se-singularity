@@ -4,8 +4,14 @@ $active = "Logs";
 include "includes/header.php";
 include "includes/navbar.php";
 
+//TODO : show different log for different user
+// superadmin : show all the logs
+// admin : logs in the entity
+// rm : logs in the department and sub-departemnt
+// user : logs in the department
 $sql = "SELECT * FROM log ORDER BY id DESC";
-
+//TODO:
+// if($role_id == 3) $departments = getAllSubdepartentIds($department_id, $conn);
 ?>
 
 <div id="layoutSidenav_content">
@@ -52,8 +58,6 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                         </tfoot>
                         <tbody>
                         <?php
-
-
                         $result = $conn->query($sql);
 
                         if ($result->num_rows > 0) {
@@ -69,8 +73,22 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                 $subject_id = $row["subject"];
                                 if($type_id>=1 && $type_id <=3){
                                     $subject = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$subject_id'"))['name'];
+                                    // super admin shows all the logs
+                                    if($role_id==2){ // admin
+                                        $entity = mysqli_fetch_array($conn->query("SELECT entity FROM user WHERE id = '$subject_id'"))['entity'];
+                                        if($entity != $entity_id) continue;
+                                    } else if ($role_id==3){ // resource manager
+                                        $department = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$subject_id'"))['department'];
+                                        //TODO: 
+                                        // if($department  not in $departments) continue;
+                                    } else { // user
+                                        $department = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$subject_id'"))['department'];
+                                        if($department != $department_id) continue;
+                                    }
                                 } else {
                                     $subject = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"))['name'];
+                                    $department = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$subject_id'"))['department'];
+                                    // if($department != $department_id&& $department_id!=-1) continue;
                                 }
 
                                 //Fetch By - always user

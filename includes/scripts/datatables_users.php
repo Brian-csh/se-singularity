@@ -1,22 +1,28 @@
 <?php
 
 require "../db/connect.php";
-
+include "../get_subdepartments.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$departmentid = intval($_GET['departmentid']);
+$roleid = intval($_GET['roleid']);
 $entityid = intval($_GET['entityid']);
+$departmentid = intval($_GET['departmentid']);
 
-// Fetch data from your database table
-if ($departmentid != -1)
-    $sql = "SELECT * FROM user WHERE department = $departmentid"; 
-else if ($entityid != -1)
-    $sql = "SELECT * FROM user WHERE entity = $entityid";
-else
+if($roleid == 1){
     $sql = "SELECT * FROM user WHERE 1=1";
+} else if ($roleid == 2){
+    $sql = $departmentid != -1? "SELECT * FROM user WHERE entity = $entityid AND department = $departmentid" : "SELECT * FROM user WHERE entity = $entityid";
+} else if ($roleid == 3){
+    // TODO : 
+    // $departments = getALLSubdepartmentIds($departmentid,$conn);
+    // $sql = "SELECT * FROM user WHERE department = $departmentid in $departments";
+    $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+    $subdepartmentids = implode(',',$subdepartmentids);
+    $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";
+}
 
 if (isset($_GET['search']['value'])) {
     $search_string = $_GET['search']['value'];
@@ -66,7 +72,7 @@ while($row = $result->fetch_assoc()) {
         "department" => $department,
         "role" => $role,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_user.php?id=".$row['id']."\">
-        Info
+        edit
         </a>"
     );
 }
