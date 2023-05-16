@@ -51,6 +51,11 @@ $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department
                             <div class="nav-link-icon"><i data-feather="package"></i></div>
                             Assets
                         </a>  
+                        <!-- Sidenav Heading (Requests)-->
+                        <a class="nav-link" href= "/requests.php">
+                            <div class="nav-link-icon"><i data-feather="git-pull-request"></i></div>
+                            Requests
+                        </a>
                     <?php } else if($role_id == 2){?>
                     <!-- Admin -->
                         <div class="sidenav-menu-heading">Main</div>
@@ -78,6 +83,11 @@ $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department
                         <a class="nav-link" href="/assets.php">
                             <div class="nav-link-icon"><i data-feather="package"></i></div>
                             Assets
+                        </a>
+                        <!-- Sidenav Heading (Requests)-->
+                        <a class="nav-link" href= "/requests.php">
+                            <div class="nav-link-icon"><i data-feather="git-pull-request"></i></div>
+                            Requests
                         </a>
                     <?php } else if($role_id == 3){?>
                         <!-- Sidenav Menu Heading (Core)-->

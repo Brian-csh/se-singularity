@@ -2,26 +2,39 @@
 
 require "../db/connect.php";
 require "../get_subdepartments.php";
+include "functions.php";
+
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$department_id = intval($_GET['department_id']);
-$userid = intval($_GET['user_id']);
-$roleid = intval($_GET['role_id']);
+$userid = intval($_GET['userid']);
+$roleid = intval($_GET['roleid']);
+$entityid = intval($_GET['entityid']);
+$departmentid = intval($_GET['departmentid']);
 
-if($roleld < 4){ // manager
-    $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
-    $subdepartmentids = implode(',',$subdepartmentids);
-    $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
-} else { // user
-    // Fetch data from database table - pending_requests
-    $sql = "SELECT * FROM pending_requests WHERE department = $department_id";
+
+switch ($roleid){
+    case 1: // show all the requests?
+        $sql = "SELECT * FROM pending_requests WHERE 1=1";
+        break;
+    case 2:
+        $departmentids = getAllDepartmentIds($entityid,$conn);
+        $departmentids = implode(',',$departmentids);
+        $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
+        break;
+    case 3:
+        $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+        $subdepartmentids = implode(',',$subdepartmentids);
+        $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
+        break;
+    case 4:
+        $sql = "SELECT * FROM pending_requests WHERE department = $departmentid";
+        break;
+    default:
+        break;
 }
-
-
-
 
 //TODO : searching 
 if (isset($_GET['search']['value'])) {
@@ -94,7 +107,7 @@ while($row = $result->fetch_assoc()) {
 }
 
 // Get the total number of records in the table
-$sql = "SELECT COUNT(*) as total FROM asset";
+$sql = "SELECT COUNT(*) as total FROM pending_requests";
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $total = $row['total'];

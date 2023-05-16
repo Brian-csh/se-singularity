@@ -2,35 +2,27 @@
 
 require "../db/connect.php";
 include "../get_subdepartments.php";
+include "functions.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
 $length = intval($_GET['length']);
 
-$userid = intval($_GET['userid']); // login user id
-$role_id = intval($_GET['roleid']);
-$entity_id = intval($_GET['entityid']);
-$department_id = intval($_GET['departmentid']);
+$userid = intval($_GET['userid']);
+$roleid = intval($_GET['roleid']);
+$entityid = intval($_GET['entityid']);
+$department_id = intval($_GET['departmentid']); //-1 for superadmin and admin
 
 // TODO : for resource manager, load assets in the department and sub-department
 // TODO : for user, just load assets in teh department
-switch ($role_id){
+switch ($roleid){
     case 1: // super admin 
         //TODO : fetch all the assets
         $sql = "SELECT * FROM asset WHERE 1=1";
         break;
     case 2: // admin
-        // TODO: fetch departments whose entity is $entity_id
-        $departmentids = array();
+        $departmentids = getAllDepartmentIds($entityid,$conn);
 
-        $query = "SELECT * FROM department WHERE entity = $entity_id";
-        $result = $conn->query($query);
-        
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $departmentids[] = $row['departmentid'];
-            }
-        }
         $departmentids = implode(',',$departmentids);
         $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
         break;
@@ -106,7 +98,7 @@ while($row = $result->fetch_assoc()) {
     }
 
 
-if($role_id != 4){
+if($roleid < 4){ // super admin, admin, resource manager
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -124,7 +116,7 @@ if($role_id != 4){
             Edit
         </a>" // TODO: put icon here
     );
-} else { // user_role_id == 4 (user)
+} else { // user
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
@@ -155,6 +147,7 @@ $response = array(
     "recordsTotal" => $total,
     "recordsFiltered" => $total,
     "data" => $data
+    // "departmentids" => $departmentids
 );
 
 // Send the JSON response

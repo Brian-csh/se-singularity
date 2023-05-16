@@ -75,7 +75,7 @@ if (isset($_POST['add_class'])) {
                                 <!-- <th>Description</th> -->
                                 <th>Position</th>
                                 <th>Status</th>
-                                <?php if($role_id == 3){?>
+                                <?php if($role_id < 4){?>
                                     <th>Edit Asset</th>
                                 <?php } else { ?>
                                     <!-- <th>Image</th> -->
@@ -91,7 +91,8 @@ if (isset($_POST['add_class'])) {
             </div>
         </div>
     </main>
-
+    
+    <!-- MODAL -->
     <!-- Add Class Modal -->
     <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -144,8 +145,8 @@ if (isset($_POST['add_class'])) {
         </div>
     </div>
 
-    <!-- MODAL -->
     <!-- User Move Modal -->
+    <?php if($role_id == 4){?>
     <div class="modal fade" id="chooseUserModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -172,7 +173,6 @@ if (isset($_POST['add_class'])) {
                                     ?>
                                 </select>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -181,7 +181,7 @@ if (isset($_POST['add_class'])) {
                 </div>
             </div>
         </div>
-
+    <?php }?>
         <!-- Manager move Modal -->
         <div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -237,20 +237,18 @@ if (isset($_POST['add_class'])) {
     <!-- DataTables Select JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
     <!-- Styles for DataTables buttons -->
+
     <style>
-        button.dt-button.use-button {
+        button.dt-button.use-button { 
+            /* only for user */
             color: white !important;
             background: green !important;
             border-radius: 20px !important;
         }
         button.dt-button.return-button {
+            /* only for manager and user */
             color: white !important;
             background: red !important;
-            border-radius: 20px !important;
-        }
-        button.dt-button.repair-button {
-            color: white !important;
-            background: blue !important;
             border-radius: 20px !important;
         }
     </style>
@@ -299,16 +297,18 @@ if (isset($_POST['add_class'])) {
                     },
                     {
                         "data": "status"
-                    },
+                    }
                     <?php if($role_id < 4){?>
-                    {
+                    ,{
                         "data": "actions"
                     }
                     <?php }?>
                 ],
+                <?php if($role_id > 2){?>
                 select: {
                     style: 'multi'
                 },
+                <?php }?>
                 buttons: [
                     <?php if($role_id == 4){?>
                     { 
@@ -334,7 +334,6 @@ if (isset($_POST['add_class'])) {
                                     console.log(response);
                                             // Perform any additional actions on success
                                             var data = JSON.parse(response);
-
                                             for (var i = 0; i<data.result.length; i++){
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
@@ -351,10 +350,10 @@ if (isset($_POST['add_class'])) {
                                 }
                             });
                         }
-                    },
-                    <?php }?>
+                    }, <?php }?>
+                    <?php if($role_id == 4 || $role_id ==3 ) {?>
                     {
-                        text: <?php if($role_id == 4) { ?> 'Return', <?php } else { ?> 'Retire', <?php }?>
+                        text: <?php if($role_id == 4) { ?> 'Return', <?php } else if($role_id ==3) { ?> 'Retire', <?php }?>
                         className: 'return-button',
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
@@ -478,9 +477,8 @@ if (isset($_POST['add_class'])) {
                                 });
                             }
                         }
-                    }
+                    }, <?php }?>
                     <?php if($role_id == 4){?>
-                    ,
                     { // TODO : handle requests
                         text:"Repair",
                         action: function(e, dt, node, config) {
@@ -521,8 +519,11 @@ if (isset($_POST['add_class'])) {
                         }
                     }
                     <?php } ?>
-                ],
-                dom: 'Bfrtip' // Add this line to display buttons
+                ]
+                <?php if($role_id > 2){?>
+                    ,
+                    dom: 'Bfrtip' // Add this line to display buttons
+                <?php }?>
             });
         });
     </script>

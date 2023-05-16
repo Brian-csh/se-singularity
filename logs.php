@@ -9,6 +9,7 @@ include "includes/navbar.php";
 // admin : logs in the entity
 // rm : logs in the department and sub-departemnt
 // user : logs in the department
+// log
 $sql = "SELECT * FROM log ORDER BY id DESC";
 //TODO:
 // if($role_id == 3) $departments = getAllSubdepartentIds($department_id, $conn);
@@ -73,14 +74,13 @@ $sql = "SELECT * FROM log ORDER BY id DESC";
                                 $subject_id = $row["subject"];
                                 if($type_id>=1 && $type_id <=3){
                                     $subject = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$subject_id'"))['name'];
-                                    // super admin shows all the logs
-                                    if($role_id==2){ // admin
+                                    // SUPER ADMIN shows all the logs 
+                                    if($role_id==2){ // ADMIN
                                         $entity = mysqli_fetch_array($conn->query("SELECT entity FROM user WHERE id = '$subject_id'"))['entity'];
                                         if($entity != $entity_id) continue;
-                                    } else if ($role_id==3){ // resource manager
+                                    } else if ($role_id==3){ // RESOURCE MANAGER
                                         $department = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$subject_id'"))['department'];
-                                        //TODO: 
-                                        // if($department  not in $departments) continue;
+                                        //TODO: if department is not in sub-departments, continue;
                                     } else { // user
                                         $department = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$subject_id'"))['department'];
                                         if($department != $department_id) continue;

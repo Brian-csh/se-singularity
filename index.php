@@ -54,7 +54,7 @@ $entity = $entity_id;
     <!-- Stats content (for admin and resource manager only) -->
     <div>
         <?php 
-        if($role == 2 || $role == 3)
+        if($role == 3) // admin don't need to see that stats
             include('asset_stats.php'); 
         ?>
     </div>

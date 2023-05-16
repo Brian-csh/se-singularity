@@ -406,4 +406,50 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
         }
     return $results;
 }
+
+/**
+ * Gets all departments in an array, given an entity ID.
+ *
+ * @param int $entityId - The ID of the requested entity.
+ * @param mysqli $mysqli - The database connection object.
+ * @return array - An array of department IDs.
+ */
+function getAllDepartmentIds($entityId, $mysqli) {
+    // Prepare the SQL statement
+    $sql = "SELECT id FROM department WHERE entity = ?";
+
+    // Prepare the statement
+    $stmt = $mysqli->prepare($sql);
+
+    if ($stmt) {
+        // Bind the entity ID parameter
+        $stmt->bind_param("i", $entityId);
+
+        // Execute the statement
+        $stmt->execute();
+
+        // Bind the result
+        $stmt->bind_result($departmentId);
+
+        // Create an array to store the department IDs
+        $departmentIds = array();
+
+        // Fetch the results
+        while ($stmt->fetch()) {
+            // Add the department ID to the array
+            $departmentIds[] = $departmentId;
+        }
+
+        // Close the statement
+        $stmt->close();
+
+        // Return the department IDs
+        return $departmentIds;
+    } else {
+        // Handle the error if the statement preparation fails
+        // You can customize this based on your error handling needs
+        return null;
+    }
+}
+
 ?>
