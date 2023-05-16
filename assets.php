@@ -5,26 +5,7 @@ $active = "Assets";
 include "includes/header.php";
 include "includes/navbar.php";
 
-/*
-Parent: class
-Item Asset: 0
-Value Asset: 1
-*/
-
-if (isset($_GET['departmentid'])) {
-    $departmentid = $_GET['departmentid'];
-} else {
-    $departmentid = -1;
-}
-
-if (isset($_GET['userid'])) {
-    $userid = $_GET['userid'];
-} else {
-    $userid = -1;
-}
-
 if (isset($_POST['add_class'])) {
-
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {
         $class_type = 0;
@@ -47,9 +28,6 @@ if (isset($_POST['add_class'])) {
         echo "Error.";
     }
 }
-$user_role_id = $_SESSION['user']['role'];
-$entity_id = $_SESSION['user']['entity'];
-$user_id = $_SESSION['user']['id'];
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -72,8 +50,10 @@ $user_id = $_SESSION['user']['id'];
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <?php if($role_id <=3){?>
+                                <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
+                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <?php }?>
                         </div>
                     </div>
                 </div>
@@ -91,54 +71,19 @@ $user_id = $_SESSION['user']['id'];
                                 <th>Name</th>
                                 <th>Class</th>
                                 <th>User</th>
-                                <th>Price</th>
-                                <th>Description</th>
+                                <th>Department</th>
+                                <!-- <th>Description</th> -->
                                 <th>Position</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <?php if($role_id < 4){?>
+                                    <th>Edit Asset</th>
+                                <?php } else { ?>
+                                    <!-- <th>Image</th> -->
+                                <?php }?>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-
-                            /*
-
-                        $result = $conn->query($sql);
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                if($row['name']=='NULL') continue;
-                                $asset_id = $row['id'];
-                                $asset_name = $row['name'];
-
-                                //Fetch Parent 
-                                //Who is the parent of asset?
-                                $asset_parent = $row['parent'];
-
-                                //Fetch Class
-                                $asset_class_id = $row['class'];
-                                $asset_class = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$asset_class_id'"))['name'];
-                                
-                                //Fetch User
-                                $asset_user_id = $row['user'];
-                                $asset_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id'"))['name'];
-
-                                $asset_price = $row['price'];
-                                $asset_description = $row['description'];
-                                $asset_position = $row['position'];
-                                $asset_expire = date("Y-m-d", strtotime($row['expire']));
-
-                                echo "<tr data-id='$asset_id' ><td>$asset_id</td><td>$asset_parent</td><td><a class='text-primary' href='/asset.php?id=$asset_id&name=$asset_name'>" . $asset_name . "</a></td>
-                                        <td>$asset_class</td><td>$asset_user</td><td>$asset_price</td><td>$asset_position</td><td>$asset_expire</td><td>" . "
-                                        <a title=\"Edit asset\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href=\"edit_asset.php?id=$asset_id&name=$asset_name"."\">
-                                        <i data-feather=\"edit\"></i>
-                                        </a>
-                                        
-                                        " ."</td></tr>";
-                            }
-                        }
-
-*/
                             ?>
                         </tbody>
                     </table>
@@ -146,9 +91,8 @@ $user_id = $_SESSION['user']['id'];
             </div>
         </div>
     </main>
-
-    <!-- TODO: Hide this from non Project Manager roles. -->
-
+    
+    <!-- MODAL -->
     <!-- Add Class Modal -->
     <div class="modal fade" id="addClassModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -201,8 +145,8 @@ $user_id = $_SESSION['user']['id'];
         </div>
     </div>
 
-    <!-- MODAL -->
     <!-- User Move Modal -->
+    <?php if($role_id == 4){?>
     <div class="modal fade" id="chooseUserModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -222,14 +166,13 @@ $user_id = $_SESSION['user']['id'];
                                         unset($id, $name);
                                         $id = $row['id'];
                                         $name = $row['name'];
-                                        $department_id = $row['department'];
-                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
+                                        $departmentid = $row['department'];
+                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$departmentid'"))['name'];
                                         echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
                                     }
                                     ?>
                                 </select>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
@@ -238,7 +181,7 @@ $user_id = $_SESSION['user']['id'];
                 </div>
             </div>
         </div>
-
+    <?php }?>
         <!-- Manager move Modal -->
         <div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -253,7 +196,7 @@ $user_id = $_SESSION['user']['id'];
                             <select class="form-control" id="destinationDepartment">
                                 <option value="">N/A</option>
                                 <?php
-                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id"); // where entity=$entity_id of the admin?
+                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id");
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
@@ -279,7 +222,6 @@ $user_id = $_SESSION['user']['id'];
             </div>
         </div> -->
 
-<!-- Request Modal -->
     <script>
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
@@ -294,7 +236,22 @@ $user_id = $_SESSION['user']['id'];
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <!-- DataTables Select JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+    <!-- Styles for DataTables buttons -->
 
+    <style>
+        button.dt-button.use-button { 
+            /* only for user */
+            color: white !important;
+            background: green !important;
+            border-radius: 20px !important;
+        }
+        button.dt-button.return-button {
+            /* only for manager and user */
+            color: white !important;
+            background: red !important;
+            border-radius: 20px !important;
+        }
+    </style>
     <!-- DataTables Buttons JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script>
@@ -308,9 +265,10 @@ $user_id = $_SESSION['user']['id'];
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
-                        d.departmentid = <?= $departmentid ?>;
-                        d.userid = <?= $userid ?>;
-                        d.role_id = <?= $_SESSION['user']['role'] ?>;
+                        d.userid = <?= $user_id ?>;
+                        d.roleid = <?= $role_id ?>;
+                        d.entityid = <?= $entity_id ?>;
+                        d.departmentid = <?= $department_id ?>;
                     }
                 },
                 columns: [{
@@ -329,28 +287,33 @@ $user_id = $_SESSION['user']['id'];
                         "data": "user"
                     },
                     {
-                        "data": "price"
+                        "data": "department"
                     },
-                    {
-                        "data": "description"
-                    },
+                    // {
+                        // "data": "description"
+                    // },
                     {
                         "data": "position"
                     },
                     {
                         "data": "status"
-                    },
-                    {
+                    }
+                    <?php if($role_id < 4){?>
+                    ,{
                         "data": "actions"
                     }
+                    <?php }?>
                 ],
+                <?php if($role_id > 2){?>
                 select: {
                     style: 'multi'
                 },
+                <?php }?>
                 buttons: [
-                    {
-                        text: <?php if($user_role_id == 4) { ?> 'Return',
-                                <?php } else { ?> 'Retire', <?php }?>
+                    <?php if($role_id == 4){?>
+                    { 
+                        text: "Use",
+                        className: 'use-button',
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -361,21 +324,62 @@ $user_id = $_SESSION['user']['id'];
 
                             // Perform AJAX request
                             $.ajax({
-                                url: <?php if($user_role_id == 4) { ?> 'includes/scripts/return_assets.php',
+                                url: "includes/scripts/request_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds,
+                                    user_id: <?=$user_id?>
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfully!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    }, <?php }?>
+                    <?php if($role_id == 4 || $role_id ==3 ) {?>
+                    {
+                        text: <?php if($role_id == 4) { ?> 'Return', <?php } else if($role_id ==3) { ?> 'Retire', <?php }?>
+                        className: 'return-button',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: <?php if($role_id == 4) { ?> 'includes/scripts/return_assets.php',
                                         <?php } else { ?> "includes/scripts/retire_assets.php", <?php }?>
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    user_id: <?=$_SESSION['user']['id']?>
+                                    user_id: <?= $user_id?>
                                 },
-                                <?php if ($user_role_id ==4 ) { ?>
-                                success: function(response) {
+                                <?php if ($role_id !=4 ) { ?>
+                                success: function(response) { // manager handle request success
                                     console.log(response);
                                     // Perform any additional actions on success
                                     dt.ajax.reload(); // Refresh the DataTables
                                 },
                                 <?php } else {?>
-                                sucess: function(response){
+                                success: function(response){ // user handle request success
                                     console.log(response);
                                             // Perform any additional actions on success
                                             var data = JSON.parse(response);
@@ -384,9 +388,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for RETURN. You can only return assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -407,7 +411,7 @@ $user_id = $_SESSION['user']['id'];
                             var assetIds = selectedRows.map(function(row) {
                                 return row.id;
                             });
-                            if(<?= $_SESSION['user']['role'] ?> != 4){ // manager move
+                            if(<?= $role_id ?> != 4){ // manager move
                                 $('#chooseDepartmentModal').modal('show');
 
                                 $('#chooseDepartmentModal').on('click', '#confirmButton', function () {
@@ -445,8 +449,8 @@ $user_id = $_SESSION['user']['id'];
                                         data: {
                                             assets: assetIds,
                                             destination: userId,
-                                            role_id: <?=$user_role_id?>,
-                                            user_id: <?=$_SESSION['user']['id']?>
+                                            role_id: <?=$role_id?>,
+                                            user_id: <?=$user_id?>
                                         },
                                         success: function(response) {
                                             console.log(response);
@@ -457,9 +461,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for move.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " is moved.")
+                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -473,10 +477,10 @@ $user_id = $_SESSION['user']['id'];
                                 });
                             }
                         }
-                    }
-                    <?php if($user_role_id == 4){?>
-                    , { // TODO : request and repair
-                        text: "Request",
+                    }, <?php }?>
+                    <?php if($role_id == 4){?>
+                    { // TODO : handle requests
+                        text:"Repair",
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -484,14 +488,13 @@ $user_id = $_SESSION['user']['id'];
                             var assetIds = selectedRows.map(function(row) {
                                 return row.id;
                             });
-
                             // Perform AJAX request
                             $.ajax({
-                                url: "includes/scripts/request_assets.php",
+                                url: "includes/scripts/repair_assets.php",
                                 method: "POST",
                                 data: {
                                     assets: assetIds,
-                                    user_id: <?=$_SESSION['user']['id']?>
+                                    user_id: <?=$user_id?>
                                 },
                                 success: function(response) {
                                     console.log(response);
@@ -502,9 +505,9 @@ $user_id = $_SESSION['user']['id'];
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for request.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " requested!.")
+                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfully!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -514,38 +517,13 @@ $user_id = $_SESSION['user']['id'];
                                 }
                             });
                         }
-                    },
-                    {
-                        text:"Repair",
-                        action: function(e, dt, node, config) {
-                            var selectedRows = dt.rows({
-                                selected: true
-                            }).data().toArray();
-                            var assetIds = selectedRows.map(function(row) {
-                                return row.id;
-                            });
-
-                            // Perform AJAX request
-                            $.ajax({
-                                url: "includes/scripts/repair_request_assets.php",
-                                method: "POST",
-                                data: {
-                                    assets: assetIds
-                                },
-                                success: function(response) {
-                                    console.log(response);
-                                    // Perform any additional actions on success
-                                    dt.ajax.reload(); // Refresh the DataTables
-                                },
-                                error: function(jqXHR, textStatus, errorThrown) {
-                                    console.error(textStatus, errorThrown);
-                                }
-                            });
-                        }
                     }
                     <?php } ?>
-                ],
-                dom: 'Bfrtip' // Add this line to display buttons
+                ]
+                <?php if($role_id > 2){?>
+                    ,
+                    dom: 'Bfrtip' // Add this line to display buttons
+                <?php }?>
             });
         });
     </script>
@@ -556,4 +534,3 @@ $user_id = $_SESSION['user']['id'];
     <?php
     include "includes/footer.php";
     ?>
-

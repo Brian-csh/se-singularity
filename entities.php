@@ -1,9 +1,9 @@
 <?php
-$sql = "SELECT * FROM entity ORDER BY id DESC";
-$active = "Entities";
-
+$active = 'Entities';
 include "includes/header.php";
 include "includes/navbar.php";
+// ONLY ACCESSABLE BY SUPER ADMIN
+$sql = "SELECT * FROM entity ORDER BY id DESC";
 
 $sync_result = 0;
 // Handle sync success/error messages
@@ -90,20 +90,18 @@ if(isset($_GET['sync_error'])) {
 
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $entity_id = $row['id'];
+                                $entityid = $row['id'];
                                 $name = $row['name'];
 
-                                echo "<tr data-id='$entity_id' ><td>$entity_id</td><td><a class='text-primary' href='entity.php?id=$entity_id'>" . $name . "</a></td>
+                                echo "<tr data-id='$entityid' ><td>$entityid</td><td><a class='text-primary' href='entity.php?id=$entityid'>" . $name . "</a></td>
                                         <td>" . "
-                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entity_id'>
+                                        <a title=\"User Info\" class=\"btn btn-datatable btn-icon btn-transparent-light\" href='entity.php?id=$entityid'>
                                         <i data-feather=\"edit\"></i>
                                         </a>
-                  
                                         
                                         " ."</td></tr>";
                             }
                         }
-
 
                         ?>
                         </tbody>

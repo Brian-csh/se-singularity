@@ -1,6 +1,25 @@
 <?php
+include "includes/db/connect.php";
+
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
+}
+
+if (isset($_POST['print'])) { //print asset tag
+    $tag_url = "asset_tag.php?id=".$asset_id;
+
+    //redirect to asset tag page
+    header("Location: ".$tag_url);
+}
+
+//fetch the asset entry
+$sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
+$result = $conn->query($sql);
+if ($result) {
+    $row = $result->fetch_assoc();
+    $asset_name = $row['name'];
+} else {
+    exit("No asset found with that ID.");
 }
 
 $active = "Asset";
@@ -121,6 +140,9 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                             ?>
                         </tbody>
                     </table>
+                    <form method="post" action="asset.php?id=<?=$asset_id?>">
+                        <button type="submit" name="print" class="btn btn-primary btn-xs float-end">Asset Tag</a>
+                    </form>
                 </div>
             </div>
         </div>

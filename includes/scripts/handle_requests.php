@@ -1,19 +1,18 @@
 <?php
-
 require "../db/connect.php";
 include "functions.php";
 // Get asset IDs from POST data
-$assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 
+$requestIds = isset($_POST['requestIds']) ? $_POST['requestIds'] : [];
 $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : -1;
-
+$handle_type = isset($_POST['handle_type']) ? intval($_POST['handle_type']) : -1;// 1 -> approve, 2 -> reject
 
 // user request - use
-if (empty($assetIds)) {
+if (empty($requestIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 } else {
-    //MAKE request to manager(leaves log at the same time)
-    $results = make_request($conn,$user_id,null,$assetIds,1); // can only IDLE assets
+
+    $results = handle_request($conn,$user_id,$requestIds,$handle_type);
 
     $responseData = array('result' => $results);
 
