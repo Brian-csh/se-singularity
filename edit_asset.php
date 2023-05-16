@@ -1,4 +1,6 @@
 <?php
+include "includes/calculate_price.php";
+
 if (isset($_GET['id'])) {
     $asset_id = $_GET['id'];
 }
@@ -124,13 +126,12 @@ if(isset($_POST['edit_basic'])){
 // Update Financial info
 if(isset($_POST['edit_financial'])){
     $financial_op = $_POST['financial_op']; if(!$financial_op) $financial_op = $asset_original_price;
-    $financial_cp = $_POST['financial_cp']; if(!$financial_cp) $financial_cp = $asset_current_price;
-    $financial_dp = $_POST['financial_dp']; if(!$financial_dp) $financial_dp = $asset_deprecation_model;
-    $sql = "UPDATE asset SET `price`='$financial_op', `current price`='$financial_cp', `depreciation model`='$financial_dp' WHERE id='$asset_id'";
+    $sql = "UPDATE asset SET `price`='$financial_op' WHERE id='$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Financial info updated successfully!')</script>";
         insert_log_asset($conn,$asset_data,$session_info['id'],6);
+        // TODO: Update current asset value
         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
     }
     else{
@@ -398,11 +399,14 @@ include "includes/header.php";
                                             </tr>
                                             <tr>
                                                 <th>Current Price</th>
-                                                <td><?php echo $asset_current_price; ?></td>
-                                            </tr>
-                                            <tr>
-                                                <th>Depreciation Model</th>
-                                                <td><?php echo $asset_depreciation_model; ?></td>
+                                                <td><?php 
+                                                if(!calculate_price($asset_data, time())){
+                                                    echo "No expire date set to calculate current price";
+                                                }
+                                                else{
+                                                    echo number_format((float)calculate_price($asset_data, time()), 2, '.', ''); 
+                                                }
+                                                    ?></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -635,16 +639,6 @@ include "includes/header.php";
                         <div class="mb-3">
                             <label for="editOP">Original Price </label>
                             <input class="form-control" id="financialEditOP" type="text" name="financial_op" placeholder="<?php echo $asset_original_price; ?>" >
-                        </div>
-                        <!-- Edit Model-->
-                        <div class="mb-3">
-                            <label for="editCP">Current Price </label>
-                            <input class="form-control" id="financialEditCP" type="text" name="financial_cp" placeholder="<?php echo $asset_current_price; ?>">
-                        </div>
-                        <!-- Edit Serial Number -->
-                        <div class="mb-3">
-                            <label for="editDeprecationModel">Depreciation Model </label>
-                            <textarea class="form-control" id="financialEditDM" type="text" name="financial_dp" rows = "5" placeholder="<?php echo $asset_deprecation_model; ?>"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

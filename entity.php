@@ -1,8 +1,8 @@
 <?php
-// $active = 'Entity #'.$_GET['id'];
+
 include "includes/header.php";
 include "includes/navbar.php";
-
+$initiator_id = $user_id; 
 if($role_id == 1){
     if (isset($_GET['id'])) {
         $entity_id = $_GET['id'];
@@ -64,7 +64,6 @@ if (isset($_POST['create_asset_attribute'])) {
 
 ?>
 
-
 <div id="layoutSidenav_content">
     <main>
         <header class="page-header pt-10 page-header-dark bg-gradient-primary-to-secondary pb-5">
@@ -121,6 +120,11 @@ if (isset($_POST['create_asset_attribute'])) {
                             </h1>
                             <a <?php echo "href=\"new_department.php?entity_id=$entity_id\""?> class="btn btn-primary btn-xs float-end ms-2">+ Add Department</a>
                             <a href="#" class="btn btn-secondary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttrModal">+ Add Asset Attribute</a>
+                            <?php if($entity_id == $_SESSION['user']['entity']) {
+                                echo "<a href='includes/entity_sync.php?entity_id=$entity_id&initiator=$initiator_id' class='btn btn-primary btn-xs float-end me-2'>
+                                        Sync Feishu
+                                    </a>";
+                            } ?>
                         </div>
                     </div>
                 </div>
