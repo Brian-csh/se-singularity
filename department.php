@@ -52,6 +52,23 @@ if (isset($_POST['edit_details'])) {
         echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "&name=" . $updated_department_name . "&insert_error'</script>";
     }
 }
+
+if (isset($_POST['define_tag'])) {
+    // Retrieve the selected checkboxes
+    $selectedOptions = $_POST['checkboxOptions'];
+    $departmentid = $_POST['department_id'];
+
+    $template = json_encode($selectedOptions);
+    $sql = "UPDATE department SET template = '$template' WHERE id = '$departmentid'";
+
+    if ($conn->query($sql)) {
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "'</script>";
+    } else {
+     echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid ."&insert_error'</script>";
+    }
+}
+
+$active = $department_name;
 ?>
 
 <div id="layoutSidenav_content">
@@ -92,6 +109,10 @@ if (isset($_POST['edit_details'])) {
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
+
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers" style="margin-right: 10px">Manage Users</a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
                             <?php if($role_id <= 2 && $role_id >=1) {?>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" style="margin-right: 10px">Edit</a>
@@ -180,6 +201,64 @@ if (isset($_POST['edit_details'])) {
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="defineAssetTags" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Define Asset Tags</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="department.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <h6>Current template</h6>
+                            <?php
+                                //obtain the existing template
+                                $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
+                                $result = $conn->query($sql);
+                                if ($result) {
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $row = $result->fetch_assoc();
+                                        $template_string = isset($row['template']) ? $row['template'] : "";
+                                    }
+                                } else {
+                                    exit("No department found with that ID.");
+                                }
+                                $template = json_decode($template_string);
+                                echo "<p>id, name, class, " . implode(", ", $template) . "<br></p>";
+
+                            ?>
+                            <h6>Select contents to be included</h6>
+                            <?php
+                                $checkboxOptions = array(
+                                    'description',
+                                    'entity',
+                                    'department',
+                                    'position',
+                                    'expire',
+                                    'serial number',
+                                    'brand',
+                                    'model'
+                                );
+                                // Generate checkboxes dynamically
+                                foreach ($checkboxOptions as $option) {
+                                    echo '<label>';
+                                    echo '<input type="checkbox" name="checkboxOptions[]" value="' . $option . '"> ' . $option;
+                                    echo '</label><br>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+                    <input type="hidden" name="department_id" value="<?=$department_id?>">
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="define_tag">Submit</button>
                     </div>
                 </form>
             </div>

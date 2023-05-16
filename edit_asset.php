@@ -262,7 +262,7 @@ include "includes/header.php";
                                 if ($image_operation_status == 1) {
                                     echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
                                 } else if ($image_operation_status == -1) {
-                                    echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
+                                    echo '<div class="alert alert-danger" role="alert">Operation Failed</div>';
                                 } else if ($image_operation_status == 2) {
                                     echo '<div class="alert alert-success" role="alert">Successful Removed!</div>';
                                 }
