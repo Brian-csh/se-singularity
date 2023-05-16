@@ -1,5 +1,7 @@
 <?php
 $active = "Dashboard";
+include "includes/header.php";
+include "includes/navbar.php";
 if(!isset($_SESSION)) 
 { 
     session_start(); 
@@ -11,10 +13,6 @@ if(!isset($_SESSION))
 $role = $_SESSION['user']['role'];
 $department = $_SESSION['user']['department'];
 $entity = $_SESSION['user']['entity'];
-
-
-include "includes/header.php";
-include "includes/navbar.php";
 ?>
 
 <div id="layoutSidenav_content">
