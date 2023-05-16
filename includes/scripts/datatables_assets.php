@@ -15,9 +15,24 @@ $department_id = intval($_GET['departmentid']);
 // TODO : for resource manager, load assets in the department and sub-department
 // TODO : for user, just load assets in teh department
 switch ($role_id){
-    case 1: // super admin can't see any asset?
+    case 1: // super admin 
+        //TODO : fetch all the assets
+        $sql = "SELECT * FROM asset WHERE 1=1";
         break;
-    case 2: // admin can't see any asset?
+    case 2: // admin
+        // TODO: fetch departments whose entity is $entity_id
+        $departmentids = array();
+
+        $query = "SELECT * FROM department WHERE entity = $entity_id";
+        $result = $conn->query($query);
+        
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $departmentids[] = $row['departmentid'];
+            }
+        }
+        $departmentids = implode(',',$departmentids);
+        $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
         break;
     case 3: // for resource manager, load assets in the department and sub-department
         $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
