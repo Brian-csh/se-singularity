@@ -1,7 +1,7 @@
 <?php
 
 require "../db/connect.php";
-
+include "../get_subdepartments.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
@@ -20,13 +20,12 @@ switch ($role_id){
     case 2: // admin can't see any asset?
         break;
     case 3: // for resource manager, load assets in the department and sub-department
-        //TODO : 树的遍历 - iteration or recursion
-        // $sql = traverse_department($conn,$departmentid);
-        // $department_id = intval($_GET['departmentid']);
-        $sql = "SELECT * FROM asset WHERE department = $department_id"; // not gonna use this one
+        $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
+        $subdepartmentids = implode(',',$subdepartmentids);
+        $sql = "SELECT * FROM asset WHERE department IN ($subdepartmentids)";
         break;
     case 4: // for user, just load assets in the department
-        // TO-IMPROVE : also load assets in the sub-departments
+        // TO-IMPROVE : also load assets in the sub-departments?
         $sql = "SELECT * FROM asset WHERE department = $department_id";
         break;
     default:
@@ -84,6 +83,13 @@ while($row = $result->fetch_assoc()) {
         $class = "N/A";
     }
 
+    if(isset($row['department'])){
+        $department_id_ = $row['department'];
+        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
+    }else {
+        $department = "N/A";
+    }
+
 
 if($role_id != 4){
     $data[] = array(
@@ -92,16 +98,16 @@ if($role_id != 4){
         "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
         "class" => $class,
         "user" => $user,
-        "price" => $row['price'],
-        "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
+        "department" => $department,
+        // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
         "position" => $row['position'],
         "expire" => $row['expire'], 
         // add Modal for the requests?
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
         "status" => $status,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
-        Info
-        </a>"
+            Edit
+        </a>" // TODO: put icon here
     );
 } else { // user_role_id == 4 (user)
     $data[] = array(
@@ -110,14 +116,14 @@ if($role_id != 4){
         "name" => "<a class='text-primary' href='../../asset_info.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
         "class" => $class,
         "user" => $user,
-        "price" => $row['price'],
-        "description" => strip_tags(substr($row['description'],0,30)) . "...",
+        "department" => $department,
+        // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
         "position" => $row['position'],
         "expire" => $row['expire'],
-        "status" => $status,
-        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"request_asset_status.php?id=".$row['id']."&name=".$row['name']."\">
-        Info
-        </a>"
+        "status" => $status
+        // "actions" => "<a title=\"Asset image\" class=\"btn btn-datatable\" href=\"request_asset_status.php?id=".$row['id']."&name=".$row['name']."\">
+        // Image
+        // </a>"
     );
 }
 }
@@ -133,10 +139,7 @@ $response = array(
     "draw" => $draw,
     "recordsTotal" => $total,
     "recordsFiltered" => $total,
-    "data" => $data,
-    "role" => $role_id,
-    "entity" => $entity_id,
-    "department"=> $department_id
+    "data" => $data
 );
 
 // Send the JSON response

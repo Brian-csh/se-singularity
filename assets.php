@@ -50,8 +50,10 @@ if (isset($_POST['add_class'])) {
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <?php if($role_id <=3){?>
+                                <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
+                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                            <?php }?>
                         </div>
                     </div>
                 </div>
@@ -69,11 +71,15 @@ if (isset($_POST['add_class'])) {
                                 <th>Name</th>
                                 <th>Class</th>
                                 <th>User</th>
-                                <th>Price</th>
-                                <th>Description</th>
+                                <th>Department</th>
+                                <!-- <th>Description</th> -->
                                 <th>Position</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <?php if($role_id == 3){?>
+                                    <th>Edit Asset</th>
+                                <?php } else { ?>
+                                    <!-- <th>Image</th> -->
+                                <?php }?>
                             </tr>
                         </thead>
                         <tbody>
@@ -230,7 +236,24 @@ if (isset($_POST['add_class'])) {
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <!-- DataTables Select JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
-
+    <!-- Styles for DataTables buttons -->
+    <style>
+        button.dt-button.use-button {
+            color: white !important;
+            background: green !important;
+            border-radius: 20px !important;
+        }
+        button.dt-button.return-button {
+            color: white !important;
+            background: red !important;
+            border-radius: 20px !important;
+        }
+        button.dt-button.repair-button {
+            color: white !important;
+            background: blue !important;
+            border-radius: 20px !important;
+        }
+    </style>
     <!-- DataTables Buttons JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script>
@@ -266,27 +289,73 @@ if (isset($_POST['add_class'])) {
                         "data": "user"
                     },
                     {
-                        "data": "price"
+                        "data": "department"
                     },
-                    {
-                        "data": "description"
-                    },
+                    // {
+                        // "data": "description"
+                    // },
                     {
                         "data": "position"
                     },
                     {
                         "data": "status"
                     },
+                    <?php if($role_id < 4){?>
                     {
                         "data": "actions"
                     }
+                    <?php }?>
                 ],
                 select: {
                     style: 'multi'
                 },
                 buttons: [
+                    <?php if($role_id == 4){?>
+                    { 
+                        text: "Use",
+                        className: 'use-button',
+                        action: function(e, dt, node, config) {
+                            var selectedRows = dt.rows({
+                                selected: true
+                            }).data().toArray();
+                            var assetIds = selectedRows.map(function(row) {
+                                return row.id;
+                            });
+
+                            // Perform AJAX request
+                            $.ajax({
+                                url: "includes/scripts/request_assets.php",
+                                method: "POST",
+                                data: {
+                                    assets: assetIds,
+                                    user_id: <?=$user_id?>
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                            // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfully!.")
+                                                }
+                                            }
+                                            dt.ajax.reload(); // Refresh the DataTables
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
+                                }
+                            });
+                        }
+                    },
+                    <?php }?>
                     {
                         text: <?php if($role_id == 4) { ?> 'Return', <?php } else { ?> 'Retire', <?php }?>
+                        className: 'return-button',
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true
@@ -411,48 +480,9 @@ if (isset($_POST['add_class'])) {
                         }
                     }
                     <?php if($role_id == 4){?>
-                    , { 
-                        text: "Use",
-                        action: function(e, dt, node, config) {
-                            var selectedRows = dt.rows({
-                                selected: true
-                            }).data().toArray();
-                            var assetIds = selectedRows.map(function(row) {
-                                return row.id;
-                            });
-
-                            // Perform AJAX request
-                            $.ajax({
-                                url: "includes/scripts/request_assets.php",
-                                method: "POST",
-                                data: {
-                                    assets: assetIds,
-                                    user_id: <?=$user_id?>
-                                },
-                                success: function(response) {
-                                    console.log(response);
-                                            // Perform any additional actions on success
-                                            var data = JSON.parse(response);
-
-                                            for (var i = 0; i<data.result.length; i++){
-                                                console.log(data.result[i]);
-                                                if(data.result[i][1] === false){ // fail
-                                                    // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
-                                                } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfully!.")
-                                                }
-                                            }
-                                            dt.ajax.reload(); // Refresh the DataTables
-                                },
-                                error: function(jqXHR, textStatus, errorThrown) {
-                                    console.error(textStatus, errorThrown);
-                                }
-                            });
-                        }
-                    },
+                    ,
                     { // TODO : handle requests
-                        text:"Repair", 
+                        text:"Repair",
                         action: function(e, dt, node, config) {
                             var selectedRows = dt.rows({
                                 selected: true

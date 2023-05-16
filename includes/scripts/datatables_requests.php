@@ -1,7 +1,7 @@
 <?php
 
 require "../db/connect.php";
-
+require "../get_subdepartments.php";
 // Get the DataTables request parameters
 $draw = intval($_GET['draw']);
 $start = intval($_GET['start']);
@@ -9,10 +9,18 @@ $length = intval($_GET['length']);
 
 $department_id = intval($_GET['department_id']);
 $userid = intval($_GET['user_id']);
+$roleid = intval($_GET['role_id']);
+
+if($roleld < 4){ // manager
+    $subdepartmentids = getALLSubdepartmentIds($department_id,$conn);
+    $subdepartmentids = implode(',',$subdepartmentids);
+    $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
+} else { // user
+    // Fetch data from database table - pending_requests
+    $sql = "SELECT * FROM pending_requests WHERE department = $department_id";
+}
 
 
-// Fetch data from database table - pending_requests
-$sql = "SELECT * FROM pending_requests WHERE department = $department_id";
 
 
 //TODO : searching 

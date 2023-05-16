@@ -264,11 +264,7 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
     return $results;
 }
 
-//TODO : 树的遍历 - iteration
-function traverse_department($conn, $departmentid){
-    
-    return $sql;
-}
+
 
 // HANDLE REQUESTS
 function handle_request($conn, $manager_id,$requestIds,$handle_type){

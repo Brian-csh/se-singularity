@@ -6,7 +6,10 @@ $session_info = $_SESSION;
 $active = 'Create User';
 $errors = "";
 
-
+//TODO :
+// superadmin : can select entity
+// admin1 : entity is already set as the entity the admin belongs to 
+// admin2 : department is also set if admin access here thourugh department page
 if (isset($_POST['submit_changes'])) {
 
     $name = $_POST['name'];
@@ -19,6 +22,7 @@ if (isset($_POST['submit_changes'])) {
     } else { //not entity super
         $entity_head = 0;
     }
+
     $password = $_POST['password'];
     $reenter_password = $_POST['reenter_password'];
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);

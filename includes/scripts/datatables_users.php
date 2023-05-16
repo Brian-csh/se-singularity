@@ -14,7 +14,7 @@ $departmentid = intval($_GET['departmentid']);
 if($roleid == 1){
     $sql = "SELECT * FROM user WHERE 1=1";
 } else if ($roleid == 2){
-    $sql = "SELECT * FROM user WHERE entity = $entityid";
+    $sql = $departmentid != -1? "SELECT * FROM user WHERE entity = $entityid AND department = $departmentid" : "SELECT * FROM user WHERE entity = $entityid";
 } else if ($roleid == 3){
     // TODO : 
     // $departments = getALLSubdepartmentIds($departmentid,$conn);
@@ -70,7 +70,7 @@ while($row = $result->fetch_assoc()) {
         "department" => $department,
         "role" => $role,
         "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_user.php?id=".$row['id']."\">
-        Info
+        edit
         </a>"
     );
 }

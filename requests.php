@@ -4,36 +4,6 @@ $active = "Requests";
 
 include "includes/header.php";
 include "includes/navbar.php";
-
-// if (isset($_GET['departmentid'])) {
-//     $department_id = $_GET['departmentid'];
-// } else {
-//     $department_id = -1;
-// }
-// $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department'] : -1;
-
-
-// if (isset($_GET['id'])) {
-//     $user_id = $_GET['id'];
-// } else {
-//     $user_id = -1;
-// }
-// $user_id = $_SESSION['user']['id'];
-
-// if (isset($_GET['role'])) {
-//     $role_id = $_GET['role'];
-// } else {
-//     $role_id = -1;
-// }
-// $role_id = $_SESSION['user']['role'];
-
-// if (isset($_GET['entityid'])) {
-//     $entity_id = $_GET['entityid'];
-// } else {
-//     $entity_id = -1;
-// }
-// $entity_id = $_SESSION['user']['entity'];
-
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -70,10 +40,10 @@ include "includes/navbar.php";
                                 <th>Initiator</th>
                                 <th>Participant</th>
                                 <th>Asset</th>
-                                <th>Request Type</th>
+                                <th>Request for</th>
                                 <th>Result</th>
-                                <th>Request_time</th>
-                                <th>Review_time</th>
+                                <th>Requested time</th>
+                                <th>Reviewed time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -132,7 +102,7 @@ include "includes/navbar.php";
                     data: function(d) {
                         d.department_id = <?=  $department_id ?>;
                         d.user_id = <?= $user_id ?>;
-                        d.user_role_id = <?= $role_id ?>;
+                        d.role_id = <?= $role_id ?>;
                         d.entity_id = <?= $entity_id?>;
                     }
                 },
@@ -165,6 +135,7 @@ include "includes/navbar.php";
                     style: 'multi'
                 },
                 buttons: [
+                    <?php if($role_id == 3){?>
                     {
                         text : 'Approve',
                         className: 'approve-button',
@@ -245,6 +216,7 @@ include "includes/navbar.php";
                             });
                         }
                     }
+                    <?php }?>
                 ],
                 dom: 'Bfrtip' // Add this line to display buttons
             });

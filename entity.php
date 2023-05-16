@@ -1,5 +1,5 @@
 <?php
-$active = 'Entity #'.$_GET['id'];
+// $active = 'Entity #'.$_GET['id'];
 include "includes/header.php";
 include "includes/navbar.php";
 
@@ -12,6 +12,8 @@ if($role_id == 1){
 } else if ($role_id == 3){
 
 }
+
+echo "<script>document.title = '" . 'Entity #'. $entity_id . ' - Singularity EAM'."';</script>";
 
 // Fetch entity values
 $sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";

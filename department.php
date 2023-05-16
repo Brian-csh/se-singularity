@@ -185,7 +185,7 @@ if (isset($_POST['edit_details'])) {
     <script>
     var btn = document.getElementById('manageUsers');
     btn.addEventListener('click', function() {
-      document.location.href = '/users.php?departmentid=<?= $department_id ?>';
+        document.location.href = '/users.php?departmentid=<?= $department_id ?>';
     });
     </script>
 

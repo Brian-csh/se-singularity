@@ -7,6 +7,9 @@ include "includes/navbar.php";
 //TODO:
 //set department id for cases when admin access users page by manage-user -> department id should be the id of department not the department id of admin
 
+if(isset($_GET['departmentid'])) {
+    $department_id = $_GET['departmentid'];
+}
 ?>
 
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -48,7 +51,7 @@ include "includes/navbar.php";
                             <th>Entity</th>
                             <th>Department</th>
                             <th>Role</th>
-                            <th>Actions</th>
+                            <th>Edit User</th>
                         </tr>
                         </thead>
                     </table>
