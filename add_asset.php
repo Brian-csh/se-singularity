@@ -372,31 +372,31 @@ if (isset($_POST['submit_asset'])) {
                                     </div>
                                 </div>
                                 <div class="card-subheader d-inline">Custom Asset Attributes</div>
-                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
+                                <!-- <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button> -->
                                 <!-- process json stuff -->
                                 <div class="row gx-3 mb-3">
                                     <?php 
-                                        if(!isset($entity_id)) {
-                                            $entity_id = $session_info['user']['entity'];
-                                        }
-                                        #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
-                                        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
-                                        $result = $conn->query($sql);
-                                        if ($result->num_rows > 0) {
-                                            $row = $result->fetch_assoc();
-                                            $custom_attribute_array = json_decode($row["custom_attribute"]);
-                                            $custom_attribute_amt = count($custom_attribute_array);
-                                            if($custom_attribute_amt > 0) {
-                                                foreach ($custom_attribute_array as $string) {
-                                                    echo '
-                                                        <div class="col-md-5">
-                                                            <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
-                                                            <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
-                                                        </div>
-                                                    ';
-                                                }
-                                            }
-                                        }
+                                        // if(!isset($entity_id)) {
+                                        //     $entity_id = $session_info['user']['entity'];
+                                        // }
+                                        // #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
+                                        // $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
+                                        // $result = $conn->query($sql);
+                                        // if ($result->num_rows > 0) {
+                                        //     $row = $result->fetch_assoc();
+                                        //     $custom_attribute_array = json_decode($row["custom_attribute"]);
+                                        //     $custom_attribute_amt = count($custom_attribute_array);
+                                        //     if($custom_attribute_amt > 0) {
+                                        //         foreach ($custom_attribute_array as $string) {
+                                        //             echo '
+                                        //                 <div class="col-md-5">
+                                        //                     <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
+                                        //                     <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
+                                        //                 </div>
+                                        //             ';
+                                        //         }
+                                        //     }
+                                        // }
                                     ?>
                                 </div>
                                 <!-- Form Row -->
