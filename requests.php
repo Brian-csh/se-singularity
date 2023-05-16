@@ -134,7 +134,7 @@ include "includes/navbar.php";
                 <?php if($role_id == 3){?>
                 select: {
                     style: 'multi'
-                },
+                }, 
                 <?php }?>
                 buttons: [
                     <?php if($role_id == 3){?>

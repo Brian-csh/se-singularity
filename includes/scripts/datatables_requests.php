@@ -19,10 +19,10 @@ switch ($roleid){
     case 1: // show all the requests? yes 
         $sql = "SELECT * FROM pending_requests WHERE 1=1";
         break;
-    case 2:
+    case 2: // show all the requests in entity
         $departmentids = getAllDepartmentIds($entityid,$conn);
         $departmentids = implode(',',$departmentids);
-        $sql = "SELECT * FROM asset WHERE department IN ($departmentids)";
+        $sql = "SELECT * FROM pending_requests WHERE department IN ($departmentids)";
         break;
     case 3:
         $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);

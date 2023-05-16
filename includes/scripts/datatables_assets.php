@@ -145,7 +145,6 @@ $response = array(
     "recordsTotal" => $total,
     "recordsFiltered" => $total,
     "data" => $data
-    // "departmentids" => $departmentids
 );
 
 // Send the JSON response
