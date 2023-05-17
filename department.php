@@ -231,7 +231,12 @@ $active = $department_name;
                                     exit("No department found with that ID.");
                                 }
                                 $template = json_decode($template_string);
-                                echo "<p>id, name, class, " . implode(", ", $template) . "<br></p>";
+                                $template_values = is_array($template) ? $template : []; // Ensure $template is an array
+                                $template_value_string = implode(", ", $template_values);
+                                if (!empty($template_value_string)) {
+                                    $template_value_string = ", ".$template_value_string;
+                                }
+                                echo "<p>id, name, class" . $template_value_string . "<br></p>";
 
                             ?>
                             <h6>Select contents to be included</h6>
