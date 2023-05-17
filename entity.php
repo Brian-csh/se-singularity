@@ -239,12 +239,15 @@ if (isset($_POST['create_asset_attribute'])) {
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
-    <script>
-        // Get the element by its href attribute
-        var element = document.querySelector('a[href="/entities.php"]');
-        // Toggle the "active" class
-        element.classList.toggle('active');
-    </script>
+    <?php
+        
+        echo"<script>
+                // Get the element by its href attribute
+                var element = document.querySelector('a[href=\"/entities.php\"]');
+                // Toggle the \"active\" class
+                element.classList.toggle('active');
+        </script>"
+    ?>
     <?php
     include "includes/footer.php";
     ?>

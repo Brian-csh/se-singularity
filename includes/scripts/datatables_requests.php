@@ -24,7 +24,7 @@ switch ($roleid){
         $departmentids = implode(',',$departmentids);
         $sql = "SELECT * FROM pending_requests WHERE department IN ($departmentids)";
         break;
-    case 3:
+    case 3: // show all the requests in the department & sub-departments
         $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
         $subdepartmentids = implode(',',$subdepartmentids);
         $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
