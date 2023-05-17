@@ -5,17 +5,7 @@ include "includes/navbar.php";
 $role = $role_id;
 $department = $department_id;
 $entity = $entity_id;
-// if (isset($_GET['id'])) {
-//     $user_id = $_GET['id'];
-// }
 
-// if (isset($_GET['role'])) {
-//     $user_role = $_GET['role'];
-// }
-
-$role = $_SESSION['user']['role'];
-$department = $_SESSION['user']['department'];
-$entity = $_SESSION['user']['entity'];
 ?>
 
 <div id="layoutSidenav_content">

@@ -7,11 +7,12 @@ include "includes/navbar.php";
 if($role_id == 1){
     //TODO: access department page from entities.php
 } else if ($role_id == 2){
+    // access from entity.php
     $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
 } else if ($role_id == 3){// resource manager
-    if(isset($_GET['departmentid'])){
+    if(isset($_GET['departmentid'])){ // access after editting department name
         $department_id = $_GET['departmentid'];
-    } else {
+    } else { // access through navbar
         $department_id = $department_id;
     }
 } else { //user
@@ -56,15 +57,15 @@ if (isset($_POST['edit_details'])) {
 if (isset($_POST['define_tag'])) {
     // Retrieve the selected checkboxes
     $selectedOptions = $_POST['checkboxOptions'];
-    $departmentid = $_POST['department_id'];
+    $departmentid_ = $_POST['department_id'];
 
     $template = json_encode($selectedOptions);
-    $sql = "UPDATE department SET template = '$template' WHERE id = '$departmentid'";
+    $sql = "UPDATE department SET template = '$template' WHERE id = '$departmentid_'";
 
     if ($conn->query($sql)) {
-        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "'</script>";
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid_ . "'</script>";
     } else {
-     echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid ."&insert_error'</script>";
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid_ ."&insert_error'</script>";
     }
 }
 
@@ -110,10 +111,8 @@ $active = $department_name;
                                 Sub-departments
                             </h1>
 
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers" style="margin-right: 10px">Manage Users</a>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
                             <?php if($role_id <= 2 && $role_id >=1) {?>
+                                <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" style="margin-right: 10px">Edit</a>
                             <?php }?>
@@ -207,6 +206,7 @@ $active = $department_name;
         </div>
     </div>
 
+    Dfine Asset Tag Modal
     <div class="modal fade" id="defineAssetTags" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -282,12 +282,14 @@ $active = $department_name;
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
-    <script>
-        // Get the element by its href attribute
-        var element = document.querySelector('a[href="/entity.php"]');
-        // Toggle the "active" class
-        element.classList.toggle('active');
-    </script>
+    <?php 
+        echo "<script>
+            // Get the element by its href attribute
+            var element = document.querySelector('a[href=\"/entity.php\"]');
+            // Toggle the \"active\" class
+            element.classList.toggle('active');
+        </script>"
+    ?>
     <?php
     include "includes/footer.php";
     ?>

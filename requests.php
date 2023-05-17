@@ -1,5 +1,4 @@
 <?php
-// $sql = "SELECT * FROM asset ORDER BY id DESC";
 $active = "Requests";
 
 include "includes/header.php";

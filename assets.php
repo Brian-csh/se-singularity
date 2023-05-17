@@ -50,8 +50,10 @@ if (isset($_POST['add_class'])) {
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <?php if($role_id <=3){?>
+                            <?php if($role_id <=3 && $role_id >1){?>
                                 <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
+                            <?php }?>
+                            <?php if($role_id <=3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                             <?php }?>
                         </div>
