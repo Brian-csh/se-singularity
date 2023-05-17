@@ -51,7 +51,7 @@ if (isset($_POST['add_class'])) {
                                 <?= $active ?>
                             </h1>
                             <?php if($role_id <=3 && $role_id >1){?>
-                                <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
+                                <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
                             <?php if($role_id <=3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
@@ -347,8 +347,8 @@ if (isset($_POST['add_class'])) {
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                 },
-                                error: function(response) {
-                                    console.error(response);
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error(textStatus, errorThrown);
                                 }
                             });
                         }
