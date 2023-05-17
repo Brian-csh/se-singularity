@@ -27,6 +27,8 @@ function getDepartmentName($id, $conn)
     }
 }
 
+//TODO!!! NULLIF($entity_id, -1) and NULLIF($department_id, -1)
+
 //handle post requests to update user account details
 if (isset($_POST['submit_changes'])) {
     $user_id = $_POST['id'];
@@ -63,8 +65,10 @@ if (isset($_GET['id'])) {
             $current_user_data = mysqli_fetch_assoc($result);
             $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
-            $entity = getEntityName($current_user_data['entity'], $conn);
-            $department_name = getDepartmentName($current_user_data['department'], $conn);
+            $entity_id = isset($current_user_data['entity']) ? $current_user_data['entity'] : -1; //-1 if no entity
+            // $entity = getEntityName($current_user_data['entity'], $conn);
+            $department_id = isset($current_user_data['department']) ? $current_user_data['department'] : -1; //-1 if no department
+            // $department_name = getDepartmentName($current_user_data['department'], $conn);
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
             $locked = $current_user_data['locked'];
@@ -159,8 +163,23 @@ $editor_role = $session_info['role'];
                                     </div>
                                     <!-- Form Group (entity)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <input <?php echo ($editor_role < $current_role) ? "" : "disabled"?> class="form-control" required id="inputEntity" type="text" value="<?php echo $entity ?>" name="entity">
+                                        <label class="small mb-1" for="inputEntity">Entity *</label>
+                                        <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments(inputEntity)" <?php echo ($editor_role < $current_role) ? "" : "disabled"?>>
+                                            <option value="-1">-</option>
+                                            <?php
+                                            $results = $conn->query("SELECT id, name FROM entity");
+                                            while ($row = $results->fetch_assoc()) {
+                                                unset($id, $name);
+                                                $id = $row['id'];
+                                                $name = $row['name'];
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                        <script>
+                                            var selectEntity = document.getElementById('inputEntity');
+                                            selectEntity.value = <?=$entity_id?>;
+                                        </script>
                                     </div>
 
                                 </div>
@@ -168,9 +187,17 @@ $editor_role = $session_info['role'];
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <input <?php echo ($editor_role < $current_role) ? "" : "disabled"?> class="form-control" id="inputDepartment" type="text" value="<?php echo $department_name ?>" name="department">
-                                    </div>
+                                        <label class="small mb-1" for="inputDepartment">Department *</label>
+                                        <select class="form-control" id="inputDepartment" name="department" required <?php echo ($editor_role < $current_role) ? "" : "disabled"?>>
+                                            <option value="-1">-</option>
+                                        </select>
+                                        <script>
+                                            const entityId = <?=$entity_id?>;
+                                            updateDepartments($entityid);
+                                            var selectDepartment = document.getElementById('inputDepartment');
+                                            selectDepartment.value = <?=$department_id?>;
+                                        </script>
+                                    </div>                                    
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
                                         <select <?php echo ($editor_role < $current_role) ? "" : "disabled"?> class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
@@ -224,6 +251,64 @@ $editor_role = $session_info['role'];
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        //!!! NOTE: there's a bug in the ajax script right now
+        function updateDepartments() {
+            let entityId = $('#inputEntity').val();
+
+            $.ajax({
+                url: 'includes/scripts/ajax.php',
+                method: 'POST',
+                data: {
+                    request: 'get_departments',
+                    entity_id: entityId
+                },
+                dataType: 'json',
+                success: function (departments) {
+                    var departmentSelect = $('#inputDepartment');
+                    departmentSelect.empty();
+
+                    // Add the default "Select a Department" option
+                    departmentSelect.append($('<option>', {
+                        value: "-1",
+                        text: "-"
+                    }));
+
+                    // Create a map to store parent departments and their subdepartments
+                    var departmentMap = {};
+
+                    // Separate parent and subdepartments
+                    departments.forEach(function (department) {
+                        if (department.parent === null) {
+                            departmentMap[department.id] = {
+                                name: department.name,
+                                subdepartments: []
+                            };
+                        } else {
+                            departmentMap[department.parent].subdepartments.push(department);
+                        }
+                    });
+
+                    // Add parent departments and their subdepartments to the select element
+                    for (var parentId in departmentMap) {
+                        // Add parent department
+                        departmentSelect.append($('<option>', {
+                            value: parentId,
+                            text: departmentMap[parentId].name
+                        }));
+
+                        // Add subdepartments with indentation
+                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
+                            departmentSelect.append($('<option>', {
+                                value: subdepartment.id,
+                                text: "— " + subdepartment.name // Indentation using an em dash (—)
+                            }));
+                        });
+                    }
+                },
+            });
+        }
+    </script>
 </div>
 
 </html>
