@@ -11,7 +11,8 @@ include "includes/navbar.php";
 $sql = "SELECT * FROM log ORDER BY id DESC";
 
 if($role_id == 3){ // resource manager 
-    require "includes/get_subdepartments.php";
+    // if getsubdepartments isnt declared
+    if(!function_exists('getAllSubdepartmentIds'))require "includes/get_subdepartments.php";
     $subdepartmentids = getAllSubdepartmentIds($department_id, $conn);
     $sql = "SELECT * FROM log WHERE department IN (".implode(',', $subdepartmentids).") ORDER BY id DESC";
 }
@@ -91,7 +92,11 @@ if($role_id == 3){ // resource manager
 
                                 //Fetch Subject
                                 $subject_id = $row["subject"];
-                                $subject = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"))['name'];
+                                $subject_row = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"));
+                                $subject = "";
+                                if(isset($subject_row)){
+                                    $subject = $subject_row['name'];
+                                }
                                 
 
 
