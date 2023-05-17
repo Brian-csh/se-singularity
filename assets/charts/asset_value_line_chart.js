@@ -66,13 +66,13 @@ var valueLineChart = new Chart(ctx, {
             label: "Total Value",
             lineTension: 0.3,
             backgroundColor: "rgba(229, 5, 59, 0.05)",
-            borderColor: "rgba(229, 5, 59, 1)",
+            // borderColor: "rgba(229, 5, 59, 1)",
             pointRadius: 3,
-            pointBackgroundColor: "rgba(229, 5, 59, 1)",
-            pointBorderColor: "rgba(229, 5, 59, 1)",
+            // pointBackgroundColor: "rgba(229, 5, 59, 1)",
+            // pointBorderColor: "rgba(229, 5, 59, 1)",
             pointHoverRadius: 3,
-            pointHoverBackgroundColor: "rgba(229, 5, 59, 1)",
-            pointHoverBorderColor: "rgba(229, 5, 59, 1)",
+            // pointHoverBackgroundColor: "rgba(229, 5, 59, 1)",
+            // pointHoverBorderColor: "rgba(229, 5, 59, 1)",
             pointHitRadius: 10,
             pointBorderWidth: 2,
             data: total_value_data,
@@ -116,7 +116,12 @@ var valueLineChart = new Chart(ctx, {
                     drawBorder: false,
                     borderDash: [2],
                     zeroLineBorderDash: [2]
-                }
+                },
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.PRGn11'
+                        }
+                },
             }]
         },
         legend: {

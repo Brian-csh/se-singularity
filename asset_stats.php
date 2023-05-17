@@ -158,6 +158,7 @@ echo "<script> var asset_value_over_time = JSON.parse('". $asset_value_over_time
           </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-colorschemes/0.4.0/chartjs-plugin-colorschemes.min.js"></script>
         <script src="assets/charts/asset_status_pie.js"></script>
         <script src="assets/charts/asset_department_pie.js"></script>
         <script src="assets/charts/asset_value_line_chart.js"></script>
