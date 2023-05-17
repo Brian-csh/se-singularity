@@ -17,6 +17,7 @@ function getDepartmentName($id, $conn)
 
 session_start();
 $session_info = $_SESSION['user'];
+$role_id = $session_info['role'];
 
 $active = 'Edit User';
 
@@ -161,18 +162,6 @@ if (isset($_GET['id'])) {
                                     </div>
                                 </div>
                                 <!-- Form Row -->
-                                <?php
-                                if ($user_id != $session_info['id'])
-                                    echo "<div class=\"row gx-3 mb-4\">
-                                        <!-- Form Group -->
-                                        <!-- entity super, checkbox-->
-
-                                        <div class=\"col-md-4\">
-                                            <label class=\"small mb-1\" for=\"inputLockAccount\">Lock Account</label>
-                                            <input class=\"form-check-input\" id=\"inputLockAccount\" type=\"checkbox\" name=\"lock_account\" <?php echo ($locked) ? \"checked\" : \"\" ?>>
-                                        </div>
-                                    </div>"
-                                ?>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($user_id == $session_info['id']) ? "disabled" : "" ?> <?php echo ($locked) ? "checked" : "" ?> />
                                     <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
