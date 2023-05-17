@@ -133,31 +133,34 @@ echo "<script> var asset_value_over_time = JSON.parse('". $asset_value_over_time
             <div class="row">
               <h6 class="text-white m-1 mb-4">Total asset count: <?php echo $num_assets ?></h6>
             <div>
-            <div class="row mt-3">
-              <div class="col-lg-6">
-                <!-- sub header -->
-                <h6 class="text-white m-1 mb-4 ml-1">
-                  Status Distribution
-                </h6>
-                <div class="chart-pie w-20 mb-4"><canvas id="assetStatusPieChart"></canvas></div>
-              </div>
+            <?php if($num_assets > 0): ?>
+              <div class="row mt-3">
+                <div class="col-lg-6">
+                  <!-- sub header -->
+                  <h6 class="text-white m-1 mb-4 ml-1">
+                    Status Distribution
+                  </h6>
+                  <div class="chart-pie w-20 mb-4"><canvas id="assetStatusPieChart"></canvas></div>
+                </div>
 
-              <div class="col-lg-6">
-                <h6 class="text-white m-1 mb-4">
-                  Department Distribution
-                </h6>
-                <div class="chart-pie w-20 mb-4"><canvas id="assetDepartmentPieChart"></canvas></div>
+                <div class="col-lg-6">
+                  <h6 class="text-white m-1 mb-4">
+                    Department Distribution
+                  </h6>
+                  <div class="chart-pie w-20 mb-4"><canvas id="assetDepartmentPieChart"></canvas></div>
+                </div>
               </div>
-            </div>
-            <div class="row mt-3">
-              <h6 class="text-white m-1 mb-4">
-                Total Value Over Time
-              </h6>
-              <div class="chart-area mb-4 mb-lg-0" style="height: 20rem"><canvas id="valueLineChart" width="100%" height="30"></canvas></div>
-            </div>
+              <div class="row mt-3">
+                <h6 class="text-white m-1 mb-4">
+                  Total Value Over Time
+                </h6>
+                <div class="chart-area mb-4 mb-lg-0" style="height: 20rem"><canvas id="valueLineChart" width="100%" height="30"></canvas></div>
+              </div>
+            <?php endif; ?>
           </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-colorschemes/0.4.0/chartjs-plugin-colorschemes.min.js"></script>
         <script src="assets/charts/asset_status_pie.js"></script>
         <script src="assets/charts/asset_department_pie.js"></script>
         <script src="assets/charts/asset_value_line_chart.js"></script>

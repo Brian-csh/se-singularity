@@ -54,7 +54,7 @@ if (isset($_POST['submit_asset'])) {
       }
     $asset_class = $_POST['asset_class'];
     $department = $_POST['department'];
-    $asset_user = $_POST['asset_user'];
+    $asset_user = $_SESSION['user']['id']; // this user
     $price = $_POST['price'];
     $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
@@ -306,8 +306,8 @@ if (isset($_POST['submit_asset'])) {
                                     <!-- TODO display only asset classes associated with each entity -->
                                     <!-- Form Group (asset class)-->
                                     <div class="col-md-3">
-                                        <label class="small mb-1" for="inputClass">Asset Class</label>
-                                        <select class="form-control" id="inputClass" name="asset_class">
+                                        <label class="small mb-1" for="inputClass">Asset Class *</label>
+                                        <select required class="form-control" id="inputClass" name="asset_class">
                                             <option value="">Select an Asset Class</option>
 
                                             <?php
@@ -358,22 +358,6 @@ if (isset($_POST['submit_asset'])) {
                                         </select>
                                     </div>
 
-                                    <!-- Form Group (user)-->
-                                    <div class="col-md-3">
-                                        <label class="small mb-1" for="inputUser">User</label>
-                                        <select class="form-control" id="inputUser" name="asset_user">
-                                            <option value="">Select a User</option>
-                                            <?php
-                                            $results = $conn->query("SELECT id, name FROM user");
-                                            while ($row = $results->fetch_assoc()) {
-                                                unset($id, $name);
-                                                $id = $row['id'];
-                                                $name = $row['name'];
-                                                echo '<option value="' . $id . '">' . $name . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
                                 </div>
                                 <div class="row gx-3 mb-3">
                                     <!-- Asset Location -->
