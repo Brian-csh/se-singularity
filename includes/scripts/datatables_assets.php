@@ -102,7 +102,7 @@ if($roleid < 4){ // super admin, admin, resource manager
         "user" => $user,
         "department" => $department,
         // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
-        "position" => $row['position'],
+        "position" => $row['position'] ? $row['position'] : "--",
         "expire" => $row['expire'], 
         // add Modal for the requests?
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,

@@ -16,8 +16,10 @@ $departmentid = intval($_GET['departmentid']);
 if($roleid == 1){
     if($departmentid == -1){
         $sql = "SELECT * FROM user WHERE 1=1";
-    } else {
-        $sql = "SELECT * FROM user WHERE department = $departmentid";
+    } else {//access through manage user
+        $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
+        $subdepartmentids = implode(',',$subdepartmentids);
+        $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";
     }
 } else if ($roleid == 2){
     if($departmentid == -1){//access through navbar
@@ -86,7 +88,8 @@ while($row = $result->fetch_assoc()) {
         $data[] = array(
             "id" => $row['id'],
             "date_registered" => gmdate("Y.m.d \ | H:i:s", $row['date_created']),
-            "name" => "<a class='text-primary' href='/edit_user.php?id=".$row['id']."'>". $row['name']."</a>",
+            // "name" => "<a class='text-primary' href='/edit_user.php?id=".$row['id']."'>". $row['name']."</a>",
+            "name" => $row['name'],
             "entity" => $entity,
             "department" => $department,
             "role" => $role,
