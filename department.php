@@ -206,7 +206,7 @@ $active = $department_name;
         </div>
     </div>
 
-    Dfine Asset Tag Modal
+    <!-- Define Asset Tag Modal -->
     <div class="modal fade" id="defineAssetTags" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
