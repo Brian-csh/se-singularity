@@ -366,7 +366,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
                     }
                     // leave log
-                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$time);
+                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$handle_type,$time);
                     break;
                 case 4:// request move
                     if($handle_type == 1){
@@ -378,7 +378,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
                     }
                     // leave log
-                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$time);
+                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$handle_type,$time);
                     break;
                 default:
                     break;
