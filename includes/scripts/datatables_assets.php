@@ -53,7 +53,6 @@ if (isset($_GET['search']['value'])) {
     }
 }
 $sql .= " ORDER BY status ASC LIMIT $start, $length";
-
 $result = $conn->query($sql);
 
 $data = array();

@@ -1,6 +1,5 @@
 <?php
 include "includes/db/connect.php";
-
 //return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn)
 {
@@ -17,7 +16,6 @@ function getDepartmentName($id, $conn)
 
 session_start();
 $session_info = $_SESSION['user'];
-
 $active = 'Edit User';
 
 //set up inital value of the form

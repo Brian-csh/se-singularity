@@ -347,8 +347,8 @@ if (isset($_POST['add_class'])) {
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                 },
-                                error: function(jqXHR, textStatus, errorThrown) {
-                                    console.error(textStatus, errorThrown);
+                                error: function(response) {
+                                    console.error(response);
                                 }
                             });
                         }
