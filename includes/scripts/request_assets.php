@@ -1,7 +1,7 @@
 <?php
 
 require "../db/connect.php";
-include "functions.php";
+require "functions.php";
 // Get asset IDs from POST data
 $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
 
@@ -21,9 +21,8 @@ if (empty($assetIds)) {
     $responseJson = json_encode($responseData);
 
     // Send the response
-    header('Content-Type : application/json');
+//    header('Content-Type : application/json');
     echo $responseJson;
 
 }
 $conn->close();
-?>
