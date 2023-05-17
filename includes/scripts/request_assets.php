@@ -15,14 +15,14 @@ if (empty($assetIds)) {
     //MAKE request to manager(leaves log at the same time)
     $results = make_request($conn,$user_id,null,$assetIds,1); // can only IDLE assets
 
-    $responseData = array('result' => $results);
-
-    //Encode the array as JSON
-    $responseJson = json_encode($responseData);
-
-    // Send the response
-//    header('Content-Type : application/json');
-    echo $responseJson;
+//    $responseData = array('result' => $results);
+//
+//    //Encode the array as JSON
+//    $responseJson = json_encode($responseData);
+//
+//    // Send the response
+////    header('Content-Type : application/json');
+//    echo $responseJson;
 
 }
 $conn->close();
