@@ -5,21 +5,51 @@ include "includes/db/connect.php";
 function getEntityName($id, $conn)
 {
     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
-    return mysqli_fetch_array($conn->query($sql_entity))['name'];
+    $row = mysqli_fetch_array($conn->query($sql_entity));
+    if (isset($row['name'])) {
+        return $row['name'];
+    } else {
+        return "";
+    }
 }
 
 //return the name of the department corresponding to @param int $id
 function getDepartmentName($id, $conn)
 {
     $sql_department = "SELECT name FROM department WHERE id = '$id'";
-    return mysqli_fetch_array($conn->query($sql_department))['name'];
+    $row = mysqli_fetch_array($conn->query($sql_department))['name'];
+    if (isset($row['name'])) {
+        return $row['name'];
+    } else {
+        return "";
+    }
 }
 
-session_start();
-$session_info = $_SESSION['user'];
-$role_id = $session_info['role'];
+//handle post requests to update user account details
+if (isset($_POST['submit_changes'])) {
+    $user_id = $_POST['id'];
+    $role_id = $_POST['role'];
+    $locked = isset($_POST['lock_account']) ? 1 : 0;
 
-$active = 'Edit User';
+    if (isset($_POST['password']) and $_POST['password'] !== "") {
+        $password = $_POST['password'];
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "UPDATE user SET password = '$hashed_password', role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
+        if ($conn->query($sql)) {
+            header('Location: users.php');
+        } else {
+            header("Location: edit_user.php?id=$user_id&insert_error");
+        }
+    } else  {
+        $sql = "UPDATE user SET role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
+        if ($conn->query($sql)) {
+            header('Location: users.php');
+        } else {
+            header("Location: edit_user.php?id=$user_id&insert_error");
+        }
+    }
+}
 
 //set up inital value of the form
 if (isset($_GET['id'])) {
@@ -41,7 +71,10 @@ if (isset($_GET['id'])) {
 } else {
     header('Location: users.php');
 }
-
+$active = 'Edit User';
+include "includes/header.php";
+$session_info = $_SESSION['user'];
+$editor_role = $session_info['role'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,20 +134,6 @@ if (isset($_GET['id'])) {
 
 <div id="layoutSidenav_content">
     <main>
-        <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
-            <div class="container-fluid px-4">
-                <div class="page-header-content">
-                    <div class="row align-items-center justify-content-between pt-3">
-                        <div class="col-auto mb-3">
-                            <h1 class="page-header-title">
-                                <div class="page-header-icon"><i data-feather="briefcase"></i></div>
-                                User
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
         <!-- Main page content-->
         <div class="container-xl px-4 mt-4 py-3">
             <!-- Account page navigation-->
@@ -127,8 +146,8 @@ if (isset($_GET['id'])) {
                             <?php
                             if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
-                            <?php echo  "<p style=\"color: gray;\">date joined: " . $last_modified . "</p>" ?>
-                            <form method="post" action="update_user.php">
+                            <?php echo  "<p style=\"color: gray;\">Date Joined: " . $last_modified . "</p>" ?>
+                            <form method="post" action="edit_user.php">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
@@ -162,10 +181,13 @@ if (isset($_GET['id'])) {
                                     </div>
                                 </div>
                                 <!-- Form Row -->
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($user_id == $session_info['id']) ? "disabled" : "" ?> <?php echo ($locked) ? "checked" : "" ?> />
-                                    <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
-                                </div>
+                                <?php   
+                                    if ($editor_role < $current_role)                                  
+                                        echo '<div class="form-check form-switch">
+                                            <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" ' . (($locked) ? "checked" : "") . ' />
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
+                                        </div>';
+                                ?>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
