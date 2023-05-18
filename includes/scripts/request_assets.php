@@ -21,7 +21,6 @@ if (empty($assetIds)) {
     $responseJson = json_encode($responseData);
 
     // Send the response
-    header('Content-Type : application/json');
     echo $responseJson;
 
 }

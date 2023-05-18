@@ -50,7 +50,6 @@ $conn->close();
         $responseJson = json_encode($responseData);
 
         // Send the response
-        header('Content-Type : application/json');
         echo $responseJson;
     }
     $conn->close();
