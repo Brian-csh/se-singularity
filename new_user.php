@@ -164,7 +164,7 @@ if (isset($_POST['submit_changes'])) {
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
                                         <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select a Department</option>
+                                            <option value="">Select an Entity</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -227,6 +227,15 @@ if (isset($_POST['submit_changes'])) {
         function updateDepartments() {
             let entityId = $('#inputEntity').val();
 
+            if (entityId === "") {
+                $('#inputDepartment').empty();
+                $('#inputDepartment').append($('<option>', {
+                    value: "",
+                    text: "Select an Entity"
+                }));
+                return;
+            }
+
             $.ajax({
                 url: 'includes/scripts/ajax.php',
                 method: 'POST',
@@ -235,7 +244,7 @@ if (isset($_POST['submit_changes'])) {
                     entity_id: entityId
                 },
                 dataType: 'json',
-                success: function (departments) {
+                success: function populateDepartments(departments) {
                     var departmentSelect = $('#inputDepartment');
                     departmentSelect.empty();
 
@@ -256,27 +265,32 @@ if (isset($_POST['submit_changes'])) {
                                 subdepartments: []
                             };
                         } else {
-                            departmentMap[department.parent].subdepartments.push(department);
+                            if (departmentMap[department.parent]) {
+                                departmentMap[department.parent].subdepartments.push(department);
+                            }
                         }
                     });
 
                     // Add parent departments and their subdepartments to the select element
                     for (var parentId in departmentMap) {
-                        // Add parent department
-                        departmentSelect.append($('<option>', {
-                            value: parentId,
-                            text: departmentMap[parentId].name
-                        }));
+                // Add parent department
+                departmentSelect.append($('<option>', {
+                    value: parentId,
+                    text: departmentMap[parentId].name
+                }));
 
-                        // Add subdepartments with indentation
-                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                            departmentSelect.append($('<option>', {
-                                value: subdepartment.id,
-                                text: "— " + subdepartment.name // Indentation using an em dash (—)
-                            }));
-                        });
-                    }
-                },
+                // Add subdepartments with indentation
+                departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
+                    departmentSelect.append($('<option>', {
+                        value: subdepartment.id,
+                        text: "— " + subdepartment.name // Indentation using an em dash (—)
+                    }));
+                });
+            }
+        },
+                error: function (error) {
+                    console.log(error);
+                }
             });
         }
     </script>
