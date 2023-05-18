@@ -8,43 +8,43 @@ $active = 'Add Asset';
 $errors = "";
 $custom_attribute_errors = "";
 
-if (isset($_POST['add_custom_attribute'])) {
-    $attribute = $_POST['custom_attribute'];
-    // todo: check for dups
-    if (!strpos($attribute, ',')) {
-        if(isset($_POST['entity'])) {
-            $custom_entity_id = $_POST['entity'];
-        }
-        else {
-            $custom_entity_id = $session_info['user']['entity'];
-        }
-        $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
-        $result = $conn->query($sql);
+// if (isset($_POST['add_custom_attribute'])) {
+//     $attribute = $_POST['custom_attribute'];
+//     // todo: check for dups
+//     if (!strpos($attribute, ',')) {
+//         if(isset($_POST['entity'])) {
+//             $custom_entity_id = $_POST['entity'];
+//         }
+//         else {
+//             $custom_entity_id = $session_info['user']['entity'];
+//         }
+//         $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$custom_entity_id'";
+//         $result = $conn->query($sql);
     
-        if ($result->num_rows > 0) {
-            // Update the existing row with the new attribute value
-            $row = $result->fetch_assoc();
-            $custom_attribute_array = json_decode($row["custom_attribute"]);
-            if (is_array($custom_attribute_array)) {
-                array_push($custom_attribute_array, $attribute);
-            } else {
-                $custom_attribute_array = array($attribute);
-            }
-            $custom_attribute_array = json_encode($custom_attribute_array);
-            $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE entity_id = $custom_entity_id";
-            if ($conn->query($sql) === FALSE) {
-                echo "Error updating record: " . $conn->error;
-            }
-        } else {
-            // Insert a new row with the attribute value
-            $custom_attribute_array = json_encode(array($attribute));
-            $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$custom_entity_id', '$custom_attribute_array')";
-            if ($conn->query($sql) === FALSE) {
-                echo "Error inserting record: " . $conn->error;
-            }
-        }
-    }
-}
+//         if ($result->num_rows > 0) {
+//             // Update the existing row with the new attribute value
+//             $row = $result->fetch_assoc();
+//             $custom_attribute_array = json_decode($row["custom_attribute"]);
+//             if (is_array($custom_attribute_array)) {
+//                 array_push($custom_attribute_array, $attribute);
+//             } else {
+//                 $custom_attribute_array = array($attribute);
+//             }
+//             $custom_attribute_array = json_encode($custom_attribute_array);
+//             $sql = "UPDATE asset_attribute SET custom_attribute = '$custom_attribute_array' WHERE entity_id = $custom_entity_id";
+//             if ($conn->query($sql) === FALSE) {
+//                 echo "Error updating record: " . $conn->error;
+//             }
+//         } else {
+//             // Insert a new row with the attribute value
+//             $custom_attribute_array = json_encode(array($attribute));
+//             $sql = "INSERT INTO asset_attribute (entity_id, custom_attribute) VALUES ('$custom_entity_id', '$custom_attribute_array')";
+//             if ($conn->query($sql) === FALSE) {
+//                 echo "Error inserting record: " . $conn->error;
+//             }
+//         }
+//     }
+// }
 
 if (isset($_POST['submit_asset'])) {
     $name = $_POST['name'];
@@ -105,7 +105,7 @@ if (isset($_POST['submit_asset'])) {
     }
 
     $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created, status, image) 
-    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1', $image_url)";
+    VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1', '$image_url')";
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
@@ -383,32 +383,6 @@ if (isset($_POST['submit_asset'])) {
 
                                 <div class="card-subheader">Custom Asset Attributes</div>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ Add Custom Atributes</button>
-                                <!-- process json stuff -->
-                                <div class="row gx-3 mb-3">
-                                    <?php 
-                                        // if(!isset($entity_id)) {
-                                        //     $entity_id = $session_info['user']['entity'];
-                                        // }
-                                        // #TODO: (Low priority) set entity id based on what superadmin picks in the entity field
-                                        // $sql = "SELECT custom_attribute FROM asset_attribute WHERE entity_id = '$entity_id'";
-                                        // $result = $conn->query($sql);
-                                        // if ($result->num_rows > 0) {
-                                        //     $row = $result->fetch_assoc();
-                                        //     $custom_attribute_array = json_decode($row["custom_attribute"]);
-                                        //     $custom_attribute_amt = count($custom_attribute_array);
-                                        //     if($custom_attribute_amt > 0) {
-                                        //         foreach ($custom_attribute_array as $string) {
-                                        //             echo '
-                                        //                 <div class="col-md-5">
-                                        //                     <label class="small mb-1" for="input' . $string . '">' . $string . '</label>
-                                        //                     <input type="text" class="form-control" name="' . strtolower(str_replace(' ', '', $string)) . '" id="input' . $string . '">
-                                        //                 </div>
-                                        //             ';
-                                        //         }
-                                        //     }
-                                        // }
-                                    ?>
-                                </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <div class="col-md-12">

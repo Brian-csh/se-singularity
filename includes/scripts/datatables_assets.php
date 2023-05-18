@@ -97,7 +97,7 @@ if($roleid < 4){ // super admin, admin, resource manager
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
-        "name" => "<a class='text-primary' href='/asset.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        "name" => "<a class='text-primary' href='/asset.php?assetid=".$row['id']."'>". $row['name']."</a>",
         "class" => $class,
         "user" => $user,
         "department" => $department,
