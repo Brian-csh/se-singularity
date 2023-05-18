@@ -40,7 +40,7 @@ class Notification
     public $viewed;
 
     // construct
-    public function __construct($asset_id, $asset_name, $link, $type, $time)
+    public function __construct($asset_id, $asset_name, $message, $link, $type, $time)
     {
         $this->asset_id = $asset_id;
         $this->asset_name = $asset_name;
@@ -51,7 +51,7 @@ class Notification
 
         switch ($type) {
             case 1:
-                $this->message = $this->asset_name . " is due for maintenance";
+                $this->message = $this->asset_name . " ". $message;
                 $this->title = "Depreciation Warning";
                 break;
             case 2:
@@ -64,17 +64,43 @@ class Notification
         }
     }
 }
+// Each department has its own warning policy
+// Warning policies are not inherited from parent departments
 // default warning policy: 
 // if asset is 30 days from being expired, and not in status 1 2 6 7 9
 // OR
 // ＮＶＭ　we dont have amount assets. todo if we do do amt assets: if the asset is a amount asset and the amount reaches 0 
 // create a notification
 
+$department = $session_info['department'];
+$role = $session_info['role'];
+
+// defaults
 $days_to_add = 30;
 $included_statuses = [1, 2, 6, 7, 9];
 $included_list = implode(',', $included_statuses);
-$department = $session_info['department'];
-$role = $session_info['role'];
+$message = "requries maintenance";
+$classes = [];	
+
+// // get warning policy
+$sql = "SELECT * FROM department WHERE id = '$department'";
+$result = mysqli_query($conn, $sql);
+$warning_policy = mysqli_fetch_assoc($result)['warning_policy'];
+if($warning_policy != null) {
+    $warning_policy = json_decode($warning_policy, true);
+    $days_to_add = $warning_policy['date_policy'];
+    $included_statuses = $warning_policy['status_policies'];
+    $message = $warning_policy['message_policy'];
+    $included_list = implode(',', $included_statuses);
+    $classes = $warning_policy['class_policy'];
+}
+
+if(!empty($classes)){
+    $classes = implode(',', $classes);
+}
+else{
+    $classes = "";
+}
 
 $notifications = array();
 
@@ -84,10 +110,14 @@ if(isset($department) && $role != 4){
     $department_list = implode(',', $subdepartmentIds);
 
     $sql = "SELECT * FROM asset 
-            WHERE department IN ($department_list) 
-            AND status IN ($included_list) 
-            AND expire IS NOT NULL
-            AND expire < NOW() + INTERVAL $days_to_add DAY";
+        WHERE department IN ($department_list) 
+        AND status IN ($included_list) 
+        AND expire IS NOT NULL
+        AND expire < NOW() + INTERVAL $days_to_add DAY";
+
+    if (!empty($classes)) {
+        $sql .= " AND class IN ($classes)";
+    }
 
     // Prepare and execute the query with the department ID parameter
     $stmt = $conn->prepare($sql);
@@ -106,7 +136,7 @@ if(isset($department) && $role != 4){
         $link = $primary_url."edit_asset.php?id=$asset_id";
         $type = 1; // Asset depreciation warning
         $time = $asset['expire'];
-        $notification = new Notification($asset_id, $asset_name, $link, $type, $time);
+        $notification = new Notification($asset_id, $asset_name, $message, $link, $type, $time);
         $notifications[] = $notification;
     }
 }

@@ -400,7 +400,7 @@ if (isset($_POST['delete_image'])) {
                                             <tr>
                                                 <th>Current Price</th>
                                                 <td><?php 
-                                                if(!calculate_price($asset_data, time())){
+                                                if(calculate_price($asset_data, time()) == -1){
                                                     echo "No expire date set to calculate current price";
                                                 }
                                                 else{
