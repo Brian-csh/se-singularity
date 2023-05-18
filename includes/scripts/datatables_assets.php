@@ -107,7 +107,7 @@ if($roleid < 4){ // super admin, admin, resource manager
         // add Modal for the requests?
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
         "status" => $status,
-        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
+        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?assetid=".$row['id']."\">
             Edit
         </a>" // TODO: put icon here
     );
@@ -115,17 +115,13 @@ if($roleid < 4){ // super admin, admin, resource manager
     $data[] = array(
         "id" => $row['id'],
         "parent" => $parent,
-        "name" => "<a class='text-primary' href='../../asset_info.php?id=".$row['id']."&name=".$row['name']."'>". $row['name']."</a>",
+        "name" => "<a class='text-primary' href='../../asset_info.php?assetid=".$row['id']."'>". $row['name']."</a>",
         "class" => $class,
         "user" => $user,
         "department" => $department,
-        // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
         "position" => $row['position'],
         "expire" => $row['expire'],
         "status" => $status
-        // "actions" => "<a title=\"Asset image\" class=\"btn btn-datatable\" href=\"request_asset_status.php?id=".$row['id']."&name=".$row['name']."\">
-        // Image
-        // </a>"
     );
 }
 }
