@@ -112,8 +112,8 @@ $active = $department_name;
                                 Sub-departments
                             </h1>
 
-                            <?php if($role_id <= 2 && $role_id >=1) {?>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
+                            <?php if($role_id <= 2 && $role_id >=1) {?>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers" style="margin-right: 10px">Manage Users </a>
                             <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" style="margin-right: 10px">Edit</a>
                             <?php }?>

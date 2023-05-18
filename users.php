@@ -12,8 +12,8 @@ include "includes/navbar.php";
 
 switch($role_id){
     case 1:
-        // 1. access through navbar
-        // 2. access through manage-user
+        // -1 -> access through navbar
+        // GET -> access through manage-user
         $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
         break;
     case 2:
@@ -141,9 +141,9 @@ switch($role_id){
                     }
                     <?php }?>
                 ],
-                select: {
-                    style: 'multi'
-                },
+                // select: {
+                //     style: 'multi'
+                // },
             });
         });
     </script>

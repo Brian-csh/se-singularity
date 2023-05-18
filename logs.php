@@ -93,7 +93,7 @@ if($role_id == 3){ // resource manager
                                 //Fetch Subject
                                 $subject_id = $row["subject"];
                                 $subject_row = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$subject_id'"));
-                                $subject = "";
+                                $subject = "--";
                                 if(isset($subject_row)){
                                     $subject = $subject_row['name'];
                                 }
@@ -103,7 +103,8 @@ if($role_id == 3){ // resource manager
                                 //Fetch Depatment
                                 $department_id_ = $row["department"];
                                 //? if department is -1, then its `By` is admin or superadmin
-                                $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
+                                $department =  mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
+
                                                                 
                                 if($role_id == 1){
                                     //? if department is -1, then its `By` is admin or superadmin

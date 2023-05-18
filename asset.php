@@ -1,19 +1,19 @@
 <?php
 include "includes/db/connect.php";
 
-if (isset($_GET['id'])) {
-    $asset_id = $_GET['id'];
+if (isset($_GET['assetid'])) {
+    $asset_id_ = $_GET['assetid'];
 }
 
 if (isset($_POST['print'])) { //print asset tag
-    $tag_url = "asset_tag.php?id=".$asset_id;
+    $tag_url = "asset_tag.php?id=".$asset_id_;
 
     //redirect to asset tag page
     header("Location: ".$tag_url);
 }
 
 //fetch the asset entry
-$sql = "SELECT * FROM asset WHERE id = $asset_id LIMIT 1";
+$sql = "SELECT * FROM asset WHERE id = $asset_id_ LIMIT 1";
 $result = $conn->query($sql);
 if ($result) {
     $row = $result->fetch_assoc();
@@ -26,7 +26,7 @@ $active = "Asset";
 include "includes/header.php";
 
 // Fetch asset name
-$asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+$asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id_'"))['name'];
 
 ?>
 
@@ -60,7 +60,7 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                             </h1>
                             <div class="page-header-subtitle">
                             <?php
-                            $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
+                            $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id_' LIMIT 1";
                             $result = $conn->query($sql_asset);
 
                             if ($result&&mysqli_num_rows($result) > 0) {
@@ -70,7 +70,7 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                             echo "Date Created: {$date_create}<br>";
 
                             // Fetch logs
-                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id') ORDER BY date DESC";
+                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id_') ORDER BY date DESC";
                             $result = $conn->query($sql_log);
 
                             ?>
@@ -140,7 +140,7 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                             ?>
                         </tbody>
                     </table>
-                    <form method="post" action="asset.php?id=<?=$asset_id?>">
+                    <form method="post" action="asset.php?assetid=<?=$asset_id_?>">
                         <button type="submit" name="print" class="btn btn-primary btn-xs float-end">Asset Tag</a>
                     </form>
                 </div>
