@@ -184,12 +184,11 @@ $editor_role = $session_info['role'];
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department *</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required <?php echo ($editor_role < $current_role) ? "" : "disabled"?>>
+                                        <select class="form-control" id="inputDepartment" name="department" required <?php echo ($editor_role < $current_role) ? "" : "disabled"?> <?php echo "value=".$department_id?>>
                                             <option value="-1">-</option>
                                         </select>
                                         <script>
-                                            const entityId = <?=$entity_id?>;
-                                            updateDepartments($entityid);
+
                                             var selectDepartment = document.getElementById('inputDepartment');
                                             selectDepartment.value = <?=$department_id?>;
                                         </script>
@@ -248,9 +247,17 @@ $editor_role = $session_info['role'];
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <script>
-        //!!! NOTE: there's a bug in the ajax script right now
         function updateDepartments() {
             let entityId = $('#inputEntity').val();
+
+            if (entityId === "") {
+                $('#inputDepartment').empty();
+                $('#inputDepartment').append($('<option>', {
+                    value: "",
+                    text: "Select an Entity"
+                }));
+                return;
+            }
 
             $.ajax({
                 url: 'includes/scripts/ajax.php',
@@ -260,14 +267,14 @@ $editor_role = $session_info['role'];
                     entity_id: entityId
                 },
                 dataType: 'json',
-                success: function (departments) {
+                success: function populateDepartments(departments) {
                     var departmentSelect = $('#inputDepartment');
                     departmentSelect.empty();
 
                     // Add the default "Select a Department" option
                     departmentSelect.append($('<option>', {
-                        value: "-1",
-                        text: "-"
+                        value: "",
+                        text: "Select a Department"
                     }));
 
                     // Create a map to store parent departments and their subdepartments
@@ -281,29 +288,41 @@ $editor_role = $session_info['role'];
                                 subdepartments: []
                             };
                         } else {
-                            departmentMap[department.parent].subdepartments.push(department);
+                            if (departmentMap[department.parent]) {
+                                departmentMap[department.parent].subdepartments.push(department);
+                            }
                         }
                     });
 
                     // Add parent departments and their subdepartments to the select element
                     for (var parentId in departmentMap) {
-                        // Add parent department
-                        departmentSelect.append($('<option>', {
-                            value: parentId,
-                            text: departmentMap[parentId].name
-                        }));
+                // Add parent department
+                departmentSelect.append($('<option>', {
+                    value: parentId,
+                    text: departmentMap[parentId].name
+                }));
 
-                        // Add subdepartments with indentation
-                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                            departmentSelect.append($('<option>', {
-                                value: subdepartment.id,
-                                text: "— " + subdepartment.name // Indentation using an em dash (—)
-                            }));
-                        });
-                    }
-                },
+                // Add subdepartments with indentation
+                departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
+                    departmentSelect.append($('<option>', {
+                        value: subdepartment.id,
+                        text: "— " + subdepartment.name // Indentation using an em dash (—)
+                    }));
+                });
+            }
+        },
+                error: function (error) {
+                    console.log(error);
+                }
             });
         }
+        updateDepartments();
+        window.onload = function(){
+            let depSelector = document.querySelector('#inputDepartment');
+            depSelector.value = <?=$department_id?>
+        };
+        
+
     </script>
 </div>
 
