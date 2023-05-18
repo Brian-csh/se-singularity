@@ -5,6 +5,8 @@ $active = "Assets";
 include "includes/header.php";
 include "includes/navbar.php";
 
+$class_entity_id = $session_info['entity'];
+
 if (isset($_POST['add_class'])) {
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {
@@ -16,11 +18,11 @@ if (isset($_POST['add_class'])) {
     }
     if (isset($_POST['class_parent']) && $_POST['class_parent']) {
         $parent = $_POST['class_parent'];
-        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type) 
-        VALUES ('$name', '$parent', '$class_type')";
+        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type, entity) 
+        VALUES ('$name', '$parent', '$class_type', '$class_entity_id')";
     } else {
-        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type) 
-        VALUES ('$name', NULL, '$class_type')";
+        $sql_add_class = "INSERT INTO asset_class (name, parent, class_type, entity) 
+        VALUES ('$name', NULL, '$class_type', '$class_entity_id')";
     }
     if ($conn->query($sql_add_class)) {
         // TODO: create a popup for success
@@ -28,6 +30,29 @@ if (isset($_POST['add_class'])) {
         echo "Error.";
     }
 }
+
+
+// get all asset classes in this entity
+$sql = "SELECT * FROM asset_class WHERE entity = '$class_entity_id'";
+$result = mysqli_query($conn, $sql);
+$asset_classes = array();
+while($row = mysqli_fetch_assoc($result)) {
+    $asset_obj = array(
+        "value" => intval($row['id']),
+        "label" => $row['name'],
+        "selected" => false
+    );
+    $asset_classes[] = $asset_obj;
+}
+$asset_classes = json_encode($asset_classes);
+
+$hidden_name = "class_parent";
+
+echo "<script> 
+        var asset_classes = JSON.parse('". $asset_classes ."'); 
+        var hidden_name = JSON.parse('". json_encode($hidden_name) ."'); 
+    </script>";
+
 ?>
 <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
 
@@ -51,7 +76,7 @@ if (isset($_POST['add_class'])) {
                                 <?= $active ?>
                             </h1>
                             <?php if($role_id <=3 && $role_id >1){?>
-                                <a href="add_asset.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
+                                <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
                             <?php if($role_id <=3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
@@ -74,7 +99,7 @@ if (isset($_POST['add_class'])) {
                                 <th>Class</th>
                                 <th>User</th>
                                 <th>Department</th>
-                                <!-- <th>Description</th> -->
+                                <th>Expiration Date</th>
                                 <th>Position</th>
                                 <th>Status</th>
                                 <?php if($role_id < 4){?>
@@ -119,23 +144,15 @@ if (isset($_POST['add_class'])) {
                             <label for="classValueType">Amount Asset</label><br>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mt-1">
                             <label for="classAddName">Parent Class<label>
-                                    <select class="form-control ms-2" id="inputParentClass" name="class_parent">
-                                        <option value="">Select a Parent Class</option>
-                                        <?php
-                                        $results = $conn->query("SELECT id, name FROM asset_class");
-                                        while ($row = $results->fetch_assoc()) {
-                                            if ($row['name']) {
-                                                unset($id, $parent);
-                                                $id = $row['id'];
-                                                $parent = $row['name'];
-                                                echo '<option value="' . $id . '">' . $parent . '</option>';
-                                            }
-                                        }
-                                        ?>
-                                    </select>
+                            <!-- uses multiselect_search.js for selection -->
+                            <input type="hidden" name="<?php echo $hidden_name ?>" id="<?php echo $hidden_name ?>" value="">
                         </div>
+                        <div>
+                            <select class="form-control" id="multiple-select-search"></select>
+                        </div>
+                        
 
                     </div>
                     <div class="modal-footer">
@@ -234,6 +251,13 @@ if (isset($_POST['add_class'])) {
     <script src="js/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
+
+    <!-- Choices JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+    <link rel="stylesheet" href="css/multiselect.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="includes/multiselect_search_class.js"></script>
+    
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
     <!-- DataTables Select JS -->
@@ -291,9 +315,9 @@ if (isset($_POST['add_class'])) {
                     {
                         "data": "department"
                     },
-                    // {
-                        // "data": "description"
-                    // },
+                    {
+                        "data": "expire"
+                    },
                     {
                         "data": "position"
                     },

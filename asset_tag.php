@@ -20,7 +20,7 @@
     } else {
         $class = "N/A";
     }
-    $qr_url = "https://singularity-eam-singularity.app.secoder.net/asset_info.php?id=" . $row['id'];
+    $qr_url = "https://singularity-eam-singularity.app.secoder.net/asset_info.php?assetid=" . $row['id'];
 
     //custom template
     $department_id = $row['department'];
