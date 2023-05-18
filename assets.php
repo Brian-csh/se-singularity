@@ -74,7 +74,7 @@ if (isset($_POST['add_class'])) {
                                 <th>Class</th>
                                 <th>User</th>
                                 <th>Department</th>
-                                <!-- <th>Description</th> -->
+                                <th>Expiration Date</th>
                                 <th>Position</th>
                                 <th>Status</th>
                                 <?php if($role_id < 4){?>
@@ -291,9 +291,9 @@ if (isset($_POST['add_class'])) {
                     {
                         "data": "department"
                     },
-                    // {
-                        // "data": "description"
-                    // },
+                    {
+                        "data": "expire"
+                    },
                     {
                         "data": "position"
                     },
