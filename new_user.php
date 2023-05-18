@@ -250,34 +250,44 @@ if (isset($_POST['submit_changes'])) {
 
                     // Separate parent and subdepartments
                     departments.forEach(function (department) {
-                        if (department.parent === null) {
-                            departmentMap[department.id] = {
-                                name: department.name,
-                                subdepartments: []
-                            };
-                        } else {
+                        departmentMap[department.id] = {
+                            name: department.name,
+                            subdepartments: []
+                        };
+                        if (department.parent !== null) {
+                            if (!departmentMap[department.parent]) {
+                                departmentMap[department.parent] = {
+                                    subdepartments: []
+                                };
+                            }
                             departmentMap[department.parent].subdepartments.push(department);
                         }
                     });
 
-                    // Add parent departments and their subdepartments to the select element
-                    for (var parentId in departmentMap) {
-                        // Add parent department
+                    // Recursive function to add departments and their subdepartments
+                    function addDepartmentsToSelect(departmentId, prefix) {
+                        var department = departmentMap[departmentId];
+                        // Add department
                         departmentSelect.append($('<option>', {
-                            value: parentId,
-                            text: departmentMap[parentId].name
+                            value: departmentId,
+                            text: prefix + department.name
                         }));
 
-                        // Add subdepartments with indentation
-                        departmentMap[parentId].subdepartments.forEach(function (subdepartment) {
-                            departmentSelect.append($('<option>', {
-                                value: subdepartment.id,
-                                text: "— " + subdepartment.name // Indentation using an em dash (—)
-                            }));
+                        // Add subdepartments with additional indentation
+                        department.subdepartments.forEach(function (subdepartment) {
+                            addDepartmentsToSelect(subdepartment.id, prefix + "— "); // Indentation using an em dash (—)
                         });
                     }
+
+                    // Add top-level departments (those with no parent)
+                    departments.filter(function (department) {
+                        return department.parent === null;
+                    }).forEach(function (topLevelDepartment) {
+                        addDepartmentsToSelect(topLevelDepartment.id, "");
+                    });
                 },
             });
+
         }
     </script>
 
