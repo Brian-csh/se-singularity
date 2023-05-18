@@ -371,8 +371,8 @@ echo "<script>
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                 },
-                                error: function(jqXHR, textStatus, errorThrown) {
-                                    console.error(textStatus, errorThrown);
+                                error: function(xhr, ajaxOptions, thrownError) {
+                                    alert("Error: " + thrownError);
                                 }
                             });
                         }
