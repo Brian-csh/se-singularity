@@ -10,7 +10,7 @@ $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : -1;
 
 // user request - use
 if (empty($assetIds)) {
-    echo json_encode(['success' => false, 'message' => 'No assets selected.']);
+    echo json_encode(['success' => false, 'message' => 'No assets selected.', 'version' => '1.0.0']);
 } else {
     //MAKE request to manager(leaves log at the same time)
     $results = make_request($conn,$user_id,null,$assetIds,1); // can only IDLE assets
