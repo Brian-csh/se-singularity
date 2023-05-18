@@ -1,31 +1,29 @@
 <?php
 include "includes/db/connect.php";
 
-//return the name of the entity corresponding to @param int $id
-function getEntityName($id, $conn)
-{
-    $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
-    $row = mysqli_fetch_array($conn->query($sql_entity));
-    if (isset($row['name'])) {
-        return $row['name'];
-    } else {
-        return "";
-    }
-}
+// //return the name of the entity corresponding to @param int $id
+// function getEntityName($id, $conn)
+// {
+//     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
+//     $row = mysqli_fetch_array($conn->query($sql_entity));
+//     if (isset($row['name'])) {
+//         return $row['name'];
+//     } else {
+//         return "";
+//     }
+// }
 
-//return the name of the department corresponding to @param int $id
-function getDepartmentName($id, $conn)
-{
-    $sql_department = "SELECT name FROM department WHERE id = '$id'";
-    $row = mysqli_fetch_array($conn->query($sql_department));
-    if (isset($row['name'])) {
-        echo "a bugggggg";
-        return $row['name'];
-    } else {
-        echo "here!!!!!!!";
-        return "";
-    }
-}
+// //return the name of the department corresponding to @param int $id
+// function getDepartmentName($id, $conn)
+// {
+//     $sql_department = "SELECT name FROM department WHERE id = '$id'";
+//     $row = mysqli_fetch_array($conn->query($sql_department));
+//     if (isset($row['name'])) {
+//         return $row['name'];
+//     } else {
+//         return "";
+//     }
+// }
 
 //TODO!!! NULLIF($entity_id, -1) and NULLIF($department_id, -1)
 
@@ -66,9 +64,7 @@ if (isset($_GET['id'])) {
             $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
             $entity_id = isset($current_user_data['entity']) ? $current_user_data['entity'] : -1; //-1 if no entity
-            // $entity = getEntityName($current_user_data['entity'], $conn);
             $department_id = isset($current_user_data['department']) ? $current_user_data['department'] : -1; //-1 if no department
-            // $department_name = getDepartmentName($current_user_data['department'], $conn);
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
             $locked = $current_user_data['locked'];
@@ -200,7 +196,7 @@ $editor_role = $session_info['role'];
                                     </div>                                    
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
-                                        <select <?php echo ($editor_role < $current_role) ? "" : "disabled"?> class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
+                                        <select <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
                                             <?php 
                                                 if ($editor_role == 1) 
                                                     echo '<option value="1"' . (($current_role == 1) ? "selected" : "null") . '>superadmin</option>'; 
