@@ -50,10 +50,10 @@ if (isset($_POST['add_class'])) {
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <?php if($role_id <=3 && $role_id >1){?>
+                            <?php if($role_id ==3){?>
                                 <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
-                            <?php if($role_id <=3){?>
+                            <?php if($role_id == 2 | $role_id ==3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                             <?php }?>
                         </div>
@@ -124,7 +124,7 @@ if (isset($_POST['add_class'])) {
                                     <select class="form-control ms-2" id="inputParentClass" name="class_parent">
                                         <option value="">Select a Parent Class</option>
                                         <?php
-                                        $results = $conn->query("SELECT id, name FROM asset_class");
+                                        $results = $conn->query("SELECT id, name FROM asset_class WHERE entity = '$entity_id'");
                                         while ($row = $results->fetch_assoc()) {
                                             if ($row['name']) {
                                                 unset($id, $parent);
