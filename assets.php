@@ -374,30 +374,29 @@ if (isset($_POST['add_class'])) {
                                     assets: assetIds,
                                     user_id: <?= $user_id?>
                                 },
-                                <?php if ($role_id !=4 ) { ?>
-                                success: function(response) { // manager handle request success
-                                    console.log(response);
-                                    // Perform any additional actions on success
-                                    dt.ajax.reload(); // Refresh the DataTables
-                                },
-                                <?php } else {?>
                                 success: function(response){ // user handle request success
                                     console.log(response);
                                             // Perform any additional actions on success
                                             var data = JSON.parse(response);
-
                                             for (var i = 0; i<data.result.length; i++){
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for RETURN. You can only return assets that are in your possession.");
+                                                    <?php if($role_id == 4) { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession!');
+                                                    <?php } else { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only return assets that is IDLE!');
+                                                    <?php }?>
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfully!.")
+                                                    <?php if($role_id == 4) { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" request (RETURN) made successfully!');
+                                                    <?php } else { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" RETIRED!');
+                                                    <?php }?>
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                 }, 
-                                <?php }?>
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     console.error(textStatus, errorThrown);
                                 }
@@ -425,11 +424,22 @@ if (isset($_POST['add_class'])) {
                                         data: {
                                             assets: assetIds,
                                             destination: departmentId,
-                                            role_id: <?= $_SESSION['user']['role'] ?>
+                                            role_id: <?= $role_id ?>
                                         }, // TODO : handle requests
                                         success: function(response) {
                                             console.log(response);
                                             // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that is IDLE.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
+                                                }
+                                            }
                                             dt.ajax.reload(); // Refresh the DataTables
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
