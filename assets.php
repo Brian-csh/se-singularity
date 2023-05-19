@@ -185,6 +185,7 @@ if (isset($_POST['add_class'])) {
             </div>
         </div>
     <?php }?>
+    <?php if($role_id == 3){?>
         <!-- Manager move Modal -->
         <div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -220,6 +221,7 @@ if (isset($_POST['add_class'])) {
                 </div>
             </div>
         </div>
+    <?php }?>
 
 
         <!-- handleRequestModal -->
