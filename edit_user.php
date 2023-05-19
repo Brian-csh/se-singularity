@@ -1,17 +1,19 @@
 <?php
 include "includes/db/connect.php";
 
-// //return the name of the entity corresponding to @param int $id
-// function getEntityName($id, $conn)
-// {
-//     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
-//     $row = mysqli_fetch_array($conn->query($sql_entity));
-//     if (isset($row['name'])) {
-//         return $row['name'];
-//     } else {
-//         return "";
-//     }
-// }
+//return the name of the entity corresponding to @param int $id
+function getEntityName($id, $conn)
+{
+    if ($id === -1)
+        return "N/A";
+    $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
+    $row = mysqli_fetch_array($conn->query($sql_entity));
+    if (isset($row['name'])) {
+        return $row['name'];
+    } else {
+        return "N/A";
+    }
+}
 
 // //return the name of the department corresponding to @param int $id
 // function getDepartmentName($id, $conn)
@@ -64,6 +66,7 @@ if (isset($_GET['id'])) {
             $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
             $entity_id = isset($current_user_data['entity']) ? $current_user_data['entity'] : -1; //-1 if no entity
+            $entity_name = getEntityName($entity_id, $conn);
             $department_id = isset($current_user_data['department']) ? $current_user_data['department'] : -1; //-1 if no department
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
@@ -158,37 +161,31 @@ $editor_role = $session_info['role'];
                                         <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name ?>" name="name">
                                     </div>
                                     <!-- Form Group (entity)-->
+                                    <!-- Form Group (entity)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputEntity">Entity *</label>
-                                        <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments(inputEntity)" <?php echo ($editor_role < $current_role) ? "" : "disabled"?>>
-                                            <option value="-1">-</option>
-                                            <?php
-                                            $results = $conn->query("SELECT id, name FROM entity");
-                                            while ($row = $results->fetch_assoc()) {
-                                                unset($id, $name);
-                                                $id = $row['id'];
-                                                $name = $row['name'];
-                                                echo '<option value="' . $id . '">' . $name . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                        <script>
-                                            var selectEntity = document.getElementById('inputEntity');
-                                            selectEntity.value = <?=$entity_id?>;
-                                        </script>
+                                        <label class="small mb-1" for="inputEntity">Entity</label>
+                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity_name ?>" name="entity">
                                     </div>
-
                                 </div>
                                 <!-- Form Row        -->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
-                                        <label class="small mb-1" for="inputDepartment">Department *</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required <?php echo ($editor_role < $current_role) ? "" : "disabled"?> <?php echo "value=".$department_id?>>
+                                        <label class="small mb-1" for="inputDepartment">Department</label>
+                                        <select class="form-control" id="inputDepartment" name="department" <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> <?php echo "value=".$department_id?>>
                                             <option value="-1">-</option>
+                                            <?php
+                                                $results = $conn->query("SELECT id, name FROM department WHERE entity='$entity_id'");
+                                                echo $entity_id;
+                                                while ($row = $results->fetch_assoc()) {
+                                                    unset($id, $name);
+                                                    $id = $row['id'];
+                                                    $name = $row['name'];
+                                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                                }
+                                            ?>
                                         </select>
                                         <script>
-
                                             var selectDepartment = document.getElementById('inputDepartment');
                                             selectDepartment.value = <?=$department_id?>;
                                         </script>
