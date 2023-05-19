@@ -5,6 +5,7 @@ $active = "Assets";
 include "includes/header.php";
 include "includes/navbar.php";
 
+
 if (isset($_POST['add_class'])) {
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {
@@ -196,9 +197,12 @@ if (isset($_POST['add_class'])) {
                         <div class="mb-3">
                             <label for="destinationDepartment">Destination Department Name</label>
                             <select class="form-control" id="destinationDepartment">
-                                <option value="">N/A</option>
+                                <!-- <option value="">Select an department</option> -->
                                 <?php
-                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id");
+                                if(!function_exists('getAllSubdepartmentIds')) require "includes/get_subdepartments.php";
+                                $subdepartmentIds = getAllSubdepartmentIds($department_id, $conn);
+                                $subdepartmentIds = implode(',', $subdepartmentIds);
+                                $results = $conn->query("SELECT id, name FROM department WHERE id in ($subdepartmentIds) and id != '$department_id'");
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
@@ -435,15 +439,16 @@ if (isset($_POST['add_class'])) {
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that is IDLE.");
+                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
+                                                    alert("Asset " + data.result[i][0] + " moved!")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
                                             console.error(textStatus, errorThrown);
+                                            dt.ajax.reload(); // Refresh the DataTables
                                         }
                                     });
 

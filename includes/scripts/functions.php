@@ -233,9 +233,23 @@ function retire_asset($conn,$userid,$asset_ids){
     return $results;
 }
 
-//TODO : move_asset
-function move_asset($conn, $userid,$destinatino,$assetIds,){
-    return 1;
+//destination : department id
+function move_asset($conn, $userid,$destination,$asset_ids){
+    $time = time();
+    $results = [];
+    foreach($asset_ids as $asset_id){
+        //fetch status of asset                
+        $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+        $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+        if($asset_status == 1){ // IN IDLE
+            $sql = "UPDATE asset SET department = $destination WHERE id = '$asset_id'";
+            insert_log_asset_rm($conn,$userid,$destination,$asset_id,$asset_name,21,$time);
+            array_push($results,[$asset_name,$conn->query($sql)]);
+        } else { // NOT IN IDLE
+            array_push($results,[$asset_name,false]);
+        }
+    }
+    return $results;
 }
 
 
@@ -248,9 +262,11 @@ function insert_log_asset_rm($conn,$initiator,$participant = null,$asset_id,$ass
     $department_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
 
     if($log_type == 21){ // 21 : move
-        $text = $initiator_name." moved ".$asset_name." in ".$department_name." to ".$participant;
+        //fetch destination department name
+        $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$participant'"))['name'];
+        $text = $initiator_name." moved \'".$asset_name."\' from \'".$department_name."\' to \'".$participant_name."\'";
     } else { //22 : retire
-        $text =$initiator_name." retired ".$asset_name." in ".$department_name;
+        $text =$initiator_name." retired \'".$asset_name."\' in \'".$department_name."\'";
     }
     //insert log
     $sql = "INSERT INTO log (date, text,log_type, subject,`By`,department) VALUES
