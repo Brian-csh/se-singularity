@@ -75,10 +75,10 @@ echo "<script>
                                 <div class="page-header-icon text-white"><i data-feather="home"></i></div>
                                 <?= $active ?>
                             </h1>
-                            <?php if($role_id <=3 && $role_id >1){?>
+                            <?php if($role_id ==3){?>
                                 <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
-                            <?php if($role_id <=3){?>
+                            <?php if($role_id == 2 | $role_id ==3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                             <?php }?>
                         </div>
@@ -201,6 +201,7 @@ echo "<script>
             </div>
         </div>
     <?php }?>
+    <?php if($role_id == 3){?>
         <!-- Manager move Modal -->
         <div class="modal fade" id="chooseDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -213,9 +214,12 @@ echo "<script>
                         <div class="mb-3">
                             <label for="destinationDepartment">Destination Department Name</label>
                             <select class="form-control" id="destinationDepartment">
-                                <option value="">N/A</option>
+                                <!-- <option value="">Select an department</option> -->
                                 <?php
-                                $results = $conn->query("SELECT id, name, entity FROM department WHERE entity = $entity_id");
+                                if(!function_exists('getAllSubdepartmentIds')) require "includes/get_subdepartments.php";
+                                $subdepartmentIds = getAllSubdepartmentIds($department_id, $conn);
+                                $subdepartmentIds = implode(',', $subdepartmentIds);
+                                $results = $conn->query("SELECT id, name FROM department WHERE id in ($subdepartmentIds) and id != '$department_id'");
                                 while ($row = $results->fetch_assoc()) {
                                     unset($id, $name);
                                     $id = $row['id'];
@@ -233,6 +237,7 @@ echo "<script>
                 </div>
             </div>
         </div>
+    <?php }?>
 
 
         <!-- handleRequestModal -->
@@ -398,30 +403,29 @@ echo "<script>
                                     assets: assetIds,
                                     user_id: <?= $user_id?>
                                 },
-                                <?php if ($role_id !=4 ) { ?>
-                                success: function(response) { // manager handle request success
-                                    console.log(response);
-                                    // Perform any additional actions on success
-                                    dt.ajax.reload(); // Refresh the DataTables
-                                },
-                                <?php } else {?>
                                 success: function(response){ // user handle request success
                                     console.log(response);
                                             // Perform any additional actions on success
                                             var data = JSON.parse(response);
-
                                             for (var i = 0; i<data.result.length; i++){
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for RETURN. You can only return assets that are in your possession.");
+                                                    <?php if($role_id == 4) { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession!');
+                                                    <?php } else { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only return assets that is IDLE!');
+                                                    <?php }?>
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (RETURN) made successfully!.")
+                                                    <?php if($role_id == 4) { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" request (RETURN) made successfully!');
+                                                    <?php } else { ?> 
+                                                        alert('Asset "' + data.result[i][0] + '" RETIRED!');
+                                                    <?php }?>
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
                                 }, 
-                                <?php }?>
                                 error: function(jqXHR, textStatus, errorThrown) {
                                     console.error(textStatus, errorThrown);
                                 }
@@ -449,15 +453,27 @@ echo "<script>
                                         data: {
                                             assets: assetIds,
                                             destination: departmentId,
-                                            role_id: <?= $_SESSION['user']['role'] ?>
+                                            role_id: <?= $role_id ?>
                                         }, // TODO : handle requests
                                         success: function(response) {
                                             console.log(response);
                                             // Perform any additional actions on success
+                                            var data = JSON.parse(response);
+
+                                            for (var i = 0; i<data.result.length; i++){
+                                                console.log(data.result[i]);
+                                                if(data.result[i][1] === false){ // fail
+                                                    // fetch asset name
+                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.");
+                                                } else { // Succeess
+                                                    alert("Asset " + data.result[i][0] + " moved!")
+                                                }
+                                            }
                                             dt.ajax.reload(); // Refresh the DataTables
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
                                             console.error(textStatus, errorThrown);
+                                            dt.ajax.reload(); // Refresh the DataTables
                                         }
                                     });
 
