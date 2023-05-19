@@ -4,6 +4,7 @@ include "includes/header.php";
 include "includes/settingbar.php";
 
 $department_id = $session_info['department'];
+$class_entity_id = $session_info['entity'];
 
 // get current policy
 $sql = "SELECT * FROM department WHERE id = '$department_id'";
@@ -82,7 +83,7 @@ if (isset($_POST['depreciationToggle'])) {
 }
 
 // get all asset classes
-$sql = "SELECT * FROM asset_class";
+$sql = "SELECT * FROM asset_class WHERE entity = '$class_entity_id'";
 $result = mysqli_query($conn, $sql);
 $asset_classes = array();
 while($row = mysqli_fetch_assoc($result)) {
@@ -94,7 +95,13 @@ while($row = mysqli_fetch_assoc($result)) {
     $asset_classes[] = $asset_obj;
 }
 $asset_classes = json_encode($asset_classes);
-echo "<script> var asset_classes = JSON.parse('". $asset_classes ."'); </script>";
+
+$hidden_name = "class_policy";
+
+echo "<script> 
+        var asset_classes = JSON.parse('". $asset_classes ."'); 
+        var hidden_name = JSON.parse('". json_encode($hidden_name) ."'); 
+    </script>";
 ?>
 <html>
 
@@ -143,9 +150,8 @@ echo "<script> var asset_classes = JSON.parse('". $asset_classes ."'); </script>
                     <div class="row gx-3 mb-3" >
                         <div class="col-md-10">
                             <label class="small mb-1" for="multiple-select-search">Asset classes * (If no asset classes are chosen, all asset classes will be used)</label>
-                            <!-- TODO -->
                             <select multiple class="form-control" id="multiple-select-search"></select>
-                            <input type="hidden" name="class_policy" id="class_policy" value="">
+                            <input type="hidden" name="<?php echo $hidden_name; ?>" id="<?php echo $hidden_name; ?>" value="">
                         </div>
                     </div>
                     

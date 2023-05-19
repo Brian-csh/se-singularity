@@ -1,6 +1,6 @@
 // Pass single element
 const element = document.getElementById('multiple-select-search');
-const hidden = document.getElementById('class_policy');
+const hidden = document.getElementById(hidden_name);
 
 const choices = new Choices(element, {
     silent: false,
