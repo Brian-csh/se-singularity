@@ -1,5 +1,6 @@
 <?php
 require "includes/get_subdepartments.php";
+include "includes/oss.php";
 
 use OSS\Core\OssException;
 session_start();
@@ -23,8 +24,8 @@ if (isset($_POST['submit_asset'])) {
     $position = $_POST['asset_location'];
     // $expire = date("Y-m-d",strtotime($_POST['expiration']));
     $image_url = "";
-    if (isset($_FILES['image'])) {
-        $file = $_FILES['image'];
+    if (isset($_FILES['file'])) {
+        $file = $_FILES['file'];
         $localFilePath = $file['tmp_name']; //path in local machine
         $originalFilename = $file['name'];
 
@@ -39,13 +40,11 @@ if (isset($_POST['submit_asset'])) {
             echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
         }
     }
-
     $date_created = time();
 
-    // $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, expire, custom_attr, date_created, status, image) 
-    // VALUES (NULLIF('$asset_parent',''), '$name', NULLIF('$asset_class',''), '$department', NULLIF('$asset_user',''), NULLIF('$price',''), '$description', '$position', '$expire', '$ca_json', '$date_created','1', $image_url)";
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position,custom_attr, date_created, status, image) 
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, custom_attr, date_created, status, image) 
     VALUES (null, '$name', '$asset_class', '$department', null, NULLIF('$price',''), '$description', '$position', null, '$date_created','1', '$image_url')";
+    // echo $sql;
     if ($conn->query($sql)) {
         header('Location: assets.php');
     } else {
@@ -153,7 +152,7 @@ if (isset($_POST['submit_asset'])) {
                             if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
                                 ' . $errors . '</div>'
                             ?>
-                            <form method="post" action="add_asset_by_rm.php">
+                            <form method="post" enctype="multipart/form-data">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <div class="col-md-4">
@@ -161,21 +160,17 @@ if (isset($_POST['submit_asset'])) {
                                         <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter an Asset Name">
                                     </div>
 
-                                    <!-- Asset department -->
+                                <!-- Asset department -->
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputDepartment">Department *</label>
                                         <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select an Asset Class</option>
+                                            <option value="">Select a Department</option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM department WHERE id IN ($subdepartmentids)");
                                                     while ($row = $results->fetch_assoc()) {
-                                                        $id = 0; $parent = NULL;
-                                                        if ($row['name']!=$asset_class_name) {
-                                                            unset($id, $class);
                                                             $id = $row['id'];
-                                                            $class = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $class . '</option>';
-                                                        }
+                                                            $department__ = $row['name'];
+                                                            echo '<option value="' . $id . '">' . $department__ . '</option>';
                                                     }
                                                     ?>
                                         </select>
@@ -216,7 +211,7 @@ if (isset($_POST['submit_asset'])) {
                                             <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
                                         </div>
                                 </div>
-                                <input type="file" name="image" id="imageInput" style="color: white">
+                                <input type="file" name="file" id="imageInput" style="color: white">
                                 <button onclick="clearFileInput()" class="btn btn-primary text-light float-end" style="background:red; border:none">Clear</button>
 
                                 <div class="row gx-3 mb-3">
@@ -235,13 +230,11 @@ if (isset($_POST['submit_asset'])) {
                     </div>
                 </div>
             </div>
-                                <script>
-                                    function clearFileInput() {
-                                        document.getElementById('imageInput').value = '';
-                                    }
-                                </script>
-
-
+            <script>
+                function clearFileInput() {
+                    document.getElementById('imageInput').value = '';
+                }
+            </script>
         </div>
     </main>
 </div>
