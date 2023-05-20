@@ -17,11 +17,15 @@ function getEntityName($id, $conn)
 
 function departmentClearance($user_id, $conn) {
     $sql_asset = "UPDATE asset SET status=1, user=NULL WHERE user=$user_id"; //set all assets to idel
-    $sql_request = "UPDATE pending_requests SET result=3 WHERE initator=$user_id"; //cancell all request
-    if (!$conn->query($sql_asset))
-        header("Location: edit_user.php?id=$user_id&error");
-    if (!$conn->query($sql_request))
-        header("Location: edit_user.php?id=$user_id&error");
+    $sql_request = "UPDATE pending_requests SET result=3 WHERE initiator=$user_id"; //cancell all request
+    if (!$conn->query($sql_asset)) {
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
+    }
+    if (!$conn->query($sql_request)) {
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
+    }
 }
 
 // //return the name of the department corresponding to @param int $id
@@ -58,11 +62,11 @@ if (isset($_GET['id'])) {
     header('Location: users.php');
 }
 
-$edit_status = 0;
+$edit_status = -1;
 if (isset($_GET['error'])) {
-    $edit_status = 1;
+    $edit_status = $_GET['error'];
 } elseif (isset($_GET['success'])) {
-    $edit_status = 2;
+    $edit_status = 0;
 }
 
 //handle post requests to update user account details
@@ -78,9 +82,9 @@ if (isset($_POST['submit_changes'])) {
     //validations for roles
     if ($new_role_id == 2)
         $new_department_id = -1;
-    elseif ($new_role_id > 2) {
-        if ($new_department_id == -1)
-            header("Location: edit_user.php?id=$user_id&error");
+    elseif ($new_role_id > 2 && $new_department_id == -1) {
+        header("Location: edit_user.php?id=$user_id&error=1");
+        exit;
     }
 
     $sql = "UPDATE user SET department=NULLIF($new_department_id, -1), role='$new_role_id', locked='$new_locked'";
@@ -92,10 +96,13 @@ if (isset($_POST['submit_changes'])) {
 
     $sql .= " WHERE id='$user_id'";
 
+    echo $sql;
+
     if ($conn->query($sql)) { //update successful
         header("Location: edit_user.php?id=$user_id&success");
     } else { //update failed
-        header("Location: edit_user.php?id=$user_id&error");
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
     }
 
 }
@@ -172,10 +179,12 @@ $editor_role = $session_info['role'];
                     <div class="card mb-4">
                         <div class="card-header">Account Details</div>
                         <?php
-                                if ($edit_status == 1) {
-                                    echo '<div class="alert alert-danger" role="alert">Operation Failed</div>';                                   
+                                if ($edit_status == 0) {
+                                    echo '<div class="alert alert-success" role="alert">Update Successful!</div>';                                                     
+                                } elseif ($edit_status == 1) {
+                                    echo '<div class="alert alert-danger" role="alert">Department cannot be empty</div>'; 
                                 } elseif ($edit_status == 2) {
-                                    echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
+                                    echo '<div class="alert alert-danger" role="alert">Update failed</div>'; 
                                 }
                         ?>
                         <div class="card-body">
@@ -183,7 +192,7 @@ $editor_role = $session_info['role'];
                             if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
                             <?php echo  "<p style=\"color: gray;\">Date Joined: " . $last_modified . "</p>" ?>
-                            <form method="post" action="edit_user.php?id=<?=$userid?>">
+                            <form method="post" action="edit_user.php?id=<?=$user_id?>">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
