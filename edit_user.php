@@ -15,6 +15,15 @@ function getEntityName($id, $conn)
     }
 }
 
+function departmentClearance($user_id, $conn) {
+    $sql_asset = "UPDATE asset SET status=1, user=NULL WHERE user=$user_id"; //set all assets to idel
+    $sql_request = "UPDATE pending_requests SET result=3 WHERE initator=$user_id"; //cancell all request
+    if (!$conn->query($sql_asset))
+        header("Location: edit_user.php?id=$user_id&error");
+    if (!$conn->query($sql_request))
+        header("Location: edit_user.php?id=$user_id&error");
+}
+
 // //return the name of the department corresponding to @param int $id
 // function getDepartmentName($id, $conn)
 // {
@@ -26,34 +35,6 @@ function getEntityName($id, $conn)
 //         return "";
 //     }
 // }
-
-//TODO!!! NULLIF($entity_id, -1) and NULLIF($department_id, -1)
-
-//handle post requests to update user account details
-if (isset($_POST['submit_changes'])) {
-    $user_id = $_POST['id'];
-    $role_id = $_POST['role'];
-    $locked = isset($_POST['lock_account']) ? 1 : 0;
-
-    if (isset($_POST['password']) and $_POST['password'] !== "") {
-        $password = $_POST['password'];
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        $sql = "UPDATE user SET password = '$hashed_password', role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
-        if ($conn->query($sql)) {
-            header('Location: users.php');
-        } else {
-            header("Location: edit_user.php?id=$user_id&insert_error");
-        }
-    } else  {
-        $sql = "UPDATE user SET role = '$role_id', locked = '$locked' WHERE id = '$user_id'";
-        if ($conn->query($sql)) {
-            header('Location: users.php');
-        } else {
-            header("Location: edit_user.php?id=$user_id&insert_error");
-        }
-    }
-}
 
 //set up inital value of the form
 if (isset($_GET['id'])) {
@@ -76,6 +57,49 @@ if (isset($_GET['id'])) {
 } else {
     header('Location: users.php');
 }
+
+$edit_status = 0;
+if (isset($_GET['error'])) {
+    $edit_status = 1;
+} elseif (isset($_GET['success'])) {
+    $edit_status = 2;
+}
+
+//handle post requests to update user account details
+if (isset($_POST['submit_changes'])) {
+    $new_department_id = $_POST['department'];
+    $new_role_id = $_POST['role'];
+    $new_locked = isset($_POST['lock_account']) ? 1 : 0;
+
+    if ($new_department_id != $department_id) { //moved to another department
+        departmentClearance($user_id, $conn);
+    }
+
+    //validations for roles
+    if ($new_role_id == 2)
+        $new_department_id = -1;
+    elseif ($new_role_id > 2) {
+        if ($new_department_id == -1)
+            header("Location: edit_user.php?id=$user_id&error");
+    }
+
+    $sql = "UPDATE user SET department=NULLIF($new_department_id, -1), role='$new_role_id', locked='$new_locked'";
+    if (isset($_POST['password']) and $_POST['password'] !== "") { //if password is updated
+        $new_password = $_POST['password'];
+        $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        $sql .= ", password='$new_hashed_password'";
+    }
+
+    $sql .= " WHERE id='$user_id'";
+
+    if ($conn->query($sql)) { //update successful
+        header("Location: edit_user.php?id=$user_id&success");
+    } else { //update failed
+        header("Location: edit_user.php?id=$user_id&error");
+    }
+
+}
+
 $active = 'Edit User';
 include "includes/header.php";
 $session_info = $_SESSION['user'];
@@ -147,12 +171,19 @@ $editor_role = $session_info['role'];
                     <!-- Account details card-->
                     <div class="card mb-4">
                         <div class="card-header">Account Details</div>
+                        <?php
+                                if ($edit_status == 1) {
+                                    echo '<div class="alert alert-danger" role="alert">Operation Failed</div>';                                   
+                                } elseif ($edit_status == 2) {
+                                    echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
+                                }
+                        ?>
                         <div class="card-body">
                             <?php
                             if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
                             ?>
                             <?php echo  "<p style=\"color: gray;\">Date Joined: " . $last_modified . "</p>" ?>
-                            <form method="post" action="edit_user.php">
+                            <form method="post" action="edit_user.php?id=<?=$userid?>">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
@@ -172,7 +203,7 @@ $editor_role = $session_info['role'];
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> <?php echo "value=".$department_id?>>
+                                        <select class="form-control" id="inputDepartment" name="department" <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?>>
                                             <option value="-1">-</option>
                                             <?php
                                                 $results = $conn->query("SELECT id, name FROM department WHERE entity='$entity_id'");
@@ -193,10 +224,6 @@ $editor_role = $session_info['role'];
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
                                         <select <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
-                                            <?php 
-                                                if ($editor_role == 1) 
-                                                    echo '<option value="1"' . (($current_role == 1) ? "selected" : "null") . '>superadmin</option>'; 
-                                            ?>
                                             <option value="2" <?php echo ($current_role == 2) ? "selected" : "null" ?>>admin</option>
                                             <option value="3" <?php echo ($current_role == 3) ? "selected" : "null" ?>>resource manager</option>
                                             <option value="4" <?php echo ($current_role == 4) ? "selected" : "null" ?>>user</option>
@@ -243,82 +270,6 @@ $editor_role = $session_info['role'];
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
-    <script>
-        function updateDepartments() {
-            let entityId = $('#inputEntity').val();
-
-            $.ajax({
-                url: 'includes/scripts/ajax.php',
-                method: 'POST',
-                data: {
-                    request: 'get_departments',
-                    entity_id: entityId
-                },
-                dataType: 'json',
-                success: function (departments) {
-                    var departmentSelect = $('#inputDepartment');
-                    departmentSelect.empty();
-
-                    // Add the default "Select a Department" option
-                    departmentSelect.append($('<option>', {
-                        value: "",
-                        text: "Select a Department"
-                    }));
-
-                    // Create a map to store parent departments and their subdepartments
-                    var departmentMap = {};
-
-                    // Separate parent and subdepartments
-                    departments.forEach(function (department) {
-                        departmentMap[department.id] = {
-                            name: department.name,
-                            subdepartments: []
-                        };
-                        if (department.parent !== null) {
-                            if (!departmentMap[department.parent]) {
-                                departmentMap[department.parent] = {
-                                    subdepartments: []
-                                };
-                            }
-                            departmentMap[department.parent].subdepartments.push(department);
-                        }
-                    });
-
-                    // Recursive function to add departments and their subdepartments
-                    function addDepartmentsToSelect(departmentId, prefix) {
-                        var department = departmentMap[departmentId];
-                        // Add department
-                        departmentSelect.append($('<option>', {
-                            value: departmentId,
-                            text: prefix + department.name
-                        }));
-
-                        // Add subdepartments with additional indentation
-                        department.subdepartments.forEach(function (subdepartment) {
-                            addDepartmentsToSelect(subdepartment.id, prefix + "— "); // Indentation using an em dash (—)
-                        });
-                    }
-
-                    // Add top-level departments (those with no parent)
-                    departments.filter(function (department) {
-                        return department.parent === null;
-                    }).forEach(function (topLevelDepartment) {
-                        addDepartmentsToSelect(topLevelDepartment.id, "");
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        }
-        updateDepartments();
-        window.onload = function(){
-            let depSelector = document.querySelector('#inputDepartment');
-            depSelector.value = <?=$department_id?>
-        };
-        
-
-    </script>
 </div>
 
 </html>
