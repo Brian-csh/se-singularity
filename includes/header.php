@@ -87,7 +87,7 @@ if(isset($_GET['bind_err'])) {
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
+                <li><a class="dropdown-item dropdown-settings-header" href="/notification_settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
                     <?php if(!$feishu_binded):?>

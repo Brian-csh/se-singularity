@@ -1,26 +1,27 @@
 <?php
-require "../db/connect.php";
 
+require "../db/connect.php";
+include "functions.php";
 // Get asset IDs from POST data
 $assetIds = isset($_POST['assets']) ? $_POST['assets'] : [];
+$user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : -1;
 
-// Retire assets 
-if (!empty($assetIds)) {
-    $ids = implode(',', $assetIds); // [1,2,3,4] => "1,2,3,4"
-    //set status to retired 
-    //TODO : add constraints, can only retire IDLE assets
-    $sql = "UPDATE asset SET status = 4 WHERE id IN ($ids)";
 
-    $result = $conn->query($sql);
-
-    if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Assets retired successfully.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error retiring assets.']);
-    }
-} else {
+// user request - return 
+if (empty($assetIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
+} else {
+    //MAKE request to manager(leaves log at the same time)
+    $results = retire_asset($conn,$user_id,$assetIds);
+
+    $responseData = array('result' => $results);
+
+    //Encode the array as JSON
+    $responseJson = json_encode($responseData);
+
+    // Send the response
+    echo $responseJson;
+
 }
-// Close the database connection
 $conn->close();
 ?>

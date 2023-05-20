@@ -17,7 +17,6 @@ build:
     - deployer build
   only:
     - master
-
 unit-test:
   image: php:8.1-apache
   stage: test

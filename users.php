@@ -7,8 +7,14 @@ include "includes/navbar.php";
 //TODO:
 //set department id for cases when admin access users page by manage-user -> department id should be the id of department not the department id of admin
 
+//TODO : change the column for rm, (entity -> possesing assets)
+
+
 switch($role_id){
     case 1:
+        // -1 -> access through navbar
+        // GET -> access through manage-user
+        $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
         break;
     case 2:
         if(isset($_GET['departmentid'])) {
@@ -48,7 +54,7 @@ switch($role_id){
                                 <div class="page-header-icon text-white"><i data-feather="user"></i></div>
                                 <?=$active?>
                             </h1>
-                            <?php if($role_id <=2){ ?>
+                            <?php if($role_id ==2){ ?>
                             <a href="new_user.php" class="btn btn-primary btn-xs float-end">+ Add</a>
                             <?php }?>
                         </div>
@@ -69,7 +75,9 @@ switch($role_id){
                             <th>Entity</th>
                             <th>Department</th>
                             <th>Role</th>
-                            <th>Edit User</th>
+                            <?php if($role_id <=2){ ?>
+                                <th>Edit User</th>
+                            <?php }?>
                         </tr>
                         </thead>
                     </table>
@@ -126,14 +134,16 @@ switch($role_id){
                     },
                     {
                         "data": "role"
-                    },
-                    {
+                    }
+                    <?php if($role_id <=2){ ?>
+                    ,{
                         "data": "actions"
                     }
+                    <?php }?>
                 ],
-                select: {
-                    style: 'multi'
-                },
+                // select: {
+                //     style: 'multi'
+                // },
             });
         });
     </script>

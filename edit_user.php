@@ -1,6 +1,5 @@
 <?php
 include "includes/db/connect.php";
-
 //return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn)
 {

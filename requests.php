@@ -164,9 +164,9 @@ include "includes/navbar.php";
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Request " + data.result[i][0] + " is not available for approve. You can only approve pending requests.");
+                                                    alert("Request " + data.result[i][0] + " is not available for approval. You can only approve pending requests.");
                                                 } else { // Succeess
-                                                    alert("Request " + data.result[i][0] + " approved successfully!.")
+                                                    alert("Request id:" + data.result[i][0] + " approved!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -204,9 +204,9 @@ include "includes/navbar.php";
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Request " + data.result[i][0] + " is not available for reject. You can only reject pending requests.");
+                                                    alert("Request " + data.result[i][0] + " is not available for rejection. You can only reject pending requests.");
                                                 } else { // Succeess
-                                                    alert("Request " + data.result[i][0] + " rejected successfully!.")
+                                                    alert("Request :" + data.result[i][0] + " rejected!.")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables

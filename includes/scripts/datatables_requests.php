@@ -54,7 +54,7 @@ if (isset($_GET['search']['value'])) {
     }
 }
 
-$sql .= " ORDER BY result LIMIT $start, $length";
+$sql .= " ORDER BY review_time LIMIT $start, $length";
 
 $result = $conn->query($sql);
 
@@ -109,8 +109,8 @@ while($row = $result->fetch_assoc()) {
         "asset" => $asset,
         "type" => $type,
         "result" => $request_result, // 0 -> pending, 1 -> approved, 2 -> rejected, 3 -> canceled
-        "request_time" => date("H:i:s m-d",$row['request_time']),
-        "review_time" => $row['review_time']
+        "request_time" => date("H:i m-d",$row['request_time']+28200),
+        "review_time" =>  $row['review_time']?  date("H:i m-d",$row['review_time']+28200) : "--",
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
         // "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
         // Info

@@ -78,10 +78,10 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
             $text= "Asset ". $asset_name." was requested (move) from " . $user_name . " to " . $participant_name;
             break;
         case 11: // asset_request_return
-            $text= "Asset ". $asset_name." was requested (return) from " . $user_name;
+            $text= "Asset '". $asset_name."' was requested (return) from " . $user_name;
             break;
         case 13: // asset_reqeust_repair
-            $text= "Asset ". $asset_name." was requested (repair) from " . $user_name;
+            $text= "Asset '". $asset_name."' was requested (repair) from " . $user_name;
             break;
         default :
             break;
@@ -99,10 +99,10 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
 
 
 // log for handling asset (manager)
+// handle_type: 1 - approve, 2 - reject
 function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$request_type,$handle_type,$time){
         // fetch asset name
         $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
-
         // fetch department_id
         $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
         // fetch user name
@@ -115,7 +115,7 @@ function insert_log_handle_request($conn, $manager_id,$request_id,$asset_id,$req
                     $text = "Request use of asset ". $asset_name." rejected by " . $manager_name;
                 }
                 break;
-            case 10: // arppove request move
+            case 10: // approve request move
                 if($handle_type == 1){
                     $text = "Request move of asset ". $asset_name." approved by " . $manager_name;
                 } else {
@@ -215,7 +215,71 @@ function insert_log_new_feishu_user($conn, $row)
     }
 }
 
-// Request functions
+function retire_asset($conn,$userid,$asset_ids){
+    $time = time();
+    $results = [];
+    foreach($asset_ids as $asset_id){
+        //fetch status of asset                
+        $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+        $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+        if($asset_status == 1){ // IN IDLE
+            $sql = "UPDATE asset SET status = 4 WHERE id = '$asset_id'";
+            insert_log_asset_rm($conn,$userid,null,$asset_id,$asset_name,22,$time);
+            array_push($results,[$asset_name,$conn->query($sql)]);
+        } else { // NOT IN IDLE
+            array_push($results,[$asset_name,false]);
+        }
+    }
+    return $results;
+}
+
+//destination : department id
+function move_asset($conn, $userid,$destination,$asset_ids){
+    $time = time();
+    $results = [];
+    foreach($asset_ids as $asset_id){
+        //fetch status of asset                
+        $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+        $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+        if($asset_status == 1){ // IN IDLE
+            $sql = "UPDATE asset SET department = $destination WHERE id = '$asset_id'";
+            insert_log_asset_rm($conn,$userid,$destination,$asset_id,$asset_name,21,$time);
+            array_push($results,[$asset_name,$conn->query($sql)]);
+        } else { // NOT IN IDLE
+            array_push($results,[$asset_name,false]);
+        }
+    }
+    return $results;
+}
+
+
+// log_type : 21 -> move, 22 -> retire
+function insert_log_asset_rm($conn,$initiator,$participant = null,$asset_id,$asset_name,$log_type,$time){
+    $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name']; // manager
+
+    //fetch department name
+    $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
+    $department_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
+
+    if($log_type == 21){ // 21 : move
+        //fetch destination department name
+        $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$participant'"))['name'];
+        $text = $initiator_name." moved \'".$asset_name."\' from \'".$department_name."\' to \'".$participant_name."\'";
+    } else { //22 : retire
+        $text =$initiator_name." retired \'".$asset_name."\' in \'".$department_name."\'";
+    }
+    //insert log
+    $sql = "INSERT INTO log (date, text,log_type, subject,`By`,department) VALUES
+        ('$time','$text','$log_type','$asset_id','$initiator','$department_id')";
+
+    if($conn->query($sql)){
+        return "Record inserted successfully.";
+    } else{
+        return "ERROR: Could not able to execute $sql. " . $conn->error;
+    }
+}
+
+//------------------------ Request functions-------------------------------------------------
 function make_request($conn,$initiator,$participant = null,$asset_ids,$request_type){
     $time = time();
     $results = [];
@@ -315,8 +379,6 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
     return $results;
 }
 
-
-
 // HANDLE REQUESTS
 function handle_request($conn, $manager_id,$requestIds,$handle_type){
     $time = time();
@@ -366,7 +428,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
                     }
                     // leave log
-                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$time);
+                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$handle_type,$time);
                     break;
                 case 4:// request move
                     if($handle_type == 1){
@@ -378,7 +440,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
                     }
                     // leave log
-                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$time);
+                    insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$handle_type,$time);
                     break;
                 default:
                     break;
