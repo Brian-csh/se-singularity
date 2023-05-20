@@ -15,6 +15,7 @@ function getEntityName($id, $conn)
     }
 }
 
+//faciliate clearance of assets and requests when a user is moved to another department
 function departmentClearance($user_id, $conn) {
     $sql_asset = "UPDATE asset SET status=1, user=NULL WHERE user=$user_id"; //set all assets to idel
     $sql_request = "UPDATE pending_requests SET result=3 WHERE initiator=$user_id"; //cancell all request
@@ -27,18 +28,6 @@ function departmentClearance($user_id, $conn) {
         exit;
     }
 }
-
-// //return the name of the department corresponding to @param int $id
-// function getDepartmentName($id, $conn)
-// {
-//     $sql_department = "SELECT name FROM department WHERE id = '$id'";
-//     $row = mysqli_fetch_array($conn->query($sql_department));
-//     if (isset($row['name'])) {
-//         return $row['name'];
-//     } else {
-//         return "";
-//     }
-// }
 
 //set up inital value of the form
 if (isset($_GET['id'])) {
@@ -95,8 +84,6 @@ if (isset($_POST['submit_changes'])) {
     }
 
     $sql .= " WHERE id='$user_id'";
-
-    echo $sql;
 
     if ($conn->query($sql)) { //update successful
         header("Location: edit_user.php?id=$user_id&success");
@@ -188,26 +175,22 @@ $editor_role = $session_info['role'];
                                 }
                         ?>
                         <div class="card-body">
-                            <?php
-                            if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
-                            ?>
                             <?php echo  "<p style=\"color: gray;\">Date Joined: " . $last_modified . "</p>" ?>
                             <form method="post" action="edit_user.php?id=<?=$user_id?>">
-                                <!-- Form Row-->
+                                <!-- Form Row -->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (name)-->
+                                    <!-- Form Group (name) -->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
                                         <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name ?>" name="name">
                                     </div>
-                                    <!-- Form Group (entity)-->
-                                    <!-- Form Group (entity)-->
+                                    <!-- Form Group (entity) -->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
                                         <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity_name ?>" name="entity">
                                     </div>
                                 </div>
-                                <!-- Form Row        -->
+                                <!-- Form Row -->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
@@ -248,7 +231,6 @@ $editor_role = $session_info['role'];
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
                                     <!-- password-->
-
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPassword">New Password</label>
                                         <input class="form-control" id="inputPassword" type="password" name="password">
@@ -271,9 +253,6 @@ $editor_role = $session_info['role'];
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     </main>
 
