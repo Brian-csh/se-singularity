@@ -1,6 +1,5 @@
 <?php
 include "includes/calculate_price.php";
-include "includes/header.php";
 
 if (isset($_GET['assetid'])) {
     $asset_id = $_GET['assetid'];
@@ -11,8 +10,6 @@ if (isset($_GET['success'])) {
 } else {
     $image_operation_status = 0;
 }
-
-$active = 'Asset #' . $asset_id . ' Edit';
 
 include "includes/db/connect.php";
 include "includes/scripts/functions.php";
@@ -48,20 +45,25 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
 // Fetch Data
 
 // Fetch parent name
-$asset_parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_parent_id' LIMIT 1"))['name'];
+$row_parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_parent_id' LIMIT 1"));
+$asset_parent = isset($row_parent['name']) ? $row_parent['name'] : "N/A";
 
 // Fetch class name
-$asset_class_name = mysqli_fetch_array($conn->query("SELECT name FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['name'];
-$asset_class_type = mysqli_fetch_array($conn->query("SELECT class_type FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['class_type'];
+$row_class = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"));
+$asset_class_name = isset($row_class['name']) ? $row_class['name'] : "N/A";
+$asset_class_type = isset($row_class['class_type']) ? $row_class['class_type'] : "N/A";
 
 // Fetch user name
-$asset_user_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id' LIMIT 1"))['name'];
+$row_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id' LIMIT 1"));
+$asset_user_name = isset($row_user['name']) ? $row_user['name'] : "N/A";
 
 // Fetch Status
-$asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"))['status'];
+$row_status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"));
+$asset_status = isset($row_status['status']) ? $row_status['status'] : "N/A";
 
 // Fetch deaprtment
-$asset_department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$asset_department_id' LIMIT 1"))['name'];
+$row_department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$asset_department_id' LIMIT 1"));
+$asset_department = isset($row_department['name']) ? $row_department['name'] : "N/A";
 
 
 // Update Asset info
@@ -209,7 +211,8 @@ if (isset($_POST['delete_image'])) {
     }
 }
 
-// include "includes/header.php";
+$active = $asset_name_;
+include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -267,7 +270,7 @@ if (isset($_POST['delete_image'])) {
                                     echo '<div class="alert alert-success" role="alert">Image Removed!</div>';
                                 }
                             ?>
-                            <div id="image-container" style="padding: 20px">
+                            <div id="image-container" style="padding: 20px" class = "row mb-3">
                                 <script>
                                     window.onload = function() {
                                         var img = document.getElementById('assetImage');
@@ -277,14 +280,20 @@ if (isset($_POST['delete_image'])) {
                                 <img src="" id="assetImage">                            
                                 
                             </div>
-                            <form action="edit_asset.php?assetid=<?php echo $asset_id ?>" method="post" enctype="multipart/form-data">
-                                <input type="file" name="file" style="color: white">
-                                <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
-                                <?php
-                                    if ($asset_image != "")
-                                        echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
-                                ?>
-                            </form>
+                            <div class = "row mb-3">
+                                <form action="edit_asset.php?assetid=<?php echo $asset_id ?>" method="post" enctype="multipart/form-data">
+                                <div class = "col -md-6">
+                                    <input type="file" name="file" style="color: white">
+                                </div>
+                                <div class = "col -md-6">
+                                    <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
+                                    <?php
+                                        if ($asset_image != "")
+                                            echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
+                                    ?>
+                                </div>
+                                </form>
+                            </div>
                         </div>
                         <div class = "col -md-6">
                             <!-- Asset table -->
