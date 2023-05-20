@@ -89,6 +89,18 @@ while($row = $result->fetch_assoc()) {
         $type = "--";
     }
 
+    if ($row['result'] == 0) {
+        $request_result = "Pending";
+    } else if ($row['result'] == 1) {
+        $request_result = "Approved";
+    } else if ($row['result'] == 2) {
+        $request_result = "Rejected";
+    } else if ($row['result'] == 3) {
+        $request_result = "Canceled";
+    } else {
+        $request_result = "--";
+    }
+
 
     $data[] = array(
         "id" => $row['id'],
@@ -96,7 +108,7 @@ while($row = $result->fetch_assoc()) {
         "participant" => $participant,
         "asset" => $asset,
         "type" => $type,
-        "result" => ($row['result'] == 0) ? "Pending" : (($row['result'] == 1) ? "Approved" : "Rejected"), // 0 -> pending, 1 -> approved, 2->rejected
+        "result" => $request_result, // 0 -> pending, 1 -> approved, 2 -> rejected, 3 -> canceled
         "request_time" => date("H:i m-d",$row['request_time']+28200),
         "review_time" =>  $row['review_time']?  date("H:i m-d",$row['review_time']+28200) : "--",
         // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,

@@ -3,20 +3,30 @@ include "includes/db/connect.php";
 //return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn)
 {
+    if ($id === -1)
+        return "N/A";
     $sql_entity = "SELECT name FROM entity WHERE id = '$id'";
-    return mysqli_fetch_array($conn->query($sql_entity))['name'];
+    $row = mysqli_fetch_array($conn->query($sql_entity));
+    if (isset($row['name'])) {
+        return $row['name'];
+    } else {
+        return "N/A";
+    }
 }
 
-//return the name of the department corresponding to @param int $id
-function getDepartmentName($id, $conn)
-{
-    $sql_department = "SELECT name FROM department WHERE id = '$id'";
-    return mysqli_fetch_array($conn->query($sql_department))['name'];
+//faciliate clearance of assets and requests when a user is moved to another department
+function departmentClearance($user_id, $conn) {
+    $sql_asset = "UPDATE asset SET status=1, user=NULL WHERE user=$user_id"; //set all assets to idel
+    $sql_request = "UPDATE pending_requests SET result=3 WHERE initiator=$user_id"; //cancell all request
+    if (!$conn->query($sql_asset)) {
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
+    }
+    if (!$conn->query($sql_request)) {
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
+    }
 }
-
-session_start();
-$session_info = $_SESSION['user'];
-$active = 'Edit User';
 
 //set up inital value of the form
 if (isset($_GET['id'])) {
@@ -28,8 +38,9 @@ if (isset($_GET['id'])) {
             $current_user_data = mysqli_fetch_assoc($result);
             $last_modified = date('Y-m-d H:i:s', $current_user_data['date_created']); //convert format
             $name = $current_user_data['name'];
-            $entity = getEntityName($current_user_data['entity'], $conn);
-            $department = getDepartmentName($current_user_data['department'], $conn);
+            $entity_id = isset($current_user_data['entity']) ? $current_user_data['entity'] : -1; //-1 if no entity
+            $entity_name = getEntityName($entity_id, $conn);
+            $department_id = isset($current_user_data['department']) ? $current_user_data['department'] : -1; //-1 if no department
             $entity_super = $current_user_data['entity_super'];
             $current_role = $current_user_data['role'];
             $locked = $current_user_data['locked'];
@@ -39,6 +50,53 @@ if (isset($_GET['id'])) {
     header('Location: users.php');
 }
 
+$edit_status = -1;
+if (isset($_GET['error'])) {
+    $edit_status = $_GET['error'];
+} elseif (isset($_GET['success'])) {
+    $edit_status = 0;
+}
+
+//handle post requests to update user account details
+if (isset($_POST['submit_changes'])) {
+    $new_department_id = $_POST['department'];
+    $new_role_id = $_POST['role'];
+    $new_locked = isset($_POST['lock_account']) ? 1 : 0;
+
+    if ($new_department_id != $department_id) { //moved to another department
+        departmentClearance($user_id, $conn);
+    }
+
+    //validations for roles
+    if ($new_role_id == 2)
+        $new_department_id = -1;
+    elseif ($new_role_id > 2 && $new_department_id == -1) {
+        header("Location: edit_user.php?id=$user_id&error=1");
+        exit;
+    }
+
+    $sql = "UPDATE user SET department=NULLIF($new_department_id, -1), role='$new_role_id', locked='$new_locked'";
+    if (isset($_POST['password']) and $_POST['password'] !== "") { //if password is updated
+        $new_password = $_POST['password'];
+        $new_hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        $sql .= ", password='$new_hashed_password'";
+    }
+
+    $sql .= " WHERE id='$user_id'";
+
+    if ($conn->query($sql)) { //update successful
+        header("Location: edit_user.php?id=$user_id&success");
+    } else { //update failed
+        header("Location: edit_user.php?id=$user_id&error=2");
+        exit;
+    }
+
+}
+
+$active = 'Edit User';
+include "includes/header.php";
+$session_info = $_SESSION['user'];
+$editor_role = $session_info['role'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,20 +156,6 @@ if (isset($_GET['id'])) {
 
 <div id="layoutSidenav_content">
     <main>
-        <header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
-            <div class="container-fluid px-4">
-                <div class="page-header-content">
-                    <div class="row align-items-center justify-content-between pt-3">
-                        <div class="col-auto mb-3">
-                            <h1 class="page-header-title">
-                                <div class="page-header-icon"><i data-feather="briefcase"></i></div>
-                                User
-                            </h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
         <!-- Main page content-->
         <div class="container-xl px-4 mt-4 py-3">
             <!-- Account page navigation-->
@@ -120,37 +164,61 @@ if (isset($_GET['id'])) {
                     <!-- Account details card-->
                     <div class="card mb-4">
                         <div class="card-header">Account Details</div>
+                        <?php
+                                if ($edit_status == 0) {
+                                    echo '<div class="alert alert-success" role="alert">Update Successful!</div>';                                                     
+                                } elseif ($edit_status == 1) {
+                                    echo '<div class="alert alert-danger" role="alert">Department cannot be empty</div>'; 
+                                } elseif ($edit_status == 2) {
+                                    echo '<div class="alert alert-danger" role="alert">Update failed</div>'; 
+                                }
+                        ?>
                         <div class="card-body">
-                            <?php
-                            if (isset($_GET["insert_error"])) echo  '<div class="alert alert-danger" role="alert">Failed to update. Re-entered password does not match password.</div>'
-                            ?>
-                            <?php echo  "<p style=\"color: gray;\">date joined: " . $last_modified . "</p>" ?>
-                            <form method="post" action="update_user.php">
-                                <!-- Form Row-->
+                            <?php echo  "<p style=\"color: gray;\">Date Joined: " . $last_modified . "</p>" ?>
+                            <form method="post" action="edit_user.php?id=<?=$user_id?>">
+                                <!-- Form Row -->
                                 <div class="row gx-3 mb-3">
-                                    <!-- Form Group (name)-->
+                                    <!-- Form Group (name) -->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputName">Name</label>
                                         <input disabled class="form-control" required id="inputName" type="text" value="<?php echo $name ?>" name="name">
                                     </div>
-                                    <!-- Form Group (entity)-->
+                                    <!-- Form Group (entity) -->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity ?>" name="entity">
+                                        <input disabled class="form-control" required id="inputEntity" type="text" value="<?php echo $entity_name ?>" name="entity">
                                     </div>
-
                                 </div>
-                                <!-- Form Row        -->
+                                <!-- Form Row -->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <input disabled class="form-control" id="inputDepartment" type="text" value="<?php echo $department ?>" name="department">
-                                    </div>
+                                        <select class="form-control" id="inputDepartment" name="department" <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?>>
+                                            <option value="-1">-</option>
+                                            <?php
+                                                $results = $conn->query("SELECT id, name FROM department WHERE entity='$entity_id'");
+                                                echo $entity_id;
+                                                while ($row = $results->fetch_assoc()) {
+                                                    unset($id, $name);
+                                                    $id = $row['id'];
+                                                    $name = $row['name'];
+                                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                        <script>
+                                            var selectDepartment = document.getElementById('inputDepartment');
+                                            selectDepartment.value = <?=$department_id?>;
+                                        </script>
+                                    </div>                                    
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
-                                        <select class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
-                                            <option value="1" <?php echo ($current_role == 1) ? "selected" : "null" ?>>superadmin</option>
+                                        <select <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> class="form-control" id="inputRole" name="role">
+                                            <?php 
+                                                if ($editor_role == 1) 
+                                                    echo '<option value="1"' . (($current_role == 1) ? "selected" : "null") . '>superadmin</option>'; 
+                                            ?>
                                             <option value="2" <?php echo ($current_role == 2) ? "selected" : "null" ?>>admin</option>
                                             <option value="3" <?php echo ($current_role == 3) ? "selected" : "null" ?>>resource manager</option>
                                             <option value="4" <?php echo ($current_role == 4) ? "selected" : "null" ?>>user</option>
@@ -159,32 +227,23 @@ if (isset($_GET['id'])) {
                                     </div>
                                 </div>
                                 <!-- Form Row -->
-                                <?php
-                                if ($user_id != $session_info['id'])
-                                    echo "<div class=\"row gx-3 mb-4\">
-                                        <!-- Form Group -->
-                                        <!-- entity super, checkbox-->
-
-                                        <div class=\"col-md-4\">
-                                            <label class=\"small mb-1\" for=\"inputLockAccount\">Lock Account</label>
-                                            <input class=\"form-check-input\" id=\"inputLockAccount\" type=\"checkbox\" name=\"lock_account\" <?php echo ($locked) ? \"checked\" : \"\" ?>>
-                                        </div>
-                                    </div>"
-                                ?>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" <?php echo ($user_id == $session_info['id']) ? "disabled" : "" ?> <?php echo ($locked) ? "checked" : "" ?> />
-                                    <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
-                                </div>
-                                <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
                                     <!-- password-->
-
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPassword">New Password</label>
                                         <input class="form-control" id="inputPassword" type="password" name="password">
+                                        <label class="small mb-1" for="inputPassword">*if the field is empty, password is unchanged.</label>
                                     </div>
                                 </div>
+                                <!-- Form Row -->
+                                <?php   
+                                    if ($editor_role < $current_role)                                  
+                                        echo '<div class="form-check form-switch">
+                                            <input class="form-check-input" id="inputLockAccount" type="checkbox" name="lock_account" ' . (($locked) ? "checked" : "") . ' />
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Lock Account</label>
+                                        </div>';
+                                ?>
 
                                 <input type="hidden" name="id" value="<?php echo $user_id ?>">
                                 <!-- Save changes button-->
@@ -194,9 +253,6 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     </main>
 
