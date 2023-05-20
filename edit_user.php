@@ -232,7 +232,11 @@ $editor_role = $session_info['role'];
                                     </div>                                    
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputRole">Role</label>
-                                        <select <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> class="form-control" id="inputRole" name="role" value=<?php echo $current_role ?>>
+                                        <select <?php echo ($editor_role < $current_role && $editor_role < 3) ? "" : "disabled"?> class="form-control" id="inputRole" name="role">
+                                            <?php 
+                                                if ($editor_role == 1) 
+                                                    echo '<option value="1"' . (($current_role == 1) ? "selected" : "null") . '>superadmin</option>'; 
+                                            ?>
                                             <option value="2" <?php echo ($current_role == 2) ? "selected" : "null" ?>>admin</option>
                                             <option value="3" <?php echo ($current_role == 3) ? "selected" : "null" ?>>resource manager</option>
                                             <option value="4" <?php echo ($current_role == 4) ? "selected" : "null" ?>>user</option>
