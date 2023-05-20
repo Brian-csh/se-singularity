@@ -234,6 +234,7 @@ $editor_role = $session_info['role'];
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPassword">New Password</label>
                                         <input class="form-control" id="inputPassword" type="password" name="password">
+                                        <label class="small mb-1" for="inputPassword">*if the field is empty, password is unchanged.</label>
                                     </div>
                                 </div>
                                 <!-- Form Row -->
