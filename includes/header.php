@@ -100,6 +100,9 @@ if(isset($_GET['bind_err'])) {
                         </a>
                     <?php endif;?>
                 </li>
+                <?php if($session_info['role'] == 2): ?>
+                    <li><a class="dropdown-item dropdown-settings-header" href="/customize_navbar.php">Customize Navbar</a></li>
+                <?php endif; ?>
                 <li><a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor : pointer;">Logout</a></li>
             </ul>
             <script>

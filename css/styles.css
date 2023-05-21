@@ -21147,3 +21147,7 @@ button.dt-button {
   padding: 4px;
   color: #a7aeb8;
 }
+
+.page-header-icon.text-white {
+  vertical-align: text-bottom;
+}
