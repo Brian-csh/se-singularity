@@ -6,7 +6,7 @@ function initFeishuApproval(
     $conn,
     $entity_id,
     $feishu_app_id = "cli_a4a8e931cd79900e",
-    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ",
+    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
 ) {
     // get tenant access token
     $token_url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/";
