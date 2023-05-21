@@ -1,14 +1,20 @@
 <?php
-session_start();
-$session_info = $_SESSION;
-$active = 'Entity #' . $_GET['id'];
-$initiator_id = $session_info['user']['id'];
 
 include "includes/header.php";
+include "includes/navbar.php";
+$initiator_id = $user_id; 
 
-if (isset($_GET['id'])) {
-    $entity_id = $_GET['id'];
+//ONLY SUPERADMIN and ADMIN CAN ACCESS THIS PAGE
+if($role_id == 1){
+    // TODO: access entity page from entities.php
+    if (isset($_GET['id'])) {
+        $entity_id = $_GET['id'];
+    }
+} else if ($role_id == 2){ // no department_id
+    // TODO: access entity page from navbar -> no get request
 }
+
+echo "<script>document.title = '" . 'Entity #'. $entity_id . ' - Singularity EAM'."';</script>";
 
 // Fetch entity values
 $sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
@@ -156,7 +162,7 @@ if (isset($_POST['create_asset_attribute'])) {
                             if ($result) {
                                 if (mysqli_num_rows($result) > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        $department_id = $row['id'];
+                                        $departmentid = $row['id'];
                                         $department_name = $row['name'];
                                         $department_parent = $row['parent'];
 
@@ -165,8 +171,8 @@ if (isset($_POST['create_asset_attribute'])) {
                                         $parent_assoc = $parent_name_result->fetch_assoc();
                                         $parent_name = (isset($parent_assoc['name'])) ? $parent_assoc['name'] : "N/A";
 
-                                        echo "<tr data-id='$department_id' ><td>$department_id</td>".
-                                                "<td><a class='text-primary' href='department.php?id=$department_id'>$department_name</a></td><td>$parent_name</td></tr>";
+                                        echo "<tr data-id='$departmentid' ><td>$departmentid</td>".
+                                                "<td><a class='text-primary' href='/department.php?departmentid=$departmentid'>$department_name</a></td><td>$parent_name</td></tr>";
                                     }
                                 }
                             }
@@ -228,17 +234,20 @@ if (isset($_POST['create_asset_attribute'])) {
         </div>
     </div>
 
-
-
-
-
-
-
     <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/jquery-3.6.0.min.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        var role_id_ = <?= $role_id ?>;
+        // Get the element by its href attribute
+        if(role_id_ == 1){
+            var element = document.querySelector('a[href="/entities.php"]');
+            // Toggle the \"active\" class
+            element.classList.toggle('active');
+        }
+    </script>
     <?php
     include "includes/footer.php";
     ?>

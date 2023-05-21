@@ -12,7 +12,7 @@ if (empty($assetIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 } else {
     //MAKE request to manager(leaves log at the same time)
-    $results = retire_asset($conn,$user_id,$assetIds);
+    $results = make_request($conn,$user_id,null,$assetIds,3);
 
     $responseData = array('result' => $results);
 

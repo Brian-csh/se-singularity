@@ -56,7 +56,7 @@ if (isset($_POST['normal-login_click'])) {
 
                 // Insert log
                 insert_log_login($conn,$row,1);
-
+                    
                 header("Location: index.php");
             } else $errors = "Wrong password";
         } else $errors = "Wrong username or password";

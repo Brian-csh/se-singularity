@@ -1,13 +1,32 @@
 <?php
-if (isset($_GET['id'])) {
-    $asset_id = $_GET['id'];
-}
-if (isset($_GET['name'])) {
-    $asset_name = $_GET['name'];
+include "includes/db/connect.php";
+
+if (isset($_GET['assetid'])) {
+    $asset_id_ = $_GET['assetid'];
 }
 
-$active = $asset_name;
+if (isset($_POST['print'])) { //print asset tag
+    $tag_url = "asset_tag.php?id=".$asset_id_;
+
+    //redirect to asset tag page
+    header("Location: ".$tag_url);
+}
+
+//fetch the asset entry
+$sql = "SELECT * FROM asset WHERE id = $asset_id_ LIMIT 1";
+$result = $conn->query($sql);
+if ($result) {
+    $row = $result->fetch_assoc();
+    $asset_name = $row['name'];
+} else {
+    exit("No asset found with that ID.");
+}
+
+$active = "Asset";
 include "includes/header.php";
+
+// Fetch asset name
+$asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id_'"))['name'];
 
 ?>
 
@@ -41,7 +60,7 @@ include "includes/header.php";
                             </h1>
                             <div class="page-header-subtitle">
                             <?php
-                            $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id' LIMIT 1";
+                            $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id_' LIMIT 1";
                             $result = $conn->query($sql_asset);
 
                             if ($result&&mysqli_num_rows($result) > 0) {
@@ -51,7 +70,7 @@ include "includes/header.php";
                             echo "Date Created: {$date_create}<br>";
 
                             // Fetch logs
-                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id') ORDER BY date DESC";
+                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id_') ORDER BY date DESC";
                             $result = $conn->query($sql_log);
 
                             ?>
@@ -92,7 +111,9 @@ include "includes/header.php";
                                                                 
                                 //Fetch Log Type
                                 $type_id = $row["log_type"];
-                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
+                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"));
+                                if(isset($type['type']))
+                                    $type = $type['type'];
                                 if($type_id>=1 && $type_id <=3)continue;
 
                                 $date = gmdate("Y.m.d \ | H:i:s", $row["date"]+28800);
@@ -102,8 +123,11 @@ include "includes/header.php";
                                 // Fetch user name
                                 $user_id = $row["By"];
                                 $by = "";
-                                if ($user_id != '') $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"))['name'];
-
+                                if ($user_id != '') {
+                                    $by = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$user_id'"));
+                                    if(isset($by['name']))
+                                        $by = $by['name'];
+                                }
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
@@ -116,6 +140,9 @@ include "includes/header.php";
                             ?>
                         </tbody>
                     </table>
+                    <form method="post" action="asset.php?assetid=<?=$asset_id_?>">
+                        <button type="submit" name="print" class="btn btn-primary btn-xs float-end">Asset Tag</a>
+                    </form>
                 </div>
             </div>
         </div>

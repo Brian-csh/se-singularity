@@ -1,7 +1,23 @@
 <?php
+
 include "includes/db/connect.php";
-if (isset($_GET['id'])) {
-    $department_id = $_GET['id'];
+include "includes/header.php";
+include "includes/navbar.php";
+
+if($role_id == 1){
+    //TODO: access department page from entities.php
+    $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
+} else if ($role_id == 2){
+    // access from entity.php
+    $department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
+} else if ($role_id == 3){// resource manager
+    if(isset($_GET['departmentid'])){ // access after editting department name
+        $department_id = $_GET['departmentid'];
+    } else { // access through navbar
+        $department_id = $department_id;
+    }
+} else { //user
+    //do nothing. user can't see this page
 }
 
 //get the department name given the id from database using mysql
@@ -18,27 +34,44 @@ if ($result) {
     exit("No department found with that ID.");
 }
 
+echo "<script>document.title = '" . $department_name . "';</script>";
+
+
 if (isset($_POST['edit_details'])) {
     //update the name and parent
-    $department_id = $_POST['department_id'];
+    $departmentid = $_POST['department_id_'];
     $updated_department_name = $_POST['department_name'];
     $updated_department_parent = $_POST['parent'];
 
     if ($updated_department_parent === "") {
-        $sql = "UPDATE department SET name = '$updated_department_name', parent = NULL WHERE id = '$department_id'";
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = NULL WHERE id = '$departmentid'";
     } else {
-        $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$department_id'";
+        $sql = "UPDATE department SET name = '$updated_department_name', parent = '$updated_department_parent' WHERE id = '$departmentid'";
     }
     if ($conn->query($sql)) {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name);
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "&name=" . $updated_department_name . "'</script>";
     } else {
-        header('Location: department.php?id=' . $department_id . '&name=' . $updated_department_name . '&insert_error');
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid . "&name=" . $updated_department_name . "&insert_error'</script>";
     }
 }
-$active = $department_name;
-include "includes/header.php";
-?>
 
+if (isset($_POST['define_tag'])) {
+    // Retrieve the selected checkboxes
+    $selectedOptions = $_POST['checkboxOptions'];
+    $departmentid_ = $_POST['department_id'];
+
+    $template = json_encode($selectedOptions);
+    $sql = "UPDATE department SET template = '$template' WHERE id = '$departmentid_'";
+
+    if ($conn->query($sql)) {
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid_ . "'</script>";
+    } else {
+        echo "<script>window.location.href = 'department.php?departmentid=" . $departmentid_ ."&insert_error'</script>";
+    }
+}
+
+$active = $department_name;
+?>
 
 <div id="layoutSidenav_content">
     <main>
@@ -78,8 +111,12 @@ include "includes/header.php";
                                 <div class="page-header-icon text-white"><i data-feather="box"></i></div>
                                 Sub-departments
                             </h1>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers">Manage Users</a>
-                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="margin-right: 10px">Edit</a>
+
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#defineAssetTags">Define Asset Tag</a>
+                            <?php if($role_id <= 2 && $role_id >=1) {?>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" id="manageUsers" style="margin-right: 10px">Manage Users </a>
+                            <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" style="margin-right: 10px">Edit</a>
+                            <?php }?>
                         </div>
                     </div>
                 </div>
@@ -117,7 +154,7 @@ include "includes/header.php";
                                         $id = $row['id'];
                                         $name = $row['name'];
 
-                                        echo "<tr data-id='$id' ><td>$id</td><td>$name</td></tr>";
+                                        echo "<tr data-id='$id'><td>$id</td><td><a href='/department.php?departmentid=$id'>$name</a></td></tr>";
                                     }
                                 }
                             }
@@ -131,8 +168,8 @@ include "includes/header.php";
 
 
 
-    <!-- Add Class Modal -->
-    <div class="modal fade" id="addDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+    <!-- Edit Department Modal -->
+    <div class="modal fade" id="editDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -159,10 +196,8 @@ include "includes/header.php";
                                 ?>
                             </select>
                         </div>
-
-
                     </div>
-                    <input type="hidden" name="department_id" value="<?php echo $department_id ?>">
+                    <input type="hidden" name="department_id_" value="<?php echo $department_id ?>">
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-success" type="submit" name="edit_details">Submit</button>
@@ -172,10 +207,74 @@ include "includes/header.php";
         </div>
     </div>
 
+    <!-- Dfine Asset Tag Modal -->
+    <div class="modal fade" id="defineAssetTags" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Define Asset Tags</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="department.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <h6>Current template</h6>
+                            <?php
+                                //obtain the existing template
+                                $sql = "SELECT * FROM department WHERE id = '$department_id' LIMIT 1";
+                                $result = $conn->query($sql);
+                                if ($result) {
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $row = $result->fetch_assoc();
+                                        $template_string = isset($row['template']) ? $row['template'] : "";
+                                    }
+                                } else {
+                                    exit("No department found with that ID.");
+                                }
+                                $template = json_decode($template_string);
+                                $template_values = is_array($template) ? $template : []; // Ensure $template is an array
+                                $template_value_string = implode(", ", $template_values);
+                                if (!empty($template_value_string)) {
+                                    $template_value_string = ", ".$template_value_string;
+                                }
+                                echo "<p>id, name, class" . $template_value_string . "<br></p>";
+
+                            ?>
+                            <h6>Select contents to be included</h6>
+                            <?php
+                                $checkboxOptions = array(
+                                    'description',
+                                    'entity',
+                                    'department',
+                                    'position',
+                                    'expire',
+                                    'serial number',
+                                    'brand',
+                                    'model'
+                                );
+                                // Generate checkboxes dynamically
+                                foreach ($checkboxOptions as $option) {
+                                    echo '<label>';
+                                    echo '<input type="checkbox" name="checkboxOptions[]" value="' . $option . '"> ' . $option;
+                                    echo '</label><br>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+                    <input type="hidden" name="department_id" value="<?=$department_id?>">
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" name="define_tag">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
     var btn = document.getElementById('manageUsers');
     btn.addEventListener('click', function() {
-      document.location.href = 'users.php?departmentid=<?= $department_id ?>';
+        document.location.href = '/users.php?departmentid=<?= $department_id ?>';
     });
     </script>
 
@@ -184,6 +283,18 @@ include "includes/header.php";
     <script src="js/scripts.js"></script>
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
+    <script>
+        var role_id = <?= $role_id ?>;
+        // Rest of your JavaScript code that uses the role_id variable
+        if (role_id === 2) {
+            var element = document.querySelector('a[href="/entity.php"]');
+            // Toggle the "active" class
+            element.classList.toggle('active');
+        } else if (role_id === 1){
+            var element = document.querySelector('a[href="/entities.php"]');
+            element.classList.toggle('active');
+        }
+        </script>
     <?php
     include "includes/footer.php";
     ?>

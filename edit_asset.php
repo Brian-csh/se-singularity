@@ -1,17 +1,15 @@
 <?php
-if (isset($_GET['id'])) {
-    $asset_id = $_GET['id'];
+include "includes/calculate_price.php";
+
+if (isset($_GET['assetid'])) {
+    $asset_id = $_GET['assetid'];
 }
-if (isset($_GET['name'])) {
-    $asset_name = $_GET['name'];
-}
+
 if (isset($_GET['success'])) {
     $image_operation_status = $_GET['success'];
 } else {
     $image_operation_status = 0;
 }
-
-$active = 'Asset #' . $asset_id . ' Edit';
 
 include "includes/db/connect.php";
 include "includes/scripts/functions.php";
@@ -23,9 +21,9 @@ $result_asset = $conn->query($sql_asset);
 
 if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_data = mysqli_fetch_assoc($result_asset);
-        $date_create = gmdate("Y.m.d \ | H:i:s",$asset_data['date_created']+28000);
+        $date_create = gmdate("Y.m.d \ | H:i:s",$asset_data['date_created']+28800);
         $asset_parent_id = $asset_data['parent'];
-        $asset_name = $asset_data['name'];
+        $asset_name_ = $asset_data['name'];
         $asset_class_id = $asset_data['class'];
         $asset_user_id = $asset_data['user'];
         $asset_price = $asset_data['price'];
@@ -47,41 +45,45 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
 // Fetch Data
 
 // Fetch parent name
-$asset_parent = mysqli_fetch_array($conn->query("SELECT * FROM asset WHERE id = '$asset_parent_id' LIMIT 1"))['name'];
+$row_parent = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_parent_id' LIMIT 1"));
+$asset_parent = isset($row_parent['name']) ? $row_parent['name'] : "N/A";
 
 // Fetch class name
-$asset_class_name = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['name'];
-$asset_class_type = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['class_type'];
+$row_class = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"));
+$asset_class_name = isset($row_class['name']) ? $row_class['name'] : "N/A";
+$asset_class_type = isset($row_class['class_type']) ? $row_class['class_type'] : "N/A";
 
 // Fetch user name
-$asset_user_name = mysqli_fetch_array($conn->query("SELECT * FROM user WHERE id = '$asset_user_id' LIMIT 1"))['name'];
+$row_user = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$asset_user_id' LIMIT 1"));
+$asset_user_name = isset($row_user['name']) ? $row_user['name'] : "N/A";
 
 // Fetch Status
-$asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"))['status'];
+$row_status = mysqli_fetch_array($conn->query("SELECT status FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"));
+$asset_status = isset($row_status['status']) ? $row_status['status'] : "N/A";
 
 // Fetch deaprtment
-$asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WHERE id = '$asset_department_id' LIMIT 1"))['name'];
+$row_department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$asset_department_id' LIMIT 1"));
+$asset_department = isset($row_department['name']) ? $row_department['name'] : "N/A";
 
 
 // Update Asset info
 if(isset($_POST['edit_asset'])){
     $asset_new_parent = $_POST['editAssetParent'];
-    $asset_new_name = $_POST['editAssetName']; if(!$asset_new_name) $asset_new_name = $asset_name;
+    $asset_new_name = $_POST['editAssetName']; if(!$asset_new_name) $asset_new_name = $asset_name_;
 
 
     $asset_new_class = $_POST['editAssetClass'];
     $asset_new_expire = $_POST['editAssetExpire']; if(!$asset_new_expire) $asset_new_expire = $asset_expire;
 
-    $asset_new_user = $_POST['editAssetUser']; if(!$asset_new_user) $asset_new_user = $asset_user_id;
     $asset_new_position = $_POST['editAssetPosition'];
-    $asset_new_status = $_POS['editAssetStatus']; if(!$asset_new_status) $asset_new_status = $asset_status_id;
     $sql = "UPDATE asset SET parent =$asset_new_parent,name = '$asset_new_name',class = '$asset_new_class', 
         expire = '$asset_new_expire',position = '$asset_new_position' WHERE id = '$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Asset info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
+        // header('Location: edit_asset.php?assetid=' . $asset_id );
+        echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id'</script>";
     }
     else{
         echo "<script>alert('Asset update failed!')</script>";
@@ -96,8 +98,8 @@ if(isset($_POST['description_change'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Description updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
+        echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id'</script>";
     }
     else{
         echo "<script>alert('Description update failed!')</script>";
@@ -113,8 +115,8 @@ if(isset($_POST['edit_basic'])){
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Basic info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
+        echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id'</script>";
     }
     else{
         echo "<script>alert('Basic info update failed!')</script>";
@@ -124,14 +126,13 @@ if(isset($_POST['edit_basic'])){
 // Update Financial info
 if(isset($_POST['edit_financial'])){
     $financial_op = $_POST['financial_op']; if(!$financial_op) $financial_op = $asset_original_price;
-    $financial_cp = $_POST['financial_cp']; if(!$financial_cp) $financial_cp = $asset_current_price;
-    $financial_dp = $_POST['financial_dp']; if(!$financial_dp) $financial_dp = $asset_deprecation_model;
-    $sql = "UPDATE asset SET `price`='$financial_op', `current price`='$financial_cp', `depreciation model`='$financial_dp' WHERE id='$asset_id'";
+    $sql = "UPDATE asset SET `price`='$financial_op' WHERE id='$asset_id'";
     $result = $conn->query($sql);
     if($result){
         echo "<script>alert('Financial info updated successfully!')</script>";
-        insert_log_asset($conn,$asset_data,$session_info['id'],6);
-        echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+        insert_log_edit_asset($conn,$asset_data,$session_info['id'],6);
+        // TODO: Update current asset value
+        echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id'</script>";
     }
     else{
         echo "<script>alert('Financial info update failed!')</script>";
@@ -155,8 +156,8 @@ if(isset($_POST['edit_custom_attr'])){
     $sql = "UPDATE asset SET custom_attr='$custom_attributes' WHERE id='$asset_id'";
      if($conn->query($sql)){
          echo "<script>alert('Custom attribute info updated successfully!')</script>";
-//         insert_log_asset($conn,$asset_data,6);
-//         echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
+//         insert_log_edit_asset($conn,$asset_data,6);
+        // echo "<script>window.location.href = 'edit_asset.php?id=$asset_id&name=$asset_name'</script>";
      }
      else{
          echo "<script>alert('Custom attribute info update failed!')</script>";
@@ -182,7 +183,8 @@ if (isset($_POST['upload_image'])) {
                 $image_operation_status = -1;
                 echo "<script>alert('Update image failed!')</script>";
             }
-            header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=1');
+            echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id&success=1'</script>";
+            // header('Location: edit_asset.php?assetid=' . $asset_id . '&success=1');
         } catch (OssException $e) {
             $image_operation_status = -1;
             echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
@@ -201,13 +203,15 @@ if (isset($_POST['delete_image'])) {
             $image_operation_status = -1;
             echo "<script>alert('Update image failed!')</script>";
         }
-        header('Location: edit_asset.php?id=' . $asset_id . '&name=' . $asset_name . '&success=2');
+        echo "<script>window.location.href = 'edit_asset.php?assetid=$asset_id&success=2'</script>";
+        // header('Location: edit_asset.php?assetid=' . $asset_id . '&success=2');
     } catch (OssException $e) {
         $image_operation_status = -1;
         echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
     }
 }
 
+$active = $asset_name_;
 include "includes/header.php";
 ?>
 <!DOCTYPE html>
@@ -238,7 +242,7 @@ include "includes/header.php";
                         <div class="col-auto mt-4">
                             <h1 class="page-header-title">
                                 <div class="page-header-icon"><i data-feather="package"></i></div>
-                                <?php echo $asset_name ?>
+                                <?php echo $asset_name_ ?>
                             </h1>
                             <div class="page-header-subtitle">
                                 <?php echo "Date Created: {$date_create}<br>";?>
@@ -261,12 +265,12 @@ include "includes/header.php";
                                 if ($image_operation_status == 1) {
                                     echo '<div class="alert alert-success" role="alert">Upload Successful!</div>';
                                 } else if ($image_operation_status == -1) {
-                                    echo '<div class="alert alert-danger" role="alert">Upload Failed</div>';
+                                    echo '<div class="alert alert-danger" role="alert">Operation Failed</div>';
                                 } else if ($image_operation_status == 2) {
-                                    echo '<div class="alert alert-success" role="alert">Successful Removed!</div>';
+                                    echo '<div class="alert alert-success" role="alert">Image Removed!</div>';
                                 }
                             ?>
-                            <div id="image-container" style="padding: 20px">
+                            <div id="image-container" style="padding: 20px" class = "row mb-3">
                                 <script>
                                     window.onload = function() {
                                         var img = document.getElementById('assetImage');
@@ -276,17 +280,23 @@ include "includes/header.php";
                                 <img src="" id="assetImage">                            
                                 
                             </div>
-                            <form action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" method="post" enctype="multipart/form-data">
-                                <input type="file" name="file" style="color: white">
-                                <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
-                                <?php
-                                    if ($asset_image != "")
-                                        echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
-                                ?>
-                            </form>
+                            <div class = "row mb-3">
+                                <form action="edit_asset.php?assetid=<?php echo $asset_id ?>" method="post" enctype="multipart/form-data">
+                                <div class = "col -md-6">
+                                    <input type="file" name="file" style="color: white">
+                                </div>
+                                <div class = "col -md-6">
+                                    <button type="submit" name="upload_image" class="btn btn-primary text-light float-end" style="background:green; border:none">Upload</button>
+                                    <?php
+                                        if ($asset_image != "")
+                                            echo '<button type="submit" name="delete_image" class="btn btn-primary text-light float-end" style="background:red; border:none; margin-right: 10px;">Delete</button>';
+                                    ?>
+                                </div>
+                                </form>
+                            </div>
                         </div>
                         <div class = "col -md-6">
-                            <!-- TODO: Asset table -->
+                            <!-- Asset table -->
                             <div class="card">
                                 <div class="card-header">
                                     <h3> Asset Info
@@ -320,7 +330,7 @@ include "includes/header.php";
                                                 </td>
                                                 <td><?php echo $asset_class_name; ?></td>
                                                 <td><?php echo $asset_user_name; ?></td>
-                                                <td><?php echo $asset_department; ?><td>
+                                                <td><?php echo $asset_department; ?></td>
                                                 <td><?php echo $asset_position; ?></td>
                                                 <td><?php echo $asset_expire; ?></td>
                                                 <!-- Todo : add color for diff status -->
@@ -336,7 +346,7 @@ include "includes/header.php";
 
                     <!-- Description input box -->
                     <!-- TODO: support RTF -->
-                    <form method = "POST" action="edit_asset.php?id=<?php echo $asset_id ?>&name=<?php echo $asset_name ?>" >
+                    <form method = "POST" action="edit_asset.php?assetid=<?php echo $asset_id ?>" >
                         <div class= "row mb-3 gx-3">
                             <div class="col-md-12">
                                 <label class="small mb-1" for="descriptionTextarea">Description</label>
@@ -398,11 +408,14 @@ include "includes/header.php";
                                             </tr>
                                             <tr>
                                                 <th>Current Price</th>
-                                                <td><?php echo $asset_current_price; ?></td>
-                                            </tr>
-                                            <tr>
-                                                <th>Depreciation Model</th>
-                                                <td><?php echo $asset_depreciation_model; ?></td>
+                                                <td><?php 
+                                                if(calculate_price($asset_data, time()) == -1){
+                                                    echo "No expire date set to calculate current price";
+                                                }
+                                                else{
+                                                    echo number_format((float)calculate_price($asset_data, time()), 2, '.', ''); 
+                                                }
+                                                    ?></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -490,7 +503,6 @@ include "includes/header.php";
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM asset_class");
                                                     while ($row = $results->fetch_assoc()) {
-                                                        $id = 0; $parent = NULL;
                                                         if ($row['name']!=$asset_class_name) {
                                                             unset($id, $class);
                                                             $id = $row['id'];
@@ -522,7 +534,7 @@ include "includes/header.php";
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM asset");
                                                     while ($row= $results->fetch_assoc()) {
-                                                        if ($row['name']!= $asset_parent&&$row['name']!= $asset_name) {
+                                                        if ($row['name']!= $asset_parent&&$row['name']!= $asset_name_) {
                                                             unset($id, $parent);
                                                             $id = $row['id'];
                                                             $parent = $row['name'];
@@ -533,48 +545,6 @@ include "includes/header.php";
                                         </select>
                                 </div>
                             </div>
-
-                            <!-- Edit user -->
-                            <!-- <div class="col">
-                                <div class="mb-3">
-                                    <label for="editAssetUser">Users</label>
-                                        <select class="form-control ms-2" id="editUser" name="editAssetUser">
-                                            <?php echo '<option value="' . $asset_user_id . '">' . $asset_user_name . '</option>'; ?>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, name FROM user");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['name']!= $asset_user_name) {
-                                                            unset($id, $user);
-                                                            $id = $row['id'];
-                                                            $user = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $user . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div> -->
-                            <!-- Edit Status -->
-                            <!-- <div class="col">
-                                <div class="mb-3">
-                                    <label for="editAssetStatus">Status</label>
-                                        <select class="form-control ms-2" id="editStatus" name="editAssetStatus">
-                                            <?php echo '<option value="' . $asset_status_id . '">' . $asset_status . '</option>';?>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, status FROM asset_status_class");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        if ($row['status']&& $row['status']!= $asset_status) {
-                                                            unset($id, $status);
-                                                            $id = $row['id'];
-                                                            $status = $row['status'];
-                                                            echo '<option value="' . $id . '">' . $status . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                        </select>
-                                </div>
-                            </div> -->
-
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -635,16 +605,6 @@ include "includes/header.php";
                         <div class="mb-3">
                             <label for="editOP">Original Price </label>
                             <input class="form-control" id="financialEditOP" type="text" name="financial_op" placeholder="<?php echo $asset_original_price; ?>" >
-                        </div>
-                        <!-- Edit Model-->
-                        <div class="mb-3">
-                            <label for="editCP">Current Price </label>
-                            <input class="form-control" id="financialEditCP" type="text" name="financial_cp" placeholder="<?php echo $asset_current_price; ?>">
-                        </div>
-                        <!-- Edit Serial Number -->
-                        <div class="mb-3">
-                            <label for="editDeprecationModel">Depreciation Model </label>
-                            <textarea class="form-control" id="financialEditDM" type="text" name="financial_dp" rows = "5" placeholder="<?php echo $asset_deprecation_model; ?>"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

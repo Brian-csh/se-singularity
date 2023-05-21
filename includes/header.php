@@ -61,6 +61,8 @@ if(isset($_GET['bind_err'])) {
 
     <!-- Navbar Items-->
     <ul class="navbar-nav align-items-center ms-auto">
+        <!-- Notifications -->
+        <?php include "header_notifications.php" ?>
         <!-- User Dropdown-->
         <li class="nav-item dropdown no-caret dropdown-user me-3 me-lg-4">
             <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage" role="button" aria-expanded="false" onclick="toggleDropdownMenu()">
@@ -85,7 +87,7 @@ if(isset($_GET['bind_err'])) {
                 </a>
             </div>
             <ul class="dropdown-menu animated--fade-in-up" id="userDropdownMenu" aria-labelledby="navbarDropdownUserImage">
-                <li><a class="dropdown-item dropdown-settings-header" href="/settings.php">Settings</a></li>
+                <li><a class="dropdown-item dropdown-settings-header" href="/notification_settings.php">Settings</a></li>
                 <li>
                     <!-- Feishu Binding -->
                     <?php if(!$feishu_binded):?>
