@@ -1,6 +1,7 @@
 <?php
 include "includes/feishu/third_approval_request.php";
 
+include "../feishu_message.php";
 /* -------------------------------- Logging functions -------------------------------------------*/
 function insert_log_login($conn,$row,$type_id)
 {                  
@@ -76,13 +77,13 @@ function insert_log_asset_user($conn,$initiator,$participant = null,$asset_id,$r
             break;
         case 9 : // asset_request_move
             $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant'"))['name'];
-            $text= "Asset ". $asset_name." was requested (move) from " . $user_name . " to " . $participant_name;
+            $text= "Asset \'". $asset_name."\' was requested (move) from " . $user_name . " to " . $participant_name;
             break;
         case 11: // asset_request_return
-            $text= "Asset '". $asset_name."' was requested (return) from " . $user_name;
+            $text= "Asset \'". $asset_name."\' was requested (return) from " . $user_name;
             break;
         case 13: // asset_reqeust_repair
-            $text= "Asset '". $asset_name."' was requested (repair) from " . $user_name;
+            $text= "Asset \'". $asset_name."\' was requested (repair) from " . $user_name;
             break;
         default :
             break;
@@ -283,6 +284,7 @@ function insert_log_asset_rm($conn,$initiator,$participant = null,$asset_id,$ass
 //------------------------ Request functions-------------------------------------------------
 function make_request($conn,$initiator,$participant = null,$asset_ids,$request_type){
     $time = time();
+    $formattedTime = date("M-d H:i:s", $time+6*3600);
     $results = [];
     switch ($request_type){
         case 1: // request use
@@ -292,6 +294,9 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 $asset_status = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
                 $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+                // fetch feishu id
+                $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+                $feishu_message;
                 if($asset_status == 1){ // IN IDLE
                     $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time,department) VALUES 
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
@@ -303,16 +308,33 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
 
                     //Make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
-
+                    
+                    // SEND notification to user
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = 'Your request (USE) for asset \"' . $asset_name .'\" has been made successfully! Please wait for approval (' .$formattedTime.')';
+                        //else do nothing 
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+                    // SEND notification to manager -> only the manager of the department where user belongs to
+                    $row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
+                    if(isset($row['feishu_id'])){
+                        $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+                        $feishu_message = 'Request (USE) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
+                    } 
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+                    
                     $sql = "UPDATE asset SET status =6 WHERE id = '$asset_id'";
                     $conn->query($sql);
                 } else { // NOT IN IDLE
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = 'Making request (USE) for asset \"' . $asset_name.'\" failed! Please check the status of the asset!(' .$formattedTime.')';
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     array_push($results,[$asset_name,false]);
                 }
             }
-
             break;
-        case 2: // request return
+        case 2 : // request return
             //only can request IN USE assets and user is initiator
             foreach($asset_ids as $asset_id){
                 //fetch user
@@ -320,6 +342,9 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+                //fetch feishu id
+                $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+                $feishu_message;
                 if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
@@ -331,10 +356,28 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,11,$time);
+                    
+                    //send feishu message to user
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = "Your request (RETURN) for asset " . $asset_name . " has been made successfully!";
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                    // SEND notification to manager -> only the manager of the department where user belongs to
+                    $row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
+                    if(isset($row['feishu_id'])){
+                        $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+                        $feishu_message = 'Request (RETURN) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
+                    } 
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
 
                     $sql = "UPDATE asset SET status = 7 WHERE id = '$asset_id'";
                     $conn->query($sql);
                 } else { // user is not initiator
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = "Making request (RETURN) for asset " . $asset_name . " failed! Please return the asset in your possession";
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     array_push($results,[$asset_name,false]);
                 }
             }
@@ -348,6 +391,8 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
+                $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+                $feishu_message;
                 if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
@@ -359,10 +404,27 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,13,$time);
 
+                    if(isset($row['feishu_id'])){
+                        $feishu_message = 'Your request (REPAIR) for asset \" ' . $asset_name .' \" has been made successfully!';
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                    // SEND notification to manager -> only the manager of the department where user belongs to
+                    $row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
+                    if(isset($row['feishu_id'])){
+                        $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+                        $feishu_message = 'Request (REPAIR) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
+                    } 
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
                     $sql = "UPDATE asset SET status = 8 WHERE id = '$asset_id'";
                     $conn->query($sql);
                 } else { // user is not initiator
                     array_push($results,[$asset_name,false]);
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = 'Making request (REPAIR) for asset \" ' . $asset_name . ' \" failed! Please check the status of asset or contact administrator!';
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                 }
             }
             break;
@@ -374,7 +436,10 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 $department_id = mysqli_fetch_array($conn->query("SELECT department FROM asset WHERE id = '$asset_id'"))['department'];
                 $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
                 $status_id = mysqli_fetch_array($conn->query("SELECT status FROM asset WHERE id = '$asset_id'"))['status'];
-                if($user == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
+                $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant'"))['name'];
+                $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+                $feishu_message;
+                if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator','$participant','$asset_id','$request_type','$time','$department_id')";
                     $row_result = $conn->query($sql);
@@ -385,10 +450,27 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
 
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = 'Your request (MOVE) asset \"' . $asset_name . '\" to \"'.$participant_name.'\" has been made successfully!';
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                    // SEND notification to manager -> only the manager of the department where user belongs to
+                    $row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
+                    if(isset($row['feishu_id'])){
+                        $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+                        $feishu_message = 'Request (MOVE) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
+                    } 
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
                     $sql = "UPDATE asset SET status = 9 WHERE id = '$asset_id'";
                     $conn->query($sql);
                 } else { // user is not initiator
                     array_push($results,[$asset_name,false]);
+                    if(isset($row['feishu_id'])){ // non null
+                        $feishu_message = 'Making request (MOVE) asset \"' . $asset_name .'\" to \"'. $participant_name.'\" failed! Please move the asset in your possession';
+                    }
+                    sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                 }
             }
             break;
@@ -407,9 +489,21 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
             $request_type = mysqli_fetch_array($conn->query("SELECT type FROM pending_requests WHERE id = '$request_id'"))['type'];
             //fetch initiator
             $initiator = mysqli_fetch_array($conn->query("SELECT initiator FROM pending_requests WHERE id = '$request_id'"))['initiator'];
+            //fetch initiator name
+            $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
+
+            //fetch department where the request is made
+            $department_id = mysqli_fetch_array($conn->query("SELECT department FROM pending_requests WHERE id = '$request_id'"))['department'];
+            $department_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
+
             //fetch asset_id
             $asset_id = mysqli_fetch_array($conn->query("SELECT asset FROM pending_requests WHERE id = '$request_id'"))['asset'];
+            //fetch asset name
+            $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id'"))['name'];
+            //fetch request_status
             $request_status = mysqli_fetch_array($conn->query("SELECT result FROM pending_requests WHERE id = '$request_id'"))['result'];
+            //fetch manger name
+            // $manager_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$manager_id'"))['name'];
             // check if request is valid
             if($request_status != 0){ 
                 array_push($results,[$request_id,false]);
@@ -417,23 +511,88 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
             }
             switch ($request_type){
                 case 1://request use
-                    if($handle_type == 1){
+                    if($handle_type == 1){ // approve
                         //set user as user_id and asset status to IN USE
                         $sql = "UPDATE asset SET user = '$initiator',status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
-                    } else {
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (USE) for asset" . $asset_name ." has been approved! You can use the asset now!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been approved!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+                    } else { // reject
                         // set asset status to IDLE
                         $sql = "UPDATE asset SET status = 1 WHERE id = '$asset_id'"; $conn->query($sql);
+                        
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (USE) for asset" . $asset_name ." has been rejected!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been rejected!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }
                     // leave log
                     insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,8,$handle_type,$time);
+
                     break;
                 case 2:// request return
                     if($handle_type == 1){
                         //set user as N/A and asset status to IDLE
                         $sql = "UPDATE asset SET user = null, status = 1 WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Your request (RETURN) for asset" . $asset_name ." has been approved!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (RETURN) for asset" . $asset_name . " from ".$initiator_name . " has been approved!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     } else {
                         // set asset status to IN USE
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Your request (RETURN) for asset" . $asset_name ." has been rejected!";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = "Request (RETURN) for asset" . $asset_name . " from ".$initiator_name . " has been rejected";
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }
                     // leave log
                     insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,12,$handle_type,$time);
@@ -442,21 +601,88 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                     if($handle_type == 1){
                         //set user as N/A and asset status to IN MAINTAIN
                         $sql = "UPDATE asset SET user = null,status = 3 WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Your request (REPAIR) for asset  \"' . $asset_name .'\" has been approved!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Request (REPAIR) for asset \"' . $asset_name . '\" from '.$initiator_name . ' has been approved!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     } else {
                         //set asset status to IN USE
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Your request (REPAIR) for asset \"' . $asset_name .'\" has been rejected!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Request (REPAIR) for asset \"' . $asset_name . '\" from '.$initiator_name . ' has been rejected';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }
                     // leave log
                     insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,14,$handle_type,$time);
                     break;
-                case 4:// request move
+                case 4:// move
+                    $participant_id = mysqli_fetch_array($conn->query("SELECT participant FROM pending_requests WHERE id = '$request_id'"))['participant'];
+                    $participant_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$participant_id'"))['name'];
                     if($handle_type == 1){
                         //fetch participant
-                        $participant_id = mysqli_fetch_array($conn->query("SELECT participant FROM pending_requests WHERE id = '$request_id'"))['participant'];
-                        //set user as participant and asset status to IN USE
-                        $sql = "UPDATE asset SET user = $participant_id,status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        //fetch destination department
+                        $destination = mysqli_fetch_array($conn->query("SELECT department FROM user WHERE id = '$participant_id'"))['department'];
+                        //set user as participant,department as destination department, asset status to IN USE
+                        $sql = "UPDATE asset SET user = $participant_id,status = 2,department=$destination WHERE id = '$asset_id'"; $conn->query($sql);
+
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Your request (MOVE) asset  \"' . $asset_name .'\" to \"'.$participant_name .'\" has been approved!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Request (MOVE) asset  \"' . $asset_name .'\" to \"'.$participant_name .'\" has been approved!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     } else {
                         $sql = "UPDATE asset SET status = 2 WHERE id = '$asset_id'"; $conn->query($sql);
+                        // SEND notification to user
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Your request (MOVE) asset  \"' . $asset_name .'\" to \"'.$participant_name .'\" has been rejected!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
+
+                        // SEND notification to manager
+                        $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
+
+                        if(isset($row['feishu_id'])){ // non null
+                            $feishu_message = 'Request (MOVE) asset  \"' . $asset_name .'\" to \"'.$participant_name .'\" has been rejected!';
+                        }
+                        sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }
                     // leave log
                     insert_log_handle_request($conn,$manager_id,$request_id,$asset_id,10,$handle_type,$time);

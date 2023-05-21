@@ -180,13 +180,13 @@ echo "<script>
                             <select class="form-control" id="destinationUser">
                                 <!-- <option value=""> N/A </option> -->
                                 <?php
-                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE entity = '$entity_id' and role = '4' and id != '$user_id'");
+                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE department = '$department_id' and role = '4' and id != '$user_id'");
                                     while ($row = $results->fetch_assoc() ) {
                                         unset($id, $name);
                                         $id = $row['id'];
                                         $name = $row['name'];
                                         $departmentid = $row['department'];
-                                        $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$departmentid'"))['name'];
+                                        $department = $conn->query("SELECT name FROM department WHERE id = '$departmentid'")->fetch_object()->name;
                                         echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
                                     }
                                     ?>

@@ -12,6 +12,7 @@ if (empty($assetIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 } else {
     //MAKE request to manager(leaves log at the same time)
+    // also notify to feishu 
     $results = make_request($conn,$user_id,null,$assetIds,2);
 
     $responseData = array('result' => $results);
