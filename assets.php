@@ -339,7 +339,7 @@ echo "<script>
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
-                ordering: true,
+                ordering: false,
                 searching: true,
                 processing: true,
                 serverSide: true,
