@@ -12,7 +12,7 @@ $entity = $entity_id;
 $sql = "SELECT * FROM pending_requests ORDER BY id DESC LIMIT 1";
 $result = mysqli_query($conn, $sql);
 $request_row = mysqli_fetch_assoc($result);
-requestFeishuApproval($conn, $entity, $request_row);
+requestFeishuApproval($conn, $entity, "temp asset name", $request_row);
 ?>
 
 <div id="layoutSidenav_content">
