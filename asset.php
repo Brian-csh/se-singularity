@@ -1,5 +1,6 @@
 <?php
 include "includes/db/connect.php";
+include "includes/scripts/functions.php";
 
 if (isset($_GET['assetid'])) {
     $asset_id_ = $_GET['assetid'];
@@ -12,22 +13,58 @@ if (isset($_POST['print'])) { //print asset tag
     header("Location: ".$tag_url);
 }
 
-//fetch the asset entry
-$sql = "SELECT * FROM asset WHERE id = $asset_id_ LIMIT 1";
-$result = $conn->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $asset_name = $row['name'];
-} else {
-    exit("No asset found with that ID.");
+$sql_asset = "SELECT * FROM asset WHERE id = '$asset_id_' LIMIT 1";
+$result_asset = $conn->query($sql_asset);
+
+if ($result_asset && mysqli_num_rows($result_asset) > 0) {
+        $asset_data = mysqli_fetch_assoc($result_asset);
+        $date_create = gmdate("Y.m.d \ | H:i:s",$asset_data['date_created']+28000);
+        $asset_parent_id = $asset_data['parent'];
+        $asset_name = $asset_data['name'];
+        $asset_class_id = $asset_data['class'];
+        $asset_user_id = $asset_data['user'];
+        $asset_price = $asset_data['price'];
+        $asset_description = $asset_data['description'];
+        $asset_position = $asset_data['position'] == '' ? '--' : $asset_data['position'];
+        $asset_status_id = $asset_data['status'];
+        $asset_brand = $asset_data['brand'];
+        $asset_model = $asset_data['model'];
+        $asset_serial_number = $asset_data['serial number'];
+        $asset_original_price = $asset_data['price'];
+        $asset_current_price = $asset_data['current price'];
+        $asset_depreciation_model = $asset_data['depreciation model'];
+        $asset_department_id = $asset_data['department'];
+        $custom_attributes = $asset_data['custom_attr'];
+        $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
 }
 
-$active = "Asset";
+// Fetch Data
+
+// Fetch parent name
+if (isset($asset_parent_id))
+    $asset_parent = mysqli_fetch_array($conn->query("SELECT * FROM asset WHERE id = '$asset_parent_id' LIMIT 1"))['name'];
+else
+    $asset_parent = "--";
+
+// Fetch class name
+$asset_class_name = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['name'];
+$asset_class_type = mysqli_fetch_array($conn->query("SELECT * FROM asset_class WHERE id = '$asset_class_id' LIMIT 1"))['class_type'];
+
+// Fetch user name
+if (isset($asset_user_id))
+    $asset_user_name = mysqli_fetch_array($conn->query("SELECT * FROM user WHERE id = '$asset_user_id' LIMIT 1"))['name'];
+else
+    $asset_user_name = "--";
+
+// Fetch Status
+$asset_status = mysqli_fetch_array($conn->query("SELECT * FROM asset_status_class WHERE id = '$asset_status_id' LIMIT 1"))['status'];
+
+// Fetch deaprtment
+$asset_department = mysqli_fetch_array($conn->query("SELECT * FROM department WHERE id = '$asset_department_id' LIMIT 1"))['name'];
+
+$active = $asset_name;
+
 include "includes/header.php";
-
-// Fetch asset name
-$asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id = '$asset_id_'"))['name'];
-
 ?>
 
 <!DOCTYPE html>
@@ -59,21 +96,7 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                                 <?php echo $asset_name ?>
                             </h1>
                             <div class="page-header-subtitle">
-                            <?php
-                            $sql_asset = "SELECT * FROM asset WHERE id = '$asset_id_' LIMIT 1";
-                            $result = $conn->query($sql_asset);
-
-                            if ($result&&mysqli_num_rows($result) > 0) {
-                                    $asset_data = mysqli_fetch_assoc($result);
-                                    $date_create = gmdate("Y.m.d \ | H:i:s",$asset_data['date_created']+28000);
-                            }
-                            echo "Date Created: {$date_create}<br>";
-
-                            // Fetch logs
-                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id_') ORDER BY date DESC";
-                            $result = $conn->query($sql_log);
-
-                            ?>
+                                <?php echo "Date Created: {$date_create}<br>";?>
                             </div>
                         </div>
                     </div>
@@ -83,6 +106,179 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
         <!-- Main page content-->
         <div class="container-fluid pt-5 px-4">
             <div class="card">
+                <div class="card-body">
+                    <div class = "row mb-3">
+                        <div class = "col -md-6">
+                            <!-- Asset Image (aliyun) -->
+                            <div class="card-header">
+                                    <h3> Asset Image
+                                    </h3>
+                                </div>
+                            <div id="image-container" style="padding: 20px">
+                                <script>
+                                    window.onload = function() {
+                                        var img = document.getElementById('assetImage');
+                                        img.src = "<?php echo ($asset_image === "") ? "assets/img/asset_placeholder.png" : $asset_image; ?>"; // Set the source of the image
+                                    }
+                                </script>
+                                <img src="" id="assetImage" alt="image not available">                            
+                            </div>
+                        </div>
+                        <div class = "col -md-6">
+                            <!-- TODO: Asset table -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3> Asset Info
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class = "row">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <th>parent</th> 
+                                                    <th>type</th>
+                                                    <th>class</th>
+                                                    <th>user</th>
+                                                    <th>department</th>
+                                                    <th>position</th>
+                                                    <th>status</th>
+                                                </tr>
+                                                <tr>
+                                                    <td><?php echo $asset_parent; ?></td>
+                                                    <td><?php
+                                                            if($asset_class_type == 0)
+                                                                echo "Item Asset";
+                                                            else if($asset_class_type == 1)
+                                                                echo "Amount Asset"; 
+                                                        ?>
+                                                    </td>
+                                                    <td><?php echo $asset_class_name; ?></td>
+                                                    <td><?php echo $asset_user_name; ?></td>
+                                                    <td><?php echo $asset_department; ?></td>
+                                                    <td><?php echo $asset_position; ?></td>
+                                                    <!-- IMPROVE : add color for diff status -->
+                                                    <td><?php echo $asset_status; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description box -->
+                    <div class= "row mb-3 gx-3">
+                        <div class="col-md-12">
+                            <label class="small mb-1" for="descriptionTextarea">Description</label>
+                            <div style="color: white; border: 1px solid white; padding: 10px">
+                                <?=$asset_description?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class = "row mb-3">
+                        <!-- Asset Basic Info Table -->
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3> Basic Info
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class = "col">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <th>Brand</th>
+                                                    <td><?php echo $asset_brand; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Model</th>
+                                                    <td><?php echo $asset_model; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Serial Number</th>
+                                                    <td><?php echo $asset_serial_number; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Asset Financial Info Table -->
+                        <div class = "col mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3> Financial Info
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class = "col">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <th>Original Price</th>
+                                                    <td><?php echo $asset_original_price; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Current Price</th>
+                                                    <td><?php echo $asset_current_price; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Depreciation Model</th>
+                                                    <td><?php echo $asset_depreciation_model; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row mb-3">
+
+                        <!-- Asset Custom Attribute Info Table -->
+                        <div class="col mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3> Custom Attributes
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class = "col">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <?php 
+                                                    if (isset($custom_attributes) && !empty($custom_attributes)) {
+                                                        $custom_attribute_obj = json_decode($custom_attributes);
+                                                        foreach ($custom_attribute_obj as $custom_key => $custom_value) {
+                                                            echo '
+                                                                <tr>
+                                                                    <th>'. $custom_key .'</th>
+                                                                    <td>'. $custom_value .'</td>
+                                                                </tr>
+                                                            ';
+                                                        }
+                                                    }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+ 
+            <div class="card">
+                <div class="card-header">
+                    <h3>History</h3>
+                </div>
                 <div class="card-body">
                     <div id="tablePreloader">
                         <p class="text-white p-3">Loading...</p>
@@ -106,9 +302,10 @@ $asset_name = mysqli_fetch_array($conn->query("SELECT name FROM asset WHERE id =
                         </tfoot>
                         <tbody>
                         <?php
-
-                            while ($row = $result->fetch_assoc()) {
-                                                                
+                            // Fetch logs
+                            $sql_log = "SELECT * FROM log WHERE (subject = '$asset_id_') ORDER BY date DESC";
+                            $result = $conn->query($sql_log);
+                            while ($row = $result->fetch_assoc()) {                                                          
                                 //Fetch Log Type
                                 $type_id = $row["log_type"];
                                 $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"));
