@@ -6,6 +6,27 @@ include "includes/header.php";
 include "includes/navbar.php";
 
 $class_entity_id = $session_info['entity'];
+$user_id_filter = -1;
+if (isset($_GET['userid'])) {
+    $user_id_filter = intval($_GET['userid']);
+
+    echo "
+    <script>
+    var active_elements = document.querySelectorAll('a[href*=\"assets.php\"]');
+
+    for (var i = 0; i < active_elements.length; i++) {
+    var element = active_elements[i];
+    element.classList.remove('active');
+    }
+
+    var active_elements = document.querySelectorAll('a[href*=\"assets.php?userid\"]');
+    let link = active_elements[0];
+
+    link.classList.toggle('active');
+
+    </script>
+    ";
+}
 
 if(isset($_GET['userid'])){
     
@@ -300,7 +321,7 @@ echo "<script>
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
-                        d.userid = <?= $user_id ?>;
+                        d.userid = <?= $user_id_filter ?>;
                         d.roleid = <?= $role_id ?>;
                         d.entityid = <?= $entity_id ?>;
                         d.departmentid = <?= $department_id ?>;

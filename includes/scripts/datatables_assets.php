@@ -35,6 +35,10 @@ switch ($roleid){
         break;
 }
 
+if ($userid != -1) {
+    $sql .= " AND user=$userid";
+}
+
 if (isset($_GET['search']['value'])) {
     $search_string = $_GET['search']['value'];
     if (!empty($search_string)) {
