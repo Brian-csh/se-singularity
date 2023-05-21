@@ -2,10 +2,17 @@
 $active = "Dashboard";
 include "includes/header.php";
 include "includes/navbar.php";
+include "includes/feishu/third_approval_request.php";
+
 $role = $role_id;
 $department = $department_id;
 $entity = $entity_id;
 
+// get the first row of the pending requests table
+$sql = "SELECT * FROM pending_requests ORDER BY id DESC LIMIT 1";
+$result = mysqli_query($conn, $sql);
+$request_row = mysqli_fetch_assoc($result);
+requestFeishuApproval($conn, $entity, "temp asset name", $request_row);
 ?>
 
 <div id="layoutSidenav_content">

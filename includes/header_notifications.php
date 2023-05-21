@@ -85,7 +85,9 @@ $classes = [];
 // // get warning policy
 $sql = "SELECT * FROM department WHERE id = '$department'";
 $result = mysqli_query($conn, $sql);
-$warning_policy = mysqli_fetch_assoc($result)['warning_policy'];
+$warning_policy = mysqli_fetch_assoc($result);
+if($warning_policy != null)
+    $warning_policy = $warning_policy['warning_policy'];
 if($warning_policy != null) {
     $warning_policy = json_decode($warning_policy, true);
     $days_to_add = $warning_policy['date_policy'];

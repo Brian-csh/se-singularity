@@ -1,4 +1,5 @@
 <?php
+include "includes/feishu/third_approval_request.php";
 
 include "../feishu_message.php";
 /* -------------------------------- Logging functions -------------------------------------------*/
@@ -299,7 +300,12 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 if($asset_status == 1){ // IN IDLE
                     $sql = "INSERT INTO pending_requests (initiator, participant, asset, type, request_time,department) VALUES 
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
-                    array_push($results,[$asset_name,$conn->query($sql)]);
+                    $row_result = $conn->query($sql);
+                    array_push($results,[$asset_name,$row_result]);
+                    // send feishu approval request
+                    $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
+                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
+
                     //Make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
                     
@@ -342,7 +348,12 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
-                    array_push($results,[$asset_name,$conn->query($sql)]);
+                    $row_result = $conn->query($sql);
+                    array_push($results,[$asset_name,$row_result]);
+
+                    // send feishu approval request
+                    $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
+                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,11,$time);
                     
@@ -385,7 +396,11 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator',null,'$asset_id','$request_type','$time','$department_id')";
-                    array_push($results,[$asset_name,$conn->query($sql)]);
+                    $row_result = $conn->query($sql);
+                    array_push($results,[$asset_name,$row_result]);
+                    // send feishu approval request
+                    $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
+                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,13,$time);
 
@@ -427,7 +442,11 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                 if($user_id == $initiator && $status_id == 2){ // user is initiator, and status is IN USE
                     $sql = "INSERT INTO pending_requests (initiator,participant,asset,type,request_time,department) VALUES
                             ('$initiator','$participant','$asset_id','$request_type','$time','$department_id')";
-                    array_push($results,[$asset_name,$conn->query($sql)]);
+                    $row_result = $conn->query($sql);
+                    array_push($results,[$asset_name,$row_result]);
+                    // send feishu approval request
+                    $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
+                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
 
