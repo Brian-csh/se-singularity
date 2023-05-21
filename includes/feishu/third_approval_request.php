@@ -7,7 +7,7 @@ function requestFeishuApproval(
     $entity_id,
     $request_row,
     $feishu_app_id = "cli_a4a8e931cd79900e",
-    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ",
+    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
 ) {
     // check if approval code exists
     $sql = "SELECT feishu_approval_code FROM entity WHERE id = $entity_id";
