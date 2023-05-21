@@ -6,6 +6,10 @@ include "includes/header.php";
 include "includes/navbar.php";
 
 $class_entity_id = $session_info['entity'];
+$user_id_filter = -1;
+if (isset($_GET['userid'])) {
+    $user_id_filter = intval($_GET['userid']);
+}
 
 if (isset($_POST['add_class'])) {
     $name = $_POST['class_name'];
@@ -296,7 +300,7 @@ echo "<script>
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
-                        d.userid = <?= $user_id ?>;
+                        d.userid = <?= $user_id_filter ?>;
                         d.roleid = <?= $role_id ?>;
                         d.entityid = <?= $entity_id ?>;
                         d.departmentid = <?= $department_id ?>;

@@ -131,9 +131,13 @@ $department_id = $_SESSION['user']['department'] ? $_SESSION['user']['department
                         </a>
                         <!-- Sidenav Heading (Assets)-->
                         <div class="sidenav-menu-heading">Data</div>
+                        <a class="nav-link" href="/assets.php?userid=<?=$user_id?>">
+                            <div class="nav-link-icon"><i data-feather="package"></i></div>
+                            My Assets
+                        </a>
                         <a class="nav-link" href="/assets.php">
                             <div class="nav-link-icon"><i data-feather="package"></i></div>
-                            Assets
+                            All Assets
                         </a>
                         <!-- Sidenav Heading (Requests)-->
                         <a class="nav-link" href="/requests.php">
