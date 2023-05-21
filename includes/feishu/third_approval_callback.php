@@ -12,10 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
     $instanceId = $data['instance_id']; // from pending_requests database, id column
-    $sql = "UPDATE pending_requests SET status = 1 WHERE id = $instanceId";
-        if (!$conn->query($sql)) {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
+    $sql = "UPDATE pending_requests SET result = 1 WHERE id = $instanceId";
+    if (!$conn->query($sql)) {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
 
     // Access the individual fields from the data array
     // $actionType = $data['action_type']; // APPROVE or REJECT
