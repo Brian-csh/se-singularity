@@ -1,5 +1,5 @@
 <?php
-include "../db/connect.php";
+require "includes/db/connect.php";
 session_start();
 $session_info = $_SESSION;
 
