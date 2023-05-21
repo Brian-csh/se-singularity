@@ -1,7 +1,6 @@
 <?php
 include "includes/feishu/third_approval_request.php";
-
-include "../feishu_message.php";
+include "includes/feishu_message.php";
 /* -------------------------------- Logging functions -------------------------------------------*/
 function insert_log_login($conn,$row,$type_id)
 {                  
