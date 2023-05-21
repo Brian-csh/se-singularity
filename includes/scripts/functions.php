@@ -1,5 +1,5 @@
 <?php
-include "includes/feishu/third_approval_request.php";
+include "../feishu/third_approval_request.php";
 
 include "../feishu_message.php";
 /* -------------------------------- Logging functions -------------------------------------------*/

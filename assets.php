@@ -7,6 +7,10 @@ include "includes/navbar.php";
 
 $class_entity_id = $session_info['entity'];
 
+if(isset($_GET['userid'])){
+    
+}
+
 if (isset($_POST['add_class'])) {
     $name = $_POST['class_name'];
     if ($_POST['class_type'] == "ItemAsset") {

@@ -4,23 +4,38 @@ session_start();
 $session_info = $_SESSION;
 
 $active = 'Create User';
-$errors = "";
 
-//TODO :
-// superadmin : can select entity
-// admin1 : entity is already set as the entity the admin belongs to 
-// admin2 : department is also set if admin access here thourugh department page
+$error = -1;
+if (isset($_GET['error'])) {
+    $error = $_GET['error'];
+}
+
+if($session_info['user']['role'] == 1){ //superadmin
+    if(isset($_GET['departmentid'])){
+        $department_id = $_GET['departmentid'];
+    } else {
+        $department_id = -1;
+    }
+} else { // admin
+    // access through navbar -> -1 | access through department pages -> department id 
+    $department_id = $_GET['departmentid'];
+}
 if (isset($_POST['submit_changes'])) {
-
     $name = $_POST['name'];
     $date_created = time();
     $role_id = $_POST['role'];
-    $entity_id = $_POST['entity'];
-    $department_id = $_POST['department'];
-    if (isset($_POST['entity_head'])) { //is entity super
-        $entity_head = $_POST['entity_head'];
-    } else { //not entity super
-        $entity_head = 0;
+    $department_id = $_POST['department_id'];
+
+    if($role_id == 1){
+        $entity_id_ = 'null';
+    } else {
+        $entity_id_ = $_POST['entity'];
+    }
+
+    if($role_id == 1 || $role_id == 2){
+        $department_id_ = 'null';
+    } else {
+        $department_id_ = $_POST['department'];
     }
 
     $password = $_POST['password'];
@@ -35,14 +50,15 @@ if (isset($_POST['submit_changes'])) {
 
     if ($password_confirmed) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-        VALUES ('$date_created', '$name', '$hashed_password', '$entity_id', '$department_id', '$entity_head', '$role_id')";
+        VALUES ('$date_created', '$name', '$hashed_password', '$entity_id_',$department_id_, '0', '$role_id')";
+        var_dump($sql);
         if ($conn->query($sql)) {
             header('Location: users.php');
         } else {
-            header('Location: new_user.php?insert_error');
+            header('Location: new_user.php?departmentid='.$department_id.'&error=2');
         }
     } else {
-        $errors .= "Re-entered password does not match with password. ";
+        header('Location: new_user.php?departmentid='.$department_id.'&error=1');
     }
 }
 ?>
@@ -128,10 +144,10 @@ if (isset($_POST['submit_changes'])) {
                         <div class="card-header">Account Details</div>
                         <div class="card-body">
                             <?php
-                                if ($errors != "") echo  '<div class="alert alert-danger" role="alert">
-                                ' . $errors . '</div>'
+                                if ($error == 1) echo  '<div class="alert alert-danger" role="alert">Re-entered password does not match password.</div>'
                             ?>
                             <form method="post" action="new_user.php">
+                                <input type="hidden" name="department_id" value="<?=$_GET['departmentid']?>">
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (name)-->
@@ -140,54 +156,94 @@ if (isset($_POST['submit_changes'])) {
                                         <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Username">
                                     </div>
                                     <!-- Form Group (entity)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputEntity">Entity</label>
-                                        <select class="form-control" required id="inputEntity" name="entity" onchange="updateDepartments()">
-                                            <option value="">Select an Entity</option>
-
-                                            <?php
-                                            $results = $conn->query("SELECT id, name FROM entity");
-                                            while ($row = $results->fetch_assoc()) {
-                                                unset($id, $name);
-                                                $id = $row['id'];
-                                                $name = $row['name'];
-                                                echo '<option value="' . $id . '">' . $name . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-
+                                    <?php if($session_info['user']['role'] == 1){ ?>
+                                        <!-- SUPER ADMIN -->
+                                        <div class="col-md-6">
+                                            <label class="small mb-1" for="inputEntity">Entity</label>
+                                            <select class="form-control" required id="inputEntity" name="entity" onchange="updatedepartments()">
+                                                <option value="">Select an Entity</option>
+                                                <?php
+                                                    $results = $conn->query("SELECT id, name FROM entity");
+                                                    while ($row = $results->fetch_assoc()) {
+                                                        unset($id, $name);
+                                                        $id = $row['id'];
+                                                        $name = $row['name'];
+                                                        echo '<option value="' . $id . '">' . $name . '</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    <?php } else {?>
+                                        <!-- ADMIN -->
+                                        <div class="col-md-6">
+                                            <label class="small mb-1" for="inputEntity">Entity</label>
+                                            <select class="form-control" required id="inputEntity" name="entity">
+                                                <?php
+                                                    $entity_id = $session_info['user']['entity']; 
+                                                    $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
+                                                    echo '<option value="' . $entity_id. '">' . $entity_name . '</option>';
+                                                ?>
+                                            </select>
+                                        </div>
+                                    <?php }?>
                                 </div>
-                                <!-- Form Row        -->
+                                <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)--> 
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputDepartment">Department</label>
-                                        <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select an Entity</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="small mb-1" for="inputRole">Role</label>
-                                        <select class="form-control" id="inputRole" name="role">
-                                            <option value="1" selected>superadmin</option>
-                                            <option value="2">admin</option>
-                                            <option value="3">resource manager</option>
-                                            <option value="4">user</option>
-                                        </select>
-
-                                    </div>
+                                    <?php if($session_info['user']['role'] == 1){?>
+                                        <!-- SUPER ADMIN -->
+                                        <div class="col-md-6">
+                                            <label class="small mb-1" for="inputDepartment">Department</label>
+                                            <select class="form-control" id="inputDepartment" name="department" required>
+                                                <option value="">Select a Department</option>
+                                            </select>
+                                        </div>
+                                    <?php } else {?>
+                                        <!-- ADMIN -->
+                                        <?php if($department_id==-1){?>
+                                            <!-- ACCESS THROUGH NAVBAR -->
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputDepartment">Department</label>
+                                                <select class="form-control" id="inputDepartment" name="department" required>
+                                                    <option value="">Select a Department</option>
+                                                </select>
+                                            </div>
+                                        <?php } else {?>
+                                            <!-- ACCESS THROUGH DEPARTMENT PAGE -->
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputDepartment">Department</label>
+                                                <select class="form-control" id="inputDepartment" name="department">
+                                                    <?php $department_name = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];?>
+                                                        <option value=<?= $department_id?>> <?=$department_name ?></option>
+                                                </select>
+                                            </div>
+                                        <?php }?>
+                                    <?php }?>
+                                    <!-- SELECT ROLE -->
+                                    <?php if($department_id == -1){?>
+                                        <!-- ACCESS THROUGH NAVBAR -->
+                                        <div class="col-md-6">
+                                            <label class="small mb-1" for="inputRole">Role</label>
+                                            <select class="form-control" id="inputRole" name="role" onchange = "updatedepartments()">
+                                                <option value="4">user</option>
+                                                <option value="3">resource manager</option>  
+                                                <option value="2">admin</option>
+                                                <?php if($session_info['user']['role'] == 1) {?>    
+                                                    <option value="1" selected>superadmin</option>
+                                                <?php }?>
+                                            </select>
+                                        </div>
+                                    <?php } else {?>
+                                        <div class="col-md-6">
+                                            <label class="small mb-1" for="inputRole">Role</label>
+                                            <select class="form-control" id="inputRole" name="role">
+                                                <option value="4">user</option>
+                                                <option value="3">resource manager</option>
+                                            </select>
+                                        </div>
+                                    <?php }?>
                                 </div>
-                                <!-- Form Row -->
-                                <div class="row gx-3 mb-4">
-                                    <!-- Form Group -->
-                                    <!-- entity super, checkbox-->
 
-                                    <div class="col-md-4">
-                                        <label class="small mb-1" for="inputEntityHead">Entity Head</label>
-                                        <input id="inputEntityHead" type="checkbox" name="entity_head" value="1">
-                                    </div>
-                                </div>
                                 <!-- Form Row -->
                                 <div class="row gx-3 mb-4">
                                     <!-- Form Group -->
@@ -210,9 +266,6 @@ if (isset($_POST['submit_changes'])) {
                     </div>
                 </div>
             </div>
-
-
-
         </div>
     </main>
 
@@ -223,83 +276,68 @@ if (isset($_POST['submit_changes'])) {
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
 
-    <script>
-        function updateDepartments() {
+<?php if($department_id==-1){?>
+<script>
+        function updatedepartments() {
+            let role = $('#inputRole').val();
             let entityId = $('#inputEntity').val();
-
-            if (entityId === "") {
+            console.log("role : "+role);
+            console.log("entityId : "+entityId);
+        
+            if (role === "2") {
                 $('#inputDepartment').empty();
                 $('#inputDepartment').append($('<option>', {
-                    value: "",
-                    text: "Select an Entity"
+                    value: null,
+                    text: "--"
                 }));
                 return;
             }
-
+            if (role == "1"){
+                $('#inputDepartment').empty();
+                $('#inputDepartment').append($('<option>', {
+                    value: null,
+                    text: "--"
+                }));
+                return;
+            }
             $.ajax({
+
                 url: 'includes/scripts/ajax.php',
                 method: 'POST',
                 data: {
-                    request: 'get_departments',
-                    entity_id: entityId
+                    request: 'set_departments',
+                    entity_id: entityId,
+                    role: role
                 },
                 dataType: 'json',
-                success: function populateDepartments(departments) {
+                success: function (departments) {
                     var departmentSelect = $('#inputDepartment');
-                    departmentSelect.empty();
 
-                    // Add the default "Select a Department" option
+                    departmentSelect.empty(); // Clear existing options
+
+                    // Add default "Select a Department" option
                     departmentSelect.append($('<option>', {
-                        value: "",
-                        text: "Select a Department"
+                        value: '',
+                        text: 'Select a Department'
                     }));
 
-                    // Create a map to store parent departments and their subdepartments
-                    var departmentMap = {};
-
-                    // Separate parent and subdepartments
+                    // Add departments to the select element
                     departments.forEach(function (department) {
-                        departmentMap[department.id] = {
-                            name: department.name,
-                            subdepartments: []
-                        };
-                        if (department.parent !== null) {
-                            if (!departmentMap[department.parent]) {
-                                departmentMap[department.parent] = {
-                                    subdepartments: []
-                                };
-                            }
-                            departmentMap[department.parent].subdepartments.push(department);
-                        }
-                    });
-
-                    // Recursive function to add departments and their subdepartments
-                    function addDepartmentsToSelect(departmentId, prefix) {
-                        var department = departmentMap[departmentId];
-                        // Add department
                         departmentSelect.append($('<option>', {
-                            value: departmentId,
-                            text: prefix + department.name
+                            value: department.id,
+                            text: department.name + ' (' + department.parent+ ')'
                         }));
-
-                        // Add subdepartments with additional indentation
-                        department.subdepartments.forEach(function (subdepartment) {
-                            addDepartmentsToSelect(subdepartment.id, prefix + "— "); // Indentation using an em dash (—)
-                        });
-                    }
-
-                    // Add top-level departments (those with no parent)
-                    departments.filter(function (department) {
-                        return department.parent === null;
-                    }).forEach(function (topLevelDepartment) {
-                        addDepartmentsToSelect(topLevelDepartment.id, "");
                     });
-                },
+                }
             });
-
         }
     </script>
-
+<script>
+    window.onload = (event) => {
+        updatedepartments();
+    };
+</script>
+<?php }?>
 </div>
 
 </html>
