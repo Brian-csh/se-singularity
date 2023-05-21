@@ -13,8 +13,8 @@ if (empty($assetIds)) {
     echo json_encode(['success' => false, 'message' => 'No assets selected.']);
 } else {
     // MAKE request to manager(leaves log at the same time)
+    // also notify to feishu 
     $results = make_request($conn,$user_id,null,$assetIds,1); // can only IDLE assets
-
     $responseData = array('result' => $results);
 
     // Encode the array as JSON

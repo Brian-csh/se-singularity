@@ -165,17 +165,13 @@ if (isset($_POST['submit_asset'])) {
                                     <div class="col-md-3">
                                         <label class="small mb-1" for="inputDepartment">Department *</label>
                                         <select class="form-control" id="inputDepartment" name="department" required>
-                                            <option value="">Select an Asset Class</option>
+                                            <option value="">Select a Department</option>
                                                 <?php
                                                     $results = $conn->query("SELECT id, name FROM department WHERE id IN ($subdepartmentids)");
                                                     while ($row = $results->fetch_assoc()) {
-                                                        $id = 0; $parent = NULL;
-                                                        if ($row['name']!=$asset_class_name) {
-                                                            unset($id, $class);
                                                             $id = $row['id'];
-                                                            $class = $row['name'];
-                                                            echo '<option value="' . $id . '">' . $class . '</option>';
-                                                        }
+                                                            $department__ = $row['name'];
+                                                            echo '<option value="' . $id . '">' . $department__ . '</option>';
                                                     }
                                                     ?>
                                         </select>
