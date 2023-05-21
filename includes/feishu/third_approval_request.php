@@ -3,54 +3,58 @@
 // $feishu_app_id = "cli_a4a8e931cd79900e";
 // $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ";
 function requestFeishuApproval(
-    $conn,
-    $entity_id,
-    $request_row,
-    $asset_name,
-    $feishu_app_id = "cli_a4a8e931cd79900e",
-    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
+  $conn,
+  $entity_id,
+  $instance_id,
+  $asset_name,
+  $initiator_id,
+  $approver_id,
+  $request_time,
+  $feishu_app_id = "cli_a4a8e931cd79900e",
+  $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
 ) {
-    // check if approval code exists
-    $sql = "SELECT feishu_approval_code FROM entity WHERE id = $entity_id";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    $approval_code = $row['feishu_approval_code'];
-    if ($approval_code == NULL) {
-        echo "ERROR! Approval code does not exist";
-        return;
-    }
+  // check if approval code exists
+  $sql = "SELECT feishu_approval_code FROM entity WHERE id = $entity_id";
+  $result = mysqli_query($conn, $sql);
+  $row = mysqli_fetch_assoc($result);
+  $approval_code = $row['feishu_approval_code'];
+  if ($approval_code == NULL) {
+    echo "ERROR! Approval code does not exist";
+    return;
+  }
 
-    // get tenant access token
-    $token_url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/";
-    $post_fields = 'app_id=' . $feishu_app_id . '&app_secret=' . $feishu_app_secret;
+  // get tenant access token
+  $token_url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal/";
+  $post_fields = 'app_id=' . $feishu_app_id . '&app_secret=' . $feishu_app_secret;
 
-    $ch = curl_init($token_url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  $ch = curl_init($token_url);
+  curl_setopt($ch, CURLOPT_POST, 1);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $response_json = json_decode($response, false);
-    $tenant_access_token = $response_json->tenant_access_token;
+  $response = curl_exec($ch);
+  curl_close($ch);
+  $response_json = json_decode($response, false);
+  $tenant_access_token = $response_json->tenant_access_token;
 
-    // SEND APPROVAL INSTANCE
-    $external_instance_url = "https://open.feishu.cn/open-apis/approval/v4/external_instances";
-    $initiator_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO get from user table from request_row initiator id
-    $approver_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO change to approver id
-    $initiator_username = "MICHIOOOOO";
-    $instance_id = 100; // $request_row['id'];
-    $headers = array(
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $tenant_access_token
-    );
+  // SEND APPROVAL INSTANCE
+  $external_instance_url = "https://open.feishu.cn/open-apis/approval/v4/external_instances";
+  $initiator_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO get from user table from request_row initiator id
+  $approver_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO change to approver id
+  $initiator_username = "MICHIOOOOO";
+  $headers = array(
+    'Content-Type: application/json',
+    'Authorization: Bearer ' . $tenant_access_token
+  );
 
-    // JSON data to be sent in the request body
-    $jsonData = '{
-        "approval_code": "'.$approval_code.'",
-        "instance_id": "'.$instance_id.'",
+  $instance_id = 101; // temp
+
+  // JSON data to be sent in the request body
+  $jsonData = '{
+        "approval_code": "' . $approval_code . '",
+        "instance_id": "' . $instance_id . '",
         "status": "PENDING",
         "extra": "",
         "links": {
@@ -64,16 +68,16 @@ function requestFeishuApproval(
             "value": "@i18n@3"
           }
         ],
-        "user_name": "'.$initiator_username.'",
-        "open_id": "'. $initiator_oid.'",
-        "start_time": "'.$request_row['request_time'].'",
-        "update_time": "'.$request_row['request_time'].'",
+        "user_name": "' . $initiator_username . '",
+        "open_id": "' . $initiator_oid . '",
+        "start_time": "' . $request_time . '",
+        "update_time": "' . $request_time . '",
         "end_time": 0,
         "update_mode": "REPLACE",
         "task_list": [
           {
             "task_id": "112253",
-            "open_id": "'.$approver_oid.'",
+            "open_id": "' . $approver_oid . '",
             "links": {
               "pc_link": "http://",
               "mobile_link": "http://"
@@ -81,9 +85,9 @@ function requestFeishuApproval(
             "status": "PENDING",
             "extra": "",
             "title": "Approve Asset Request",
-            "create_time": "'.$request_row['request_time'].'",
+            "create_time": "' . $request_time . '",
             "end_time": 0,
-            "update_time": "'.$request_row['request_time'].'",
+            "update_time": "' . $request_time . '",
             "action_context": "123456",
             "action_configs": [
               {
@@ -111,38 +115,38 @@ function requestFeishuApproval(
               },
               {
                 "key": "@i18n@3",
-                "value": "'.$asset_name.'"
+                "value": "' . $asset_name . '"
               }
             ]
           }
         ]
       }';
 
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $external_instance_url);
-    // Set the request method to POST
-    curl_setopt($curl, CURLOPT_POST, true);
-    // Set the request body data as JSON
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
-    // Set the request headers
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-    // Set the option to receive the response as a string
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  $curl = curl_init();
+  curl_setopt($curl, CURLOPT_URL, $external_instance_url);
+  // Set the request method to POST
+  curl_setopt($curl, CURLOPT_POST, true);
+  // Set the request body data as JSON
+  curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
+  // Set the request headers
+  curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+  // Set the option to receive the response as a string
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    $response = curl_exec($curl);
+  $response = curl_exec($curl);
 
-    if (curl_errno($curl)) {
-        $error_message = curl_error($curl);
+  if (curl_errno($curl)) {
+    $error_message = curl_error($curl);
+  }
+  curl_close($curl);
+
+  if ($response) {
+    $response = json_decode($response, true);
+    if (!$conn->query($sql)) {
+      echo "Error: " . $sql . "<br>" . $conn->error;
     }
-    curl_close($curl);
-
-    if ($response) {
-        $response = json_decode($response, true);
-        if (!$conn->query($sql)) {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-    } else {
-        echo "No response received.";
-    }
+  } else {
+    echo "No response received.";
+  }
 }
 ?>

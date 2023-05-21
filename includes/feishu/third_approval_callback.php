@@ -5,9 +5,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payload = file_get_contents('php://input');
 
     // Convert the JSON string into a PHP object
+    if($payload == NULL) {
+        http_response_code(400);
+        exit();
+    }
     $data = json_decode($payload);
     // write data in the database
     $sql = "UPDATE entity SET temp_column = '$payload' WHERE id = 1";
+    $sql = "UPDATE entity SET temp_column = '$data' WHERE id = 2";
     if (!$conn->query($sql)) {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
