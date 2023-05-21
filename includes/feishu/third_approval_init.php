@@ -26,6 +26,10 @@ function initFeishuApproval(
 
     // CREATE APPROVAL
     $external_approval_url = "https://open.feishu.cn/open-apis/approval/v4/external_approvals?department_id_type=open_department_id&user_id_type=open_id";
+    
+    // if local
+    $action_callback_url = 'https://singularity-eam-singularity.app.secoder.net/includes/feishu/third_approval_callback.php';
+
     $headers = array(
         'Content-Type: application/json',
         'Authorization: Bearer ' . $tenant_access_token
@@ -42,9 +46,9 @@ function initFeishuApproval(
         "support_pc": true,
         "support_mobile": true,
         "support_batch_read": false,
-        "action_callback_url": "http://feishu.cn/approval/openapi/operate",
+        "action_callback_url": "'.$action_callback_url.'",
         "action_callback_token": "sdjkljkx9lsadf110",
-        "action_callback_key": "gfdqedvsadfgfsd",
+        "action_callback_key": "",
         "enable_mark_readed": false
         },
         "viewers": [
