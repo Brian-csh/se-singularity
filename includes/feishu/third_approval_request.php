@@ -6,8 +6,9 @@ function requestFeishuApproval(
     $conn,
     $entity_id,
     $request_row,
+    $asset_name,
     $feishu_app_id = "cli_a4a8e931cd79900e",
-    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ",
+    $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
 ) {
     // check if approval code exists
     $sql = "SELECT feishu_approval_code FROM entity WHERE id = $entity_id";
@@ -39,7 +40,6 @@ function requestFeishuApproval(
     $external_instance_url = "https://open.feishu.cn/open-apis/approval/v4/external_instances";
     $initiator_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO get from user table from request_row initiator id
     $approver_oid = "ou_29bdc51fbfc84e1401dd9a8ae0316fa5"; // TODO change to approver id
-    $asset_name = $request_row['asset']; // TODO get corresponding asset name from asset table
     $initiator_username = "MICHIOOOOO";
     $instance_id = 100; // $request_row['id'];
     $headers = array(
@@ -50,7 +50,7 @@ function requestFeishuApproval(
     // JSON data to be sent in the request body
     $jsonData = '{
         "approval_code": "'.$approval_code.'",
-        "instance_id": "122",
+        "instance_id": "'.$instance_id.'",
         "status": "PENDING",
         "extra": "",
         "links": {
@@ -80,7 +80,7 @@ function requestFeishuApproval(
             },
             "status": "PENDING",
             "extra": "",
-            "title": "同意",
+            "title": "Approve Asset Request",
             "create_time": "'.$request_row['request_time'].'",
             "end_time": 0,
             "update_time": "'.$request_row['request_time'].'",
