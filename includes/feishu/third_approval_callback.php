@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
     $instanceId = $data['instance_id']; // from pending_requests database, id column
-    $sql = "UPDATE pending_requests SET result = 1 WHERE id = $instanceId";
+    $sql = "UPDATE pending_requests SET result = 1 WHERE id = '$instanceId'";
     if (!$conn->query($sql)) {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
