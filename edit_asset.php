@@ -11,6 +11,8 @@ if (isset($_GET['success'])) {
     $image_operation_status = 0;
 }
 
+$active = "Edit Asset";
+include "includes/header.php";
 include "includes/db/connect.php";
 include "includes/scripts/functions.php";
 include "includes/oss.php";
@@ -28,8 +30,11 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_user_id = $asset_data['user'];
         $asset_price = $asset_data['price'];
         $asset_description = $asset_data['description'];
-        $asset_position = $asset_data['position'];
-        $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));
+        $asset_position = $asset_data['position'];        
+        if (!isset($asset_data['date_created']))
+            $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));    
+        else
+            $asset_expire = "";
         $asset_status_id = $asset_data['status'];
         $asset_brand = $asset_data['brand'];
         $asset_model = $asset_data['model'];
@@ -210,9 +215,6 @@ if (isset($_POST['delete_image'])) {
         echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
     }
 }
-
-$active = $asset_name_;
-include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -484,7 +486,7 @@ include "includes/header.php";
                         <!-- Edit asset name -->
                         <div class="mb-3">
                             <label for="editAssetName">Asset Name</label>
-                            <input class="form-control" id="editAssetName" type="text" name="editAssetName" placeholder="<?php echo $asset_name; ?>">
+                            <input class="form-control" id="editAssetName" type="text" name="editAssetName" placeholder="<?php echo $asset_name_; ?>">
                         </div>
                         <!-- Edit position -->
                         <div class="mb-3">
