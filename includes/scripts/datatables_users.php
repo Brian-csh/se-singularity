@@ -13,26 +13,37 @@ $roleid = intval($_GET['roleid']);
 $entityid = intval($_GET['entityid']);
 $departmentid = intval($_GET['departmentid']);
 
+// Get the total number of records in the table
 if($roleid == 1){
     if($departmentid == -1){
         $sql = "SELECT * FROM user WHERE 1=1";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
     } else {//access through manage user
         $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
         $subdepartmentids = implode(',',$subdepartmentids);
         $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
     }
 } else if ($roleid == 2){
     if($departmentid == -1){//access through navbar
         $sql = "SELECT * FROM user WHERE entity = $entityid";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
     } else {//access through manage user
         $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
         $subdepartmentids = implode(',',$subdepartmentids);
         $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids) AND entity = $entityid";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
     }
 } else if ($roleid == 3){
     $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
     $subdepartmentids = implode(',',$subdepartmentids);
     $sql = "SELECT * FROM user WHERE department IN ($subdepartmentids)";
+    $result = $conn->query($sql);
+    $total = mysqli_num_rows($result);
 }
 
 if (isset($_GET['search']['value'])) {
@@ -88,7 +99,6 @@ while($row = $result->fetch_assoc()) {
         $data[] = array(
             "id" => $row['id'],
             "date_registered" => gmdate("Y.m.d \ | H:i:s", $row['date_created']),
-            // "name" => "<a class='text-primary' href='/edit_user.php?id=".$row['id']."'>". $row['name']."</a>",
             "name" => $row['name'],
             "entity" => $entity,
             "department" => $department,
@@ -101,10 +111,10 @@ while($row = $result->fetch_assoc()) {
 }
 
 // Get the total number of records in the table
-$sql = "SELECT COUNT(*) as total FROM user";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
-$total = $row['total'];
+// $sql = "SELECT COUNT(*) as total FROM user";
+// $result = $conn->query($sql);
+// $row = $result->fetch_assoc();
+// $total = $row['total'];
 
 // Prepare the JSON response
 $response = array(

@@ -115,11 +115,8 @@ while($row = $result->fetch_assoc()) {
             "class" => $class,
             "user" => $user,
             "department" => $department,
-            // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
             "position" => $row['position'] ? $row['position'] : "--",
             "expire" => date('Y-m-d', $row['expire']), 
-            // add Modal for the requests?
-            // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
             "status" => $status,
             "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?assetid=".$row['id']."\">
                 Edit

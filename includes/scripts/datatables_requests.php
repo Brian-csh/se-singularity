@@ -14,7 +14,7 @@ $roleid = intval($_GET['roleid']);
 $entityid = intval($_GET['entityid']);
 $departmentid = intval($_GET['departmentid']);
 
-
+// Get the total number of records in the table
 switch ($roleid){
     case 1: // show all the requests? yes 
         $sql = "SELECT * FROM pending_requests WHERE 1=1";
@@ -62,7 +62,7 @@ if (isset($_GET['search']['value'])) {
     }
 }
 
-$sql .= " ORDER BY review_time LIMIT $start, $length";
+$sql .= " ORDER BY review_time DESC LIMIT $start, $length";
 
 $result = $conn->query($sql);
 $data = array();
@@ -118,14 +118,9 @@ while($row = $result->fetch_assoc()) {
         "result" => $request_result, // 0 -> pending, 1 -> approved, 2 -> rejected, 3 -> canceled
         "request_time" => date("H:i m-d",$row['request_time']+28200),
         "review_time" =>  $row['review_time']?  date("H:i m-d",$row['review_time']+28200) : "--",
-        // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
-        // "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?id=".$row['id']."&name=".$row['name']."\">
-        // Info
-        // </a>"
     );
 }
 
-// Get the total number of records in the table
 
 // Prepare the JSON response
 $response = array(
