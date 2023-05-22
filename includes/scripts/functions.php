@@ -356,7 +356,7 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
 
                     // send feishu approval request
                     $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
-                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
+                    // requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,11,$time);
                     
@@ -403,7 +403,7 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     array_push($results,[$asset_name,$row_result]);
                     // send feishu approval request
                     $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
-                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
+                    // requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,13,$time);
 
@@ -449,7 +449,7 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     array_push($results,[$asset_name,$row_result]);
                     // send feishu approval request
                     $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
-                    requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
+                    // requestFeishuApproval($conn, $entity_id, $row_result, $asset_name);
                     //make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,9,$time);
 
