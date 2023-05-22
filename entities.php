@@ -29,6 +29,7 @@ if (isset($_POST['add_entity'])) {
     } else {
         $popupCondition = "failure";
     }
+    echo "<script> window.location.href = 'entities.php'; </script>";
 }
 ?>
 
