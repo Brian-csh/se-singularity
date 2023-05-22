@@ -105,7 +105,7 @@ if($role_id == 3){ // resource manager
                                 
 
 
-                                //Fetch Depatment
+                                //Fetch Department
                                 $department_id_ = $row["department"];
                                 //? if department is -1, then its `By` is admin or superadmin
                                 $department =  mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"));
@@ -115,11 +115,22 @@ if($role_id == 3){ // resource manager
                                                                 
                                 if($role_id == 1){
                                     //? if department is -1, then its `By` is admin or superadmin
-                                    $entity_id_ = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id_'"));
-                                    if(isset($entity_id_['entity'])) $entity_id_ = $entity_id_['entity'];
-                                    $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id_'"));
-                                    if(isset($entity_name['entity'])) $entity_name = $entity_name['name'];
-                                        else $entity_name = '--';
+                                    $role_of_by = mysqli_fetch_array($conn->query("SELECT role FROM user WHERE id = '$by_id'"));
+                                    if($role_of_by['role'] == 1){
+                                        $department = "Super Admin";
+                                        $entity_name = 'Super Admin';
+                                    } else if($role_of_by['role'] == 2){
+                                        $department = "Admin";
+                                        $entity_id_ = mysqli_fetch_array($conn->query("SELECT entity FROM user WHERE id = '$by_id'"))['entity'];
+                                        $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id_'"))['name'];
+                                    } else{
+                                        $entity_id_ = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id_'"));
+                                        if(isset($entity_id_['entity'])) $entity_id_ = $entity_id_['entity'];
+                                    
+                                        $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id_'"));
+                                        if(isset($entity_name['name'])) $entity_name = $entity_name['name'];
+                                            else $entity_name = '--';
+                                    }
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
