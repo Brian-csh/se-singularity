@@ -83,7 +83,7 @@ if (isset($_POST['submit_asset'])) {
 <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="js/scripts.js"></script>
 <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
-<script src="js/datatables/datatables-simple-demo.js"></script>s
+<script src="js/datatables/datatables-simple-demo.js"></script>
 <body class="nav-fixed">
 <nav class="topnav navbar navbar-expand shadow justify-content-between justify-content-sm-start navbar-light bg-black border-bottom border-dark" id="sidenavAccordion">
     <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 me-2 ms-lg-2 me-lg-0" id="sidebarToggle" onclick="document.body.classList.toggle('sidenav-toggled');localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sidenav-toggled'));

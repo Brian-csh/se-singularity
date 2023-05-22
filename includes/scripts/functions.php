@@ -307,10 +307,10 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     // send feishu approval request
                     $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
                     $manager_row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
-                    if(isset($manager_row['feishu_id']))
-                        requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], $manager_row['feishu_id'], $time);
-                    else // temp
-                        requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], "ou_29bdc51fbfc84e1401dd9a8ae0316fa5", $time);
+                    // if(isset($manager_row['feishu_id']))
+                        // requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], $manager_row['feishu_id'], $time);
+                    // else // temp
+                        // requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], "ou_29bdc51fbfc84e1401dd9a8ae0316fa5", $time);
                     //Make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
                     
@@ -486,6 +486,7 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
 // HANDLE REQUESTS
 function handle_request($conn, $manager_id,$requestIds,$handle_type){
     $time = time();
+    $formattedTime = date('Y-m-d H:i:s', $time);
     $results = [];
         foreach($requestIds as $request_id){
             //fetch request type
@@ -522,7 +523,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
 
                         if(isset($row['feishu_id'])){ // non null
-                            $feishu_message = "Request (USE) for asset" . $asset_name ." has been approved! You can use the asset now!";
+                            $feishu_message = "Request (USE) for asset \"" . $asset_name ."\" has been approved! You can use the asset now! (".$formattedTime.')';
                         }
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
 
@@ -530,7 +531,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
 
                         if(isset($row['feishu_id'])){ // non null
-                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been approved!";
+                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been approved! (".$formattedTime.")";
                         }
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     } else { // reject
@@ -541,7 +542,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$initiator'"));
 
                         if(isset($row['feishu_id'])){ // non null
-                            $feishu_message = "Request (USE) for asset" . $asset_name ." has been rejected!";
+                            $feishu_message = "Request (USE) for asset" . $asset_name ." has been rejected! (".$formattedTime.")";
                         }
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
 
@@ -549,7 +550,7 @@ function handle_request($conn, $manager_id,$requestIds,$handle_type){
                         $row = mysqli_fetch_array($conn->query("SELECT feishu_id FROM user WHERE id = '$manager_id'"));
 
                         if(isset($row['feishu_id'])){ // non null
-                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been rejected!";
+                            $feishu_message = "Request (USE) for asset" . $asset_name . " from ".$initiator_name . " has been rejected! (".$formattedTime.")";
                         }
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }

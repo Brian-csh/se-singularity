@@ -18,19 +18,27 @@ $departmentid = intval($_GET['departmentid']);
 switch ($roleid){
     case 1: // show all the requests? yes 
         $sql = "SELECT * FROM pending_requests WHERE 1=1";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
         break;
     case 2: // show all the requests in entity
         $departmentids = getAllDepartmentIds($entityid,$conn);
         $departmentids = implode(',',$departmentids);
         $sql = "SELECT * FROM pending_requests WHERE department IN ($departmentids)";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
         break;
     case 3: // show all the requests in the department & sub-departments
         $subdepartmentids = getALLSubdepartmentIds($departmentid,$conn);
         $subdepartmentids = implode(',',$subdepartmentids);
         $sql = "SELECT * FROM pending_requests WHERE department IN ($subdepartmentids)";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
         break;
     case 4:
-        $sql = "SELECT * FROM pending_requests WHERE department = $departmentid";
+        $sql = "SELECT * FROM pending_requests WHERE department = $departmentid AND initiator = $userid";
+        $result = $conn->query($sql);
+        $total = mysqli_num_rows($result);
         break;
     default:
         break;
@@ -57,7 +65,6 @@ if (isset($_GET['search']['value'])) {
 $sql .= " ORDER BY review_time LIMIT $start, $length";
 
 $result = $conn->query($sql);
-
 $data = array();
 while($row = $result->fetch_assoc()) {
 
@@ -119,11 +126,6 @@ while($row = $result->fetch_assoc()) {
 }
 
 // Get the total number of records in the table
-//TODO : change this
-$sql = "SELECT COUNT(*) as total FROM pending_requests";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
-$total = $row['total'];
 
 // Prepare the JSON response
 $response = array(

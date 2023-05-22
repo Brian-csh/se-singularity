@@ -11,6 +11,8 @@ if (isset($_GET['success'])) {
     $image_operation_status = 0;
 }
 
+$active = "Edit Asset";
+include "includes/header.php";
 include "includes/db/connect.php";
 include "includes/scripts/functions.php";
 include "includes/oss.php";
@@ -210,9 +212,6 @@ if (isset($_POST['delete_image'])) {
         echo "<script>alert('Failed to upload the file: " . $e->getMessage() . "')</script>";
     }
 }
-
-$active = $asset_name_;
-include "includes/header.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -484,7 +483,7 @@ include "includes/header.php";
                         <!-- Edit asset name -->
                         <div class="mb-3">
                             <label for="editAssetName">Asset Name</label>
-                            <input class="form-control" id="editAssetName" type="text" name="editAssetName" placeholder="<?php echo $asset_name; ?>">
+                            <input class="form-control" id="editAssetName" type="text" name="editAssetName" placeholder="<?php echo $asset_name_; ?>">
                         </div>
                         <!-- Edit position -->
                         <div class="mb-3">

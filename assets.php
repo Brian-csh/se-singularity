@@ -6,9 +6,26 @@ include "includes/header.php";
 include "includes/navbar.php";
 
 $class_entity_id = $session_info['entity'];
+$user_id_filter = -1;
+if (isset($_GET['userid'])) {
+    $user_id_filter = intval($_GET['userid']);
 
-if(isset($_GET['userid'])){
-    
+    echo "
+    <script>
+    var active_elements = document.querySelectorAll('a[href*=\"assets.php\"]');
+
+    for (var i = 0; i < active_elements.length; i++) {
+    var element = active_elements[i];
+    element.classList.remove('active');
+    }
+
+    var active_elements = document.querySelectorAll('a[href*=\"assets.php?userid\"]');
+    let link = active_elements[0];
+
+    link.classList.toggle('active');
+
+    </script>
+    ";
 }
 
 if (isset($_POST['add_class'])) {
@@ -84,6 +101,8 @@ echo "<script>
                             <?php }?>
                             <?php if($role_id == 2 | $role_id ==3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
+                                <button type="button" class="btn btn-warning btn-xs float-end ms-2 me-2" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
+                                <a href="includes/scripts/export_assets.php" class="btn btn-success btn-xs float-end">Export</a>
                             <?php }?>
                         </div>
                     </div>
@@ -243,6 +262,30 @@ echo "<script>
         </div>
     <?php }?>
 
+    <!-- Import Asset Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="classAddLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="includes/scripts/import_assets.php" enctype="multipart/form-data" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Import Assets</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="importFile">Select File</label>
+                            <input class="form-control" type="file" id="importFile" name="csvFile" accept=".csv">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" type="submit" id="confirmButton" value="Upload CSV" name="submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
         <!-- handleRequestModal -->
         <!-- <div class="modal fade" id="handleRequestModal" tabindex="-1" role="dialog" aria-labelledby="BasicInfoEditLabel" aria-hidden="true">
@@ -292,7 +335,7 @@ echo "<script>
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
-                ordering: true,
+                ordering: false,
                 searching: true,
                 processing: true,
                 serverSide: true,
@@ -300,7 +343,7 @@ echo "<script>
                 ajax: {
                     url: "includes/scripts/datatables_assets.php",
                     data: function(d) {
-                        d.userid = <?= $user_id ?>;
+                        d.userid = <?= $user_id_filter ?>;
                         d.roleid = <?= $role_id ?>;
                         d.entityid = <?= $entity_id ?>;
                         d.departmentid = <?= $department_id ?>;
