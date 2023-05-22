@@ -51,21 +51,21 @@ while($row = $result->fetch_assoc()) {
         $entity_id = $row['entity'];
         $entity = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
     } else {
-        $entity = "N/A";
+        $entity = "--";
     }
 
     if (isset($row['department'])) {
         $department_id = $row['department'];
         $department = mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id'"))['name'];
     } else {
-        $department = "N/A";
+        $department = "--";
     }
 
     if (isset($row['role'])) {
         $role_id = $row['role'];
         $role = mysqli_fetch_array($conn->query("SELECT role FROM role WHERE id = '$role_id'"))['role'];
     } else {
-        $class = "N/A";
+        $class = "--";
     }
 
     $entity_super = $row['entity_super'];

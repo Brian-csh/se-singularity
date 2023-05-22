@@ -14,7 +14,7 @@ $result = $conn->query($sql_navbar);
 $navbar_links = array();
 
 $row = $result->fetch_assoc();
-$navbar_links_json = $row['urls'];
+$navbar_links_json = $row['urls']; // TODO : NULL CHECK
 
 if ($navbar_links_json != null) {
     $navbar_links = json_decode($navbar_links_json);

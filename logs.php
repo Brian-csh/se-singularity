@@ -76,7 +76,10 @@ if($role_id == 3){ // resource manager
                             while ($row = $result->fetch_assoc()) {
                                 //Fetch By - always user
                                 $by_id = $row["By"];
-                                $by_whom = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$by_id'"))['name'];
+                                
+                                $by_whom = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$by_id'"));
+                                if(isset($by_whom))$by_whom = $by_whom['name'];
+                                else $by_whom = "--";
                                 
                                 if($role_id == 2){
                                     $entity = mysqli_fetch_array($conn->query("SELECT entity FROM user WHERE id = '$by_id'"))['entity'];
@@ -88,7 +91,9 @@ if($role_id == 3){ // resource manager
 
                                 //Fetch Log Type
                                 $type_id = $row["log_type"];
-                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"))['type'];
+                                $type = mysqli_fetch_array($conn->query("SELECT type FROM log_type WHERE id = '$type_id'"));
+                                if(isset($type))$type = $type['type'];
+                                else $type = "--";
 
                                 //Fetch Subject
                                 $subject_id = $row["subject"];
@@ -103,13 +108,18 @@ if($role_id == 3){ // resource manager
                                 //Fetch Depatment
                                 $department_id_ = $row["department"];
                                 //? if department is -1, then its `By` is admin or superadmin
-                                $department =  mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"))['name'];
+                                $department =  mysqli_fetch_array($conn->query("SELECT name FROM department WHERE id = '$department_id_'"));
+                                if(isset($department)) $department = $department['name'];
+                                    else $department = '--';
 
                                                                 
                                 if($role_id == 1){
                                     //? if department is -1, then its `By` is admin or superadmin
-                                    $entity_id_ = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id_'"))['entity'];
-                                    $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id_'"))['name'];
+                                    $entity_id_ = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id_'"));
+                                    if(isset($entity_id_['entity'])) $entity_id_ = $entity_id_['entity'];
+                                    $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id_'"));
+                                    if(isset($entity_name['entity'])) $entity_name = $entity_name['name'];
+                                        else $entity_name = '--';
 
                                 echo "<tr data-id='$log_id' >
                                 <td class='text-primary'>$date</td>
