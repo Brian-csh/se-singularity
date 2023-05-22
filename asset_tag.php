@@ -139,7 +139,7 @@
             }
             if (in_array("expire", $template)) {
                 $expire = (isset($row['expire']) && !empty($row['expire'])) ? $row['expire'] : "N/A";
-                echo '<p class="asset-description">Expire: ' . $expire . '<br></p>';
+                echo '<p class="asset-description">Expire: ' . date('Y-m-d',$expire) . '<br></p>';
             }
             if (in_array("serial number", $template)) {
                 $serialnumber = (isset($row['serial number']) && !empty($row['serial number'])) ? $row['serial number'] : "N/A";
