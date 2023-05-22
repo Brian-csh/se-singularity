@@ -93,37 +93,37 @@ while($row = $result->fetch_assoc()) {
     }
 
 
-if($roleid < 4){ // super admin, admin, resource manager
-    $data[] = array(
-        "id" => $row['id'],
-        "parent" => $parent,
-        "name" => "<a class='text-primary' href='/asset.php?assetid=".$row['id']."'>". $row['name']."</a>",
-        "class" => $class,
-        "user" => $user,
-        "department" => $department,
-        // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
-        "position" => $row['position'] ? $row['position'] : "--",
-        "expire" => $row['expire'], 
-        // add Modal for the requests?
-        // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
-        "status" => $status,
-        "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?assetid=".$row['id']."\">
-            Edit
-        </a>" // TODO: put icon here
-    );
-} else { // user
-    $data[] = array(
-        "id" => $row['id'],
-        "parent" => $parent,
-        "name" => "<a class='text-primary' href='../../asset_info.php?assetid=".$row['id']."'>". $row['name']."</a>",
-        "class" => $class,
-        "user" => $user,
-        "department" => $department,
-        "position" => $row['position'],
-        "expire" => $row['expire'],
-        "status" => $status
-    );
-}
+    if($roleid < 4){ // super admin, admin, resource manager
+        $data[] = array(
+            "id" => $row['id'],
+            "parent" => $parent,
+            "name" => "<a class='text-primary' href='/asset.php?assetid=".$row['id']."'>". $row['name']."</a>",
+            "class" => $class,
+            "user" => $user,
+            "department" => $department,
+            // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
+            "position" => $row['position'] ? $row['position'] : "--",
+            "expire" => date('Y-m-d', $row['expire']), 
+            // add Modal for the requests?
+            // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
+            "status" => $status,
+            "actions" => "<a title=\"User Info\" class=\"btn btn-datatable\" href=\"edit_asset.php?assetid=".$row['id']."\">
+                Edit
+            </a>" // TODO: put icon here
+        );
+    } else { // user
+        $data[] = array(
+            "id" => $row['id'],
+            "parent" => $parent,
+            "name" => "<a class='text-primary' href='../../asset_info.php?assetid=".$row['id']."'>". $row['name']."</a>",
+            "class" => $class,
+            "user" => $user,
+            "department" => $department,
+            "position" => $row['position'],
+            "expire" => date('Y-m-d', $row['expire']),
+            "status" => $status
+        );
+    }
 }
 
 // Get the total number of records in the table
