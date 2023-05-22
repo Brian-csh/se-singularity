@@ -10,12 +10,12 @@ $active = 'Create User';
 // Insert info
 if (isset($_POST['submit_changes'])) {
     $name = $_POST['Entityname'];
-
-    $sql = "INSERT INTO entity (name) VALUES
-    ('$name')";
+    $time = time();
+    $sql = "INSERT INTO entity (name,date_created) VALUES
+    ('$name','$time')";
 
     if ($conn->query($sql)) {
-        header('Location: ../../entities.php?id=' . $conn->insert_id);
+        header('Location: entities.php?id=' . $conn->insert_id);
     } else {
         header('Location: new_entity.php?insert_error');
     }

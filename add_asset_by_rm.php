@@ -22,7 +22,7 @@ if (isset($_POST['submit_asset'])) {
     $price = $_POST['price'];
     $description = addslashes($_POST['description']);
     $position = $_POST['asset_location'];
-    // $expire = date("Y-m-d",strtotime($_POST['expiration']));
+    $expire = strtotime($_POST['expiration']);
     $image_url = "";
     if (isset($_FILES['file'])) {
         $file = $_FILES['file'];
@@ -42,8 +42,8 @@ if (isset($_POST['submit_asset'])) {
     }
     $date_created = time();
 
-    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, custom_attr, date_created, status, image) 
-    VALUES (null, '$name', '$asset_class', '$department', null, NULLIF('$price',''), '$description', '$position', null, '$date_created','1', '$image_url')";
+    $sql = "INSERT INTO asset (parent, name, class, department, user, price, description, position, custom_attr, date_created, expire,status, image) 
+    VALUES (null, '$name', '$asset_class', '$department', null, NULLIF('$price',''), '$description', '$position', null, '$date_created','$expire','1', '$image_url')";
     // echo $sql;
     if ($conn->query($sql)) {
         header('Location: assets.php');
@@ -196,7 +196,7 @@ if (isset($_POST['submit_asset'])) {
 
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputExpiration">Expiration Date</label>
-                                        <input class="form-control" id="inputExpiration" type="date" value="" name="expiration">
+                                        <input class="form-control" id="inputExpiration" type="date" value="" name="expiration" required>
                                     </div>
                                     
                                         <!-- Asset Location -->
@@ -208,7 +208,7 @@ if (isset($_POST['submit_asset'])) {
                                         <!-- Asset price -->
                                         <div class="col-md-3">
                                             <label class="small mb-1" for="inputPrice">Price</label>
-                                            <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="10.00">
+                                            <input type="number" class="form-control" name="price" id="inputPrice" step="0.01" placeholder="1000.00" required>
                                         </div>
                                 </div>
                                 <input type="file" name="file" id="imageInput" style="color: white">

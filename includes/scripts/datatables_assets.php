@@ -117,7 +117,7 @@ while($row = $result->fetch_assoc()) {
             "department" => $department,
             // "description" => isset($row['description']) ? strip_tags(substr($row['description'],0,30)) . "..." : '',
             "position" => $row['position'] ? $row['position'] : "--",
-            "expire" => $row['expire'], 
+            "expire" => date('Y-m-d', $row['expire']), 
             // add Modal for the requests?
             // "status" => ($status_id >=6 && $status_id <= 9)? "<button class= 'text-primary handleRequestButton' data-bs-toggle='modal' data-bs-target = '#handleRequestModal'>"."You have pending Request! : ".$status. "</button>" : $status,
             "status" => $status,
@@ -134,7 +134,7 @@ while($row = $result->fetch_assoc()) {
             "user" => $user,
             "department" => $department,
             "position" => $row['position'],
-            "expire" => $row['expire'],
+            "expire" => date('Y-m-d', $row['expire']),
             "status" => $status
         );
     }

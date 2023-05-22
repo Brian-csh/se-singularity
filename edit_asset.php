@@ -30,11 +30,8 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_user_id = $asset_data['user'];
         $asset_price = $asset_data['price'];
         $asset_description = $asset_data['description'];
-        $asset_position = $asset_data['position'];        
-        if (!isset($asset_data['date_created']))
-            $asset_expire = date("Y-m-d", strtotime($asset_data['expire']));    
-        else
-            $asset_expire = "";
+        $asset_position = $asset_data['position'];
+        $asset_expire = date(strtotime($asset_data['expire']));
         $asset_status_id = $asset_data['status'];
         $asset_brand = $asset_data['brand'];
         $asset_model = $asset_data['model'];
