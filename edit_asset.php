@@ -38,7 +38,6 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_serial_number = $asset_data['serial number'];
         $asset_original_price = $asset_data['price'];
         $asset_current_price = $asset_data['current price'];
-        $asset_depreciation_model = $asset_data['depreciation model'];
         $asset_department_id = $asset_data['department'];
         $custom_attributes = $asset_data['custom_attr'];
         $asset_image = isset($asset_data['image']) ? $asset_data['image'] : "";
