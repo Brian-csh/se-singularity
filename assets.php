@@ -309,6 +309,12 @@ echo "<script>
     <link rel="stylesheet" href="css/multiselect.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="includes/multiselect_search_class.js"></script>
+
+    <!-- toastr -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="js/show_toast.js"></script>
+
     
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
@@ -459,15 +465,15 @@ echo "<script>
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
                                                     <?php if($role_id == 4) { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession!');
+                                                        showToast('Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession.', "warning");
                                                     <?php } else { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only return assets that is IDLE!');
+                                                        showToast('Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only retire assets that is IDLE.', "warning");
                                                     <?php }?>
                                                 } else { // Succeess
                                                     <?php if($role_id == 4) { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" request (RETURN) made successfully!');
+                                                        showToast('Asset "' + data.result[i][0] + '" request (RETURN) made successfully!', "success");
                                                     <?php } else { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" RETIRED!');
+                                                        showToast('Asset "' + data.result[i][0] + '" RETIRED!', "success");
                                                     <?php }?>
                                                 }
                                             }
@@ -511,9 +517,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.");
+                                                    showToast("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.", "warning");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " moved!")
+                                                    showToast("Asset " + data.result[i][0] + " moved!", "success");
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -550,9 +556,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.");
+                                                    showToast("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.", "warning");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
+                                                    showToast("Asset " + data.result[i][0] + " request (MOVE) made successfully!", "success");
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -594,9 +600,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.");
+                                                    showToast("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.", "warning");
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfully!.")
+                                                    showToast("Asset " + data.result[i][0] + " request (REPAIR) made successfully!.", "success")
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
