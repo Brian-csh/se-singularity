@@ -5,12 +5,14 @@ include($includePath);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payload = file_get_contents('php://input');
+    // debugging
+    $sql = "INSERT INTO test (test) VALUES ('$payload')";
 
-    // Convert the JSON string into a PHP object
     if(empty($payload)) {
         http_response_code(400);
         exit();
     }
+    // Convert the JSON string into a PHP object
     $data = json_decode($payload, true);
 
     // print the data
