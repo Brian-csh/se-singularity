@@ -24,13 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // update the pending_requests table
         // 1 is approved, 2 is rejected
         // set review_time to current time
-        $sql = "UPDATE pending_requests SET status = 1, review_time = NOW() WHERE id = $instanceId";
+        $sql = "UPDATE pending_requests SET result = 1, review_time = NOW() WHERE id = $instanceId";
         if (!$conn->query($sql)) {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
     } else if($actionType == "REJECT") {
         // update the pending_requests table
-        $sql = "UPDATE pending_requests SET status = 2, review_time = NOW() WHERE id = $instanceId";
+        $sql = "UPDATE pending_requests SET result = 2, review_time = NOW() WHERE id = $instanceId";
         if (!$conn->query($sql)) {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
