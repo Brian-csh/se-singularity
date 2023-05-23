@@ -16,13 +16,13 @@ if (isset($_POST['submit_changes'])) {
     $parent = $_POST['parent'];
     $entity_id = $_POST['entity_id'];
     $entity_name = $_POST['entity_name'];
-
+    $default_template = "";
     if ($parent === "") {
-        $sql = "INSERT INTO department (name, entity, parent) 
-                VALUES ('$name', '$entity_id', NULL)";
+        $sql = "INSERT INTO department (name, entity, parent,template) 
+                VALUES ('$name', '$entity_id', NULL,'$default_template')";
     } else {
-        $sql = "INSERT INTO department (name, entity, parent)
-        VALUES ('$name', '$entity_id', '$parent')";
+        $sql = "INSERT INTO department (name, entity, parent,template)
+        VALUES ('$name', '$entity_id', '$parent','$default_template')";
     }
     if ($conn->query($sql)) {
         header('Location: entity.php?id='.$entity_id);
