@@ -99,7 +99,7 @@ echo "<script>
                             <?php if($role_id ==3){?>
                                 <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
-                            <?php if($role_id == 2 | $role_id ==3){?>
+                            <?php if($role_id == 2 || $role_id == 3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                                 <button type="button" class="btn btn-warning btn-xs float-end ms-2 me-2" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
                                 <a href="includes/scripts/export_assets.php" class="btn btn-success btn-xs float-end">Export</a>
@@ -466,7 +466,7 @@ echo "<script>
                                                     <?php if($role_id == 4) { ?> 
                                                         Toastify({ text: 'Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession.', duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                     <?php } else { ?> 
-                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only retire assets that is IDLE.', duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
+                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only retire assets that are IDLE.', duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                     <?php }?>
                                                 } else { // Succeess
                                                     <?php if($role_id == 4) { ?> 

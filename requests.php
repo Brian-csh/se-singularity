@@ -170,7 +170,7 @@ include "includes/navbar.php";
                                                     // fetch asset name
                                                     Toastify({ text: "Request " + data.result[i][0] + " is not available for approval. You can only approve pending requests.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    Toastify({ text: "Request id:" + data.result[i][0] + " approved!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
+                                                    Toastify({ text: "Request (id: " + data.result[i][0] + ") approved!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -209,8 +209,8 @@ include "includes/navbar.php";
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
                                                     Toastify({ text: "Request " + data.result[i][0] + " is not available for rejection. You can only reject pending requests.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
-                                                } else { // Succeess
-                                                    Toastify({ text: "Request :" + data.result[i][0] + " rejected!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
+                                                } else { // Success
+                                                    Toastify({ text: "Request (id: " + data.result[i][0] + ") rejected!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
