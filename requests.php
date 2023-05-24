@@ -12,6 +12,10 @@ include "includes/navbar.php";
 <!-- DataTables Buttons CSS -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" />
 
+<!-- Toast -->
+<link rel="stylesheet" type="text/css" href="css/toastify.css">
+<script src="js/toastify.js"></script>
+
 <div id="layoutSidenav_content">
     <main>
         <header class="page-header page-header-compact page-header-light border-bottom bg-black mb-4">
@@ -164,9 +168,9 @@ include "includes/navbar.php";
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Request " + data.result[i][0] + " is not available for approval. You can only approve pending requests.");
+                                                    Toastify({ text: "Request " + data.result[i][0] + " is not available for approval. You can only approve pending requests.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    alert("Request id:" + data.result[i][0] + " approved!.")
+                                                    Toastify({ text: "Request (id: " + data.result[i][0] + ") approved!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -204,9 +208,9 @@ include "includes/navbar.php";
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Request " + data.result[i][0] + " is not available for rejection. You can only reject pending requests.");
-                                                } else { // Succeess
-                                                    alert("Request :" + data.result[i][0] + " rejected!.")
+                                                    Toastify({ text: "Request " + data.result[i][0] + " is not available for rejection. You can only reject pending requests.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
+                                                } else { // Success
+                                                    Toastify({ text: "Request (id: " + data.result[i][0] + ") rejected!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables

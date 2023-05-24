@@ -15,6 +15,8 @@ if($role_id == 1){
 }
 
 echo "<script>document.title = '" . 'Entity #'. $entity_id . ' - Singularity EAM'."';</script>";
+echo '<link rel="stylesheet" type="text/css" href="css/toastify.css">';
+echo '<script src="js/toastify.js"></script>';
 
 // Fetch entity values
 $sql = "SELECT * FROM entity WHERE id = '$entity_id' LIMIT 1";
@@ -41,7 +43,7 @@ if (isset($_GET['delete_attribute_id']) and $_GET['delete_attribute_id'] != "") 
             // Delete the attribute
             $sql = "DELETE FROM asset_attribute WHERE id = '$attribute_deletion_id' LIMIT 1";
             $conn->query($sql);
-            echo "<script type='text/javascript'>alert('Attribute deleted successfully.');</script>";
+            echo "<script type='text/javascript'>Toastify({ text: \"Attribute deleted successfully.\", duration: 3000, backgroundColor: \"green\", position: \"center\", gravity: \"top\" }).showToast();</script>";
         }
     }
 }
@@ -56,7 +58,7 @@ if (isset($_POST['create_asset_attribute'])) {
     $result = $conn->query($sql);
 
     if ($result) {
-        echo "<script type='text/javascript'>alert('Attribute created successfully.');</script>";
+        echo "<script type='text/javascript'>Toastify({ text: \"Attribute created successfully.\", duration: 3000, backgroundColor: \"green\", position: \"center\", gravity: \"top\" }).showToast();</script>";
     } else {
         echo "<script type='text/javascript'>alert('Error creating attribute: ". $conn->error ."');</script>";
     }
