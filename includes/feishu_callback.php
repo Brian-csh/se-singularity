@@ -3,6 +3,8 @@ require 'db/connect.php';
 
 session_start();
 include '../includes/scripts/functions.php';
+include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+
 // bind: existing Singularity users can bind their Feishu accs
 // signin: sign in to Singularity w Feishu (not sign up)
 if(isset($_GET['mode'])) {
@@ -88,6 +90,11 @@ if(isset($arr->access_token)){
 
         // Execute the SQL statement
         mysqli_query($conn, $sql);
+
+        if($_SESSION['user']['role'] == 3){
+            // if user is RM, init approval
+            initFeishuApproval($conn, $_SESSION['user']['department']);
+        }
         
         // Redirect
         header('Location: ../index.php');

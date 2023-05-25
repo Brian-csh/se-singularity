@@ -2,7 +2,6 @@
 ob_start();
 require 'db/connect.php';
 include 'scripts/functions.php';
-include 'feishu/third_approval_init.php';
 
 // get tenant access token
 $feishu_app_id = "cli_a4a8e931cd79900e";
@@ -85,9 +84,6 @@ foreach ($users as $user) {
 }
 if($contacts_added > 0){
     insert_log_feishu_sync($conn, $entity_id, $initiator);
-}
-if(true){ // TODO check if entity sync has succeeded
-    initFeishuApproval($conn, $entity_id);
 }
 
 header('Location: ../entities.php?sync_success='.$contacts_added);

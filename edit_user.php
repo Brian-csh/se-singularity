@@ -1,5 +1,6 @@
 <?php
 include "includes/db/connect.php";
+include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
 //return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn)
 {
@@ -85,7 +86,11 @@ if (isset($_POST['submit_changes'])) {
     $sql .= " WHERE id='$user_id'";
 
     if ($conn->query($sql)) { //update successful
-        header("Location: edit_user.php?id=$user_id&success");
+        // update feishu approval system if new role or old role is changed to RM
+        if ($new_role_id == 3 || $editor_role == 3) {
+            initFeishuApproval($conn, $new_department_id);
+        }
+        // header("Location: edit_user.php?id=$user_id&success");
     } else { //update failed
         header("Location: edit_user.php?id=$user_id&error=2");
         exit;

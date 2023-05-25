@@ -23,15 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 1 is approved, 2 is rejected
         // set review_time to current time
         $sql = "UPDATE pending_requests SET result = 1, review_time = UNIX_TIMESTAMP() WHERE id = $instanceId";
-        if (!$conn->query($sql)) {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+        if($conn->query($sql)) {
+            
+        } else {
+            http_response_code(500);
+            exit();
         }
     } else if($actionType == "REJECT") {
         // update the pending_requests table
         $sql = "UPDATE pending_requests SET result = 2, review_time = UNIX_TIMESTAMP() WHERE id = $instanceId";
-        if (!$conn->query($sql)) {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
+        $conn->query($sql);
     }
 
     http_response_code(200);

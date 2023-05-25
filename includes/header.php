@@ -17,6 +17,10 @@ if (isset($_POST['feishu-unbind-click'])) {
     $_SESSION['feishu_bind'] = false;
     $sql = "UPDATE user SET feishu_id = NULL WHERE id = '$session_user_id'";
     mysqli_query($conn, $sql);
+    if($_SESSION['user']['role'] == 3){
+        // if user is RM, init approval
+        initFeishuApproval($conn, $_SESSION['user']['department']);
+    }
 }
 
 if(isset($_SESSION['feishu_bind']) && $_SESSION['feishu_bind']) {
