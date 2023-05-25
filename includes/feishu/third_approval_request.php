@@ -211,12 +211,6 @@ function requestFeishuApproval(
 
   if ($response) {
     $response = json_decode($response, true);
-    if (!$conn->query($sql)) {
-      echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-    else{
-      var_dump($response);
-    }
   } else {
     echo "No response received.";
   }
