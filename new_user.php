@@ -10,31 +10,26 @@ if (isset($_GET['error'])) {
     $error = $_GET['error'];
 }
 
-if($session_info['user']['role'] == 1){ //superadmin
-    if(isset($_GET['departmentid'])){
-        $department_id = $_GET['departmentid'];
-    } else {
-        $department_id = -1;
-    }
-} else { // admin
-    // access through navbar -> -1 | access through department pages -> department id 
-    $department_id = $_GET['departmentid'];
-}
+//always exist
+$department_id = isset($_GET['departmentid']) ? $_GET['departmentid'] : -1;
+$role_id_ = $session_info['user']['role'];
+
 if (isset($_POST['submit_changes'])) {
     $name = $_POST['name'];
     $date_created = time();
     $role_id = $_POST['role'];
     $department_id = $_POST['department_id'];
-
-    if($role_id == 1){
+    
+    $entity_head = 0; 
+    if($role_id == 1){ // superadmin
         $entity_id_ = 'null';
-    } else {
-        $entity_id_ = $_POST['entity'];
-    }
-
-    if($role_id == 1 || $role_id == 2){
         $department_id_ = 'null';
-    } else {
+    } else if ($role_id == 2){
+        $entity_id_ = $_POST['entity'];
+        $department_id_ = 'null';
+        $entity_head = 1;
+    } else{
+        $entity_id_ = $_POST['entity'];
         $department_id_ = $_POST['department'];
     }
 
@@ -47,13 +42,16 @@ if (isset($_POST['submit_changes'])) {
     if (strcmp($password, $reenter_password) != 0) {
         $password_confirmed = false;
     }
-
     if ($password_confirmed) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
-        VALUES ('$date_created', '$name', '$hashed_password', '$entity_id_',$department_id_, '0', '$role_id')";
-        var_dump($sql);
+        VALUES ('$date_created', '$name', '$hashed_password', $entity_id_,$department_id_, '$entity_head', '$role_id')";
+    var_dump($sql);
         if ($conn->query($sql)) {
-            header('Location: users.php');
+            if($department_id == -1){
+                header('Location: users.php');
+            } else {
+                header('Location: users.php?departmentid='.$department_id);
+            }
         } else {
             header('Location: new_user.php?departmentid='.$department_id.'&error=2');
         }
@@ -156,23 +154,27 @@ if (isset($_POST['submit_changes'])) {
                                         <input required class="form-control" id="inputName" type="text" value="" name="name" placeholder="Enter a Username">
                                     </div>
                                     <!-- Form Group (entity)-->
-                                    <?php if($session_info['user']['role'] == 1){ ?>
+                                    <?php if($role_id_ == 1){ ?>
                                         <!-- SUPER ADMIN -->
-                                        <div class="col-md-6">
-                                            <label class="small mb-1" for="inputEntity">Entity</label>
-                                            <select class="form-control" required id="inputEntity" name="entity" onchange="updatedepartments()">
-                                                <option value="">Select an Entity</option>
-                                                <?php
-                                                    $results = $conn->query("SELECT id, name FROM entity");
-                                                    while ($row = $results->fetch_assoc()) {
-                                                        unset($id, $name);
-                                                        $id = $row['id'];
-                                                        $name = $row['name'];
-                                                        echo '<option value="' . $id . '">' . $name . '</option>';
-                                                    }
-                                                ?>
-                                            </select>
-                                        </div>
+                                        <?php if($department_id == -1) { // entity undetermined ?>
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputEntity">Entity</label>
+                                                <select class="form-control" required id="inputEntity" name="entity" onchange = "updatedepartments_sa()">
+                                                    <option value="">Select a Entity</option>
+                                                </select>
+                                            </div>
+                                        <?php } else {  // entity dertermined?>
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputEntity">Entity</label>
+                                                <select class="form-control" required id="inputEntity" name="entity">
+                                                    <?php
+                                                        $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity']; 
+                                                        $entity_name = mysqli_fetch_array($conn->query("SELECT name FROM entity WHERE id = '$entity_id'"))['name'];
+                                                        echo '<option value="' . $entity_id. '">' . $entity_name . '</option>';
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        <?php }?>
                                     <?php } else {?>
                                         <!-- ADMIN -->
                                         <div class="col-md-6">
@@ -190,16 +192,6 @@ if (isset($_POST['submit_changes'])) {
                                 <!-- Form Row-->
                                 <div class="row gx-3 mb-3">
                                     <!-- Form Group (department, role)--> 
-                                    <?php if($session_info['user']['role'] == 1){?>
-                                        <!-- SUPER ADMIN -->
-                                        <div class="col-md-6">
-                                            <label class="small mb-1" for="inputDepartment">Department</label>
-                                            <select class="form-control" id="inputDepartment" name="department" required>
-                                                <option value="">Select a Department</option>
-                                            </select>
-                                        </div>
-                                    <?php } else {?>
-                                        <!-- ADMIN -->
                                         <?php if($department_id==-1){?>
                                             <!-- ACCESS THROUGH NAVBAR -->
                                             <div class="col-md-6">
@@ -218,22 +210,33 @@ if (isset($_POST['submit_changes'])) {
                                                 </select>
                                             </div>
                                         <?php }?>
-                                    <?php }?>
                                     <!-- SELECT ROLE -->
                                     <?php if($department_id == -1){?>
                                         <!-- ACCESS THROUGH NAVBAR -->
-                                        <div class="col-md-6">
-                                            <label class="small mb-1" for="inputRole">Role</label>
-                                            <select class="form-control" id="inputRole" name="role" onchange = "updatedepartments()">
-                                                <option value="4">user</option>
-                                                <option value="3">resource manager</option>  
-                                                <option value="2">admin</option>
-                                                <?php if($session_info['user']['role'] == 1) {?>    
+                                        <?php if($role_id_ == 1) {?>
+                                            <!-- SUPERADMIN -->
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputRole">Role</label>
+                                                <select class="form-control" id="inputRole" name="role" onchange = "updateentities()">
+                                                    <option value="4">user</option>
+                                                    <option value="3">resource manager</option>  
+                                                    <option value="2">admin</option>  
                                                     <option value="1" selected>superadmin</option>
-                                                <?php }?>
-                                            </select>
-                                        </div>
+                                                </select>
+                                            </div>
+                                            <?php }else{?>
+                                            <!-- ADMIN -->
+                                            <div class="col-md-6">
+                                                <label class="small mb-1" for="inputRole">Role</label>
+                                                <select class="form-control" id="inputRole" name="role" onchange = "updatedepartments_admin()">
+                                                    <option value="4">user</option>
+                                                    <option value="3">resource manager</option>  
+                                                    <option value="2">admin</option>
+                                                </select>
+                                            </div>
+                                        <?php }?>
                                     <?php } else {?>
+                                        <!-- ACCESS THROUGH DEPARTMENT PAGE -->
                                         <div class="col-md-6">
                                             <label class="small mb-1" for="inputRole">Role</label>
                                             <select class="form-control" id="inputRole" name="role">
@@ -276,13 +279,12 @@ if (isset($_POST['submit_changes'])) {
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
 
-<?php if($department_id==-1){?>
+<?php if($department_id==-1 && $role_id_ == 2){?>
 <script>
-        function updatedepartments() {
+        function updatedepartments_admin() {
             let role = $('#inputRole').val();
             let entityId = $('#inputEntity').val();
             console.log("role : "+role);
-            console.log("entityId : "+entityId);
         
             if (role === "2") {
                 $('#inputDepartment').empty();
@@ -292,22 +294,14 @@ if (isset($_POST['submit_changes'])) {
                 }));
                 return;
             }
-            if (role == "1"){
-                $('#inputDepartment').empty();
-                $('#inputDepartment').append($('<option>', {
-                    value: null,
-                    text: "--"
-                }));
-                return;
-            }
-            $.ajax({
 
+            $.ajax({
                 url: 'includes/scripts/ajax.php',
                 method: 'POST',
                 data: {
-                    request: 'set_departments',
-                    entity_id: entityId,
-                    role: role
+                    request: 'set_departments_admin',
+                    role: role,
+                    entity_id : entityId
                 },
                 dataType: 'json',
                 success: function (departments) {
@@ -332,12 +326,127 @@ if (isset($_POST['submit_changes'])) {
             });
         }
     </script>
-<script>
-    window.onload = (event) => {
-        updatedepartments();
-    };
-</script>
+    <script>
+        window.onload = (event) => {
+            updatedepartments_admin();
+        };
+    </script>
 <?php }?>
+
+<?php if($department_id == -1 && $role_id_ == 1){?>
+<script>
+        function updateentities() {
+            let role = $('#inputRole').val(); // can't be 1
+            let entityId = $('#inputEntity').val();
+            console.log("role : "+role);
+            console.log("entityId : "+entityId);
+        
+            if (role === "1") {
+                $('#inputDepartment').empty();
+                $('#inputEntity').empty();
+
+                $('#inputDepartment').append($('<option>', {
+                    value: null,
+                    text: "--"
+                }));
+
+                $('#inputEntity').append($('<option>', {
+                    value: null,
+                    text:"--"
+                }));
+                return;
+            }
+            if (role === "2") {
+                $('#inputDepartment').empty();
+                $('#inputDepartment').append($('<option>', {
+                    value: null,
+                    text: "--"
+                }));
+            }
+
+            $.ajax({
+                url: 'includes/scripts/ajax.php',
+                method: 'POST',
+                data: {
+                    request: 'set_entities',
+                    entity_id: entityId,
+                    role: role
+                },
+                dataType: 'json',
+                success: function (entities) {
+                    var entitySelect = $('#inputEntity');
+
+                    entitySelect.empty(); // Clear existing options
+
+                    // Add default "Select a Department" option
+                    entitySelect.append($('<option>', {
+                        value: '',
+                        text: 'Select a Department'
+                    }));
+
+                    // Add departments to the select element
+                    entities.forEach(function (entity) {
+                        entitySelect.append($('<option>', {
+                            value: entity.id,
+                            text: entity.name
+                        }));
+                    });
+                }
+            });
+        }
+        function updatedepartments_sa(){
+            let role = $('#inputRole').val();
+            let entityId = $('#inputEntity').val();
+            console.log("role : "+role);
+        
+            if (role === "2") {
+                $('#inputDepartment').empty();
+                $('#inputDepartment').append($('<option>', {
+                    value: null,
+                    text: "--"
+                }));
+                return;
+            }
+
+            $.ajax({
+                url: 'includes/scripts/ajax.php',
+                method: 'POST',
+                data: {
+                    request: 'set_departments_admin',
+                    role: role,
+                    entity_id : entityId
+                },
+                dataType: 'json',
+                success: function (departments) {
+                    var departmentSelect = $('#inputDepartment');
+
+                    departmentSelect.empty(); // Clear existing options
+
+                    // Add default "Select a Department" option
+                    departmentSelect.append($('<option>', {
+                        value: '',
+                        text: 'Select a Department'
+                    }));
+
+                    // Add departments to the select element
+                    departments.forEach(function (department) {
+                        departmentSelect.append($('<option>', {
+                            value: department.id,
+                            text: department.name + ' (' + department.parent+ ')'
+                        }));
+                    });
+                }
+            });
+        }
+    </script>
+    <script>
+        window.onload = (event) => {
+            updateentities();
+        };
+    </script>
+
+<?php }?>
+
 </div>
 
 </html>
