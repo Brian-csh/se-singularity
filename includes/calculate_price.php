@@ -62,7 +62,6 @@ function calculate_price($row, $date) {
 
     if($current_price <= 0) {
         $current_price = 0;
-        handle_expired_item($row);
     }
 
     return $current_price;
