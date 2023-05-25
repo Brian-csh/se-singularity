@@ -32,7 +32,7 @@ function initFeishuApproval(
     $feishu_oids = get_RM_FS_OID($conn, $department_id);
     if(empty($feishu_oids)){
         echo "NO RMs";
-        return; // No RMs means no need to init
+        return false; // No RMs means no need to init
     }
 
     // get tenant access token
@@ -88,7 +88,6 @@ function initFeishuApproval(
         "' . $feishu_oids_string . '"
         ]
     }';
-    // TODO: i have to init third approval for every resource manager with a feishu
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $external_approval_url);
@@ -116,8 +115,11 @@ function initFeishuApproval(
         if (!$conn->query($sql)) {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
+        else
+            return true;
     } else {
         var_dump($response);
     }
+    return false;
 }
 ?>

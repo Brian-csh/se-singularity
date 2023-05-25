@@ -1,4 +1,5 @@
 <?php
+include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
 
 function getUserData($conn, $id) {
   $sql = "SELECT name, feishu_id FROM user WHERE id = $id";
@@ -53,8 +54,10 @@ function requestFeishuApproval(
   $row = mysqli_fetch_assoc($result);
   $approval_code = $row['feishu_approval_code'];
   if ($approval_code == NULL) {
-    echo "ERROR! Approval code does not exist";
-    return;
+    // try to make a approval code
+    if(!initFeishuApproval($conn, $department_id)) {
+      return;
+    }
   }
 
   // get tenant access token
@@ -79,6 +82,7 @@ function requestFeishuApproval(
   $approver_oid = $approver_data[1];
   if($approver_oid == "") {
     // if approver does not have feishu id, do not send request
+    echo "No approver oid";
     return;
   }
 
