@@ -62,7 +62,7 @@ if (isset($_GET['search']['value'])) {
     }
 }
 
-$sql .= " ORDER BY review_time DESC LIMIT $start, $length";
+$sql .= " ORDER BY result ASC LIMIT $start, $length";
 
 $result = $conn->query($sql);
 $data = array();

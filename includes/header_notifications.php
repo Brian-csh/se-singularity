@@ -45,8 +45,8 @@ class Notification
         $this->asset_id = $asset_id;
         $this->asset_name = $asset_name;
         $this->link = $link;
-        $date = DateTime::createFromFormat('Ymd', $time);
-        $this->time = $date->format('Y-m-d');
+        // $date = DateTime::createFromFormat('Ymd', $time);
+        $this->time = $time;
         $this->viewed = false;
 
         switch ($type) {
@@ -181,7 +181,7 @@ if(count($notifications) == 0) {
                                     <?= $notification->message ?>
                                 </div>
                                 <div class="dropdown-item-desc smaller mt-1">
-                                    Expire Date: <?= $notification->time ?>
+                                    Expire Date: <?= date("Y-m-d", strtotime($notification->$time)) ?>
                                 </div>
                             </div>
                             <!-- <div class="dropdown-item-icon" style="margin-left: 1em;"><i data-feather="x"></i></div> -->

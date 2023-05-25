@@ -215,7 +215,7 @@ function requestFeishuApproval(
       echo "Error: " . $sql . "<br>" . $conn->error;
     }
     else{
-      var_dump($response);
+      return($response);
     }
   } else {
     echo "No response received.";
