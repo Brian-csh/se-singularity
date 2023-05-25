@@ -199,23 +199,20 @@ echo "<script>
                     <div class="modal-body">
                         <!-- User -->
                         <div class ="mb-3">
-                            <label for="destinationUser">Destination User ID</label>
-                            <input type="text" class="form-control" id="destinationUser" placeholder="e.g., 1" required>
-                            <!-- <label for="destinationUser">Destination User Name</label> -->
-                            <!-- <select class="form-control" id="destinationUser"> -->
-                                <!-- <option value=""> N/A </option> -->
+                            <label for="destinationUser">Destination User Name</label>
+                            <select class="form-control" id="destinationUser">
                                 <?php
-                                    // $results = $conn->query("SELECT id, name,department,role FROM user WHERE department = '$department_id' and role = '4' and id != '$user_id'");
-                                    // while ($row = $results->fetch_assoc() ) {
-                                    //     unset($id, $name);
-                                    //     $id = $row['id'];
-                                    //     $name = $row['name'];
-                                    //     $departmentid = $row['department'];
-                                    //     $department = $conn->query("SELECT name FROM department WHERE id = '$departmentid'")->fetch_object()->name;
-                                    //     echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
-                                    // }
+                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE department = '$department_id' and role = '4' and id != '$user_id' LIMIT 1000");
+                                    while ($row = $results->fetch_assoc() ) {
+                                        unset($id, $name);
+                                        $id = $row['id'];
+                                        $name = $row['name'];
+                                        $departmentid = $row['department'];
+                                        $department = $conn->query("SELECT name FROM department WHERE id = '$departmentid'")->fetch_object()->name;
+                                        echo '<option value="' . $id . '">' . $name ." - ". $department.'</option>';
+                                    }
                                     ?>
-                                <!-- </select> -->
+                                </select>
                         </div>
                     </div>
                     <div class="modal-footer">
