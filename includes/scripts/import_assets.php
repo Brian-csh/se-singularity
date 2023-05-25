@@ -36,7 +36,7 @@ if (isset($_FILES['csvFile'])) {
                 $conn->query($sql);
             } catch (Exception $e) {
                 header("Location: ../../assets.php?error=".$row_number);
-                exit;
+                exit();
             }
         }
 
