@@ -1,6 +1,9 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/includes/db/connect.php";
-include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+
+if(!function_exists('initFeishuApproval')) {
+    include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+}
 session_start();
 $session_info = $_SESSION['user'];
 if (!isset($session_info['role'])) {

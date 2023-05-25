@@ -3,7 +3,9 @@ require 'db/connect.php';
 
 session_start();
 include '../includes/scripts/functions.php';
-include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+if(!function_exists('initFeishuApproval')){
+    include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+}
 
 // bind: existing Singularity users can bind their Feishu accs
 // signin: sign in to Singularity w Feishu (not sign up)

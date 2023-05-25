@@ -1,6 +1,8 @@
 <?php
 include "includes/db/connect.php";
-include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+if(!function_exists('initFeishuApproval')) {
+    include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+}
 //return the name of the entity corresponding to @param int $id
 function getEntityName($id, $conn)
 {

@@ -1,6 +1,7 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
-
+if(!function_exists('initFeishuApproval')) {
+  include $_SERVER['DOCUMENT_ROOT'] . "/includes/feishu/third_approval_init.php";
+}
 function getUserData($conn, $id) {
   $sql = "SELECT name, feishu_id FROM user WHERE id = $id";
   $result = mysqli_query($conn, $sql);
