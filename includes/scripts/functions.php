@@ -301,15 +301,12 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                     $sql_result = $conn->query($sql);
                     array_push($results,[$asset_name,$sql_result]);
                     // get id of sql result
-                    $instance_id = 177;
+                    $instance_id = $conn->insert_id;
 
                     // send feishu approval request
                     $entity_id = mysqli_fetch_array($conn->query("SELECT entity FROM department WHERE id = '$department_id'"))['entity'];
-                    $manager_row = mysqli_fetch_assoc($conn->query("SELECT feishu_id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
-                    // if(isset($manager_row['feishu_id']))
-                        // requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], $manager_row['feishu_id'], $time);
-                    // else // temp
-                        // requestFeishuApproval($conn, $entity_id, $instance_id, $asset_name, $row['feishu_id'], "ou_29bdc51fbfc84e1401dd9a8ae0316fa5", $time);
+                    $manager_row = mysqli_fetch_assoc($conn->query("SELECT feishu_id,id FROM user WHERE department = '$department_id' AND role = 3 AND feishu_id IS NOT NULL LIMIT 1"));
+
                     //Make log
                     insert_log_asset_user($conn,$initiator,$participant,$asset_id,7,$time);
                     
@@ -318,12 +315,14 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                         $feishu_message = 'Your request (USE) for asset \"' . $asset_name .'\" has been made successfully! Please wait for approval (' .$formattedTime.')';
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
                     }
+
                     // SEND notification to manager -> only the manager of the department where user belongs to
                     if(isset($manager_row['feishu_id'])){
                         $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
                         $feishu_message = 'Request (USE) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
                         sendFeishuMessage($conn,$manager_row['feishu_id'],$feishu_message);
-                    } 
+                        requestFeishuApproval($conn, $department_id,$instance_id,$asset_name,$initiator, $manager_row['id'], $time*1000,1);
+                    }
                     
                     $sql = "UPDATE asset SET status =6 WHERE id = '$asset_id'";
                     $conn->query($sql);
