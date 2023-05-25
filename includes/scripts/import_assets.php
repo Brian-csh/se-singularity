@@ -13,8 +13,9 @@ if (isset($_FILES['csvFile'])) {
 
     if (($handle = fopen($csvFile, 'r')) !== false) {
         $columns = fgetcsv($handle); // assuming the first row contains column headers
-
+        $row_number = 0;
         while (($row = fgetcsv($handle)) !== false) {
+            $row_number++;
             $sql = "INSERT INTO asset (
                 date_created,
                 name, 
@@ -31,8 +32,11 @@ if (isset($_FILES['csvFile'])) {
             $sql = rtrim($sql, ','); // remove the last comma
             $sql .= ");";
 
-            if (!$conn->query($sql)) {
-                echo "Query failed: (" . $conn->errno . ") " . $conn->error;
+            try {
+                $conn->query($sql);
+            } catch (Exception $e) {
+                header("Location: ../../assets.php?error=".$row_number);
+                exit;
             }
         }
 
