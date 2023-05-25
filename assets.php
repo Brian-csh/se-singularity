@@ -99,7 +99,7 @@ echo "<script>
                             <?php if($role_id ==3){?>
                                 <a href="add_asset_by_rm.php" class="btn btn-secondary btn-xs float-end ms-2">+ Add Asset</a> 
                             <?php }?>
-                            <?php if($role_id == 2 | $role_id ==3){?>
+                            <?php if($role_id == 2 || $role_id == 3){?>
                                 <button type="button" class="btn btn-primary btn-xs float-end" data-bs-toggle="modal" data-bs-target="#addClassModal">+ Add Class</button>
                                 <button type="button" class="btn btn-warning btn-xs float-end ms-2 me-2" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
                                 <a href="includes/scripts/export_assets.php" class="btn btn-success btn-xs float-end">Export</a>
@@ -309,6 +309,11 @@ echo "<script>
     <link rel="stylesheet" href="css/multiselect.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="includes/multiselect_search_class.js"></script>
+
+    <!-- Toast -->
+    <link rel="stylesheet" type="text/css" href="css/toastify.css">
+    <script src="js/toastify.js"></script>
+
     
     <script src="js/simple-datatables@4.0.8.js" crossorigin="anonymous"></script>
     <script src="js/datatables/datatables-simple-demo.js"></script>
@@ -416,9 +421,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.");
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " is not available for USE. You can only make requests for assets that are idle.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (USE) made successfully!.")
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " request (USE) made successfully!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -459,15 +464,15 @@ echo "<script>
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
                                                     <?php if($role_id == 4) { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession!');
+                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" is not available for RETURN. You can only return assets that are in your possession.', duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                     <?php } else { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only return assets that is IDLE!');
+                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" is not available for RETIRE. You can only retire assets that are IDLE.', duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                     <?php }?>
                                                 } else { // Succeess
                                                     <?php if($role_id == 4) { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" request (RETURN) made successfully!');
+                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" request (RETURN) made successfully!', duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                     <?php } else { ?> 
-                                                        alert('Asset "' + data.result[i][0] + '" RETIRED!');
+                                                        Toastify({ text: 'Asset "' + data.result[i][0] + '" RETIRED!', duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                     <?php }?>
                                                 }
                                             }
@@ -500,7 +505,8 @@ echo "<script>
                                         data: {
                                             assets: assetIds,
                                             destination: departmentId,
-                                            role_id: <?= $role_id ?>
+                                            role_id: <?= $role_id ?>,
+                                            user_id: <?=$user_id?>
                                         }, // TODO : handle requests
                                         success: function(response) {
                                             console.log(response);
@@ -511,9 +517,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.");
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are IDLE.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " moved!")
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " moved!", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -550,9 +556,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.");
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " is not available for MOVE. You can only move assets that are in your possession.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (MOVE) made successfully!")
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " request (MOVE) made successfully!", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables
@@ -594,9 +600,9 @@ echo "<script>
                                                 console.log(data.result[i]);
                                                 if(data.result[i][1] === false){ // fail
                                                     // fetch asset name
-                                                    alert("Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.");
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " is not available for REPAIR. You can only make requests for assets that are in your possession.", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();
                                                 } else { // Succeess
-                                                    alert("Asset " + data.result[i][0] + " request (REPAIR) made successfully!.")
+                                                    Toastify({ text: "Asset " + data.result[i][0] + " request (REPAIR) made successfully!.", duration: 3000, backgroundColor: "green", position: "center", gravity: "top" }).showToast();
                                                 }
                                             }
                                             dt.ajax.reload(); // Refresh the DataTables

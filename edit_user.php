@@ -232,7 +232,7 @@ $editor_role = $session_info['role'];
                                     <!-- password-->
                                     <div class="col-md-6">
                                         <label class="small mb-1" for="inputPassword">New Password</label>
-                                        <input class="form-control" id="inputPassword" type="password" name="password">
+                                        <input class="form-control" id="inputPassword" type="password" name="password" <?php echo (($editor_role < $current_role && $editor_role < 3) || $user_id == $session_info['id']) ? "" : "disabled"?>>
                                         <label class="small mb-1" for="inputPassword">*if the field is empty, password is unchanged.</label>
                                     </div>
                                 </div>
@@ -246,8 +246,14 @@ $editor_role = $session_info['role'];
                                 ?>
 
                                 <input type="hidden" name="id" value="<?php echo $user_id ?>">
+                                <?php
+                                    if ($user_id == $session_info['id']) {
+                                        echo '<input type="hidden" name="department" value="'.$department_id.'">';
+                                        echo '<input type="hidden" name="role" value="'.$current_role.'">';
+                                    }
+                                ?>
                                 <!-- Save changes button-->
-                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes">Update</button>
+                                <button class="btn btn-success float-end mx-1" type="submit" name="submit_changes" <?php echo (($editor_role < $current_role && $editor_role < 3) || $user_id == $session_info['id']) ? "" : "disabled"?>>Update</button>
                             </form>
                         </div>
                     </div>
