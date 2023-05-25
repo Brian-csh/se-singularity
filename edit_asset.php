@@ -78,7 +78,7 @@ if(isset($_POST['edit_asset'])){
 
 
     $asset_new_class = $_POST['editAssetClass'];
-    $asset_new_expire = $_POST['editAssetExpire']; if(!$asset_new_expire) $asset_new_expire = $asset_expire;
+    $asset_new_expire = strtotime($_POST['editAssetExpire']); if(!$asset_new_expire) $asset_new_expire = $asset_expire;
 
     $asset_new_position = $_POST['editAssetPosition'];
     $sql = "UPDATE asset SET parent =$asset_new_parent,name = '$asset_new_name',class = '$asset_new_class', 
