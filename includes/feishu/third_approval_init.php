@@ -28,10 +28,10 @@ function initFeishuApproval(
     $feishu_app_id = "cli_a4a8e931cd79900e",
     $feishu_app_secret = "7Q1Arabz1qImkNpLOp2D9coj5cXp1ufJ"
 ) {
-    echo "HELLO>??";
     // get all RMs in department
     $feishu_oids = get_RM_FS_OID($conn, $department_id);
     if(empty($feishu_oids)){
+        echo "NO RMs";
         return; // No RMs means no need to init
     }
 
@@ -62,7 +62,6 @@ function initFeishuApproval(
     );
 
     $feishu_oids_string = implode('","', $feishu_oids);
-    $feishu_oids_string = '"' . $feishu_oids_string . '"';
 
     // JSON data to be sent in the request body
     $jsonData = '{
@@ -120,6 +119,5 @@ function initFeishuApproval(
     } else {
         var_dump($response);
     }
-    var_dump($response);
 }
 ?>
