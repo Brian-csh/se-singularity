@@ -33,12 +33,12 @@ function handle_expired_item($row){
  */
 function calculate_price($row, $date) {
     $original_price = $row["price"];
-    $expire_date = strtotime($row["expire"]); // convert to Unix time
+    $expire_date = $row["expire"]; // convert to Unix time
     $create_date = $row["date_created"];
 
     if(isset($expire_date) && $expire_date < time()) {
         $current_price = 0;
-        handle_expired_item($row);
+        // handle_expired_item($row);
     }
     else if(isset($expire_date)){
         // calculate the number of years between the two dates
