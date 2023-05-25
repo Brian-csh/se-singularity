@@ -201,9 +201,8 @@ echo "<script>
                         <div class ="mb-3">
                             <label for="destinationUser">Destination User Name</label>
                             <select class="form-control" id="destinationUser">
-                                <!-- <option value=""> N/A </option> -->
                                 <?php
-                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE department = '$department_id' and role = '4' and id != '$user_id'");
+                                    $results = $conn->query("SELECT id, name,department,role FROM user WHERE department = '$department_id' and role = '4' and id != '$user_id' LIMIT 1000");
                                     while ($row = $results->fetch_assoc() ) {
                                         unset($id, $name);
                                         $id = $row['id'];
@@ -622,6 +621,12 @@ echo "<script>
             });
         });
     </script>
+
+    <?php
+        if (isset($_GET['error'])) {
+            echo '<script>Toastify({ text: "Import error at row '.$_GET['error'].'", duration: 3000, backgroundColor: "red", position: "center", gravity: "top" }).showToast();</script>';
+        }
+    ?>
     
     <!-- For Request Modal -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
