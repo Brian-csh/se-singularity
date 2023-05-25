@@ -32,10 +32,10 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_description = $asset_data['description'];
         $asset_position = $asset_data['position'];
         $asset_expire = $asset_data['expire'];
-        if(isset($asset_expire)){
-            $date = DateTime::createFromFormat('Ymd', $asset_expire);
-            $asset_expire = $date->format('Y-m-d');
-        }
+        // if(isset($asset_expire)){
+            // $date = DateTime::createFromFormat('Ymd', $asset_expire);
+            // $asset_expire = $date->format('Y-m-d');
+        // }
         $asset_status_id = $asset_data['status'];
         $asset_brand = $asset_data['brand'];
         $asset_model = $asset_data['model'];
@@ -334,7 +334,7 @@ if (isset($_POST['delete_image'])) {
                                                 <td><?php echo $asset_user_name; ?></td>
                                                 <td><?php echo $asset_department; ?></td>
                                                 <td><?php echo $asset_position; ?></td>
-                                                <td><?php echo $asset_expire; ?></td>
+                                                <td><?php echo date('Y-m-d', $asset_expire); ?></td>
                                                 <!-- Todo : add color for diff status -->
                                                 <td><?php echo $asset_status; ?></td>
                                             </tr>

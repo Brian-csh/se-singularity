@@ -181,7 +181,7 @@ if(count($notifications) == 0) {
                                     <?= $notification->message ?>
                                 </div>
                                 <div class="dropdown-item-desc smaller mt-1">
-                                    Expire Date: <?= date("Y-m-d", strtotime($notification->$time)) ?>
+                                    Expire Date: <?= date("Y-m-d", $notification->$time) ?>
                                 </div>
                             </div>
                             <!-- <div class="dropdown-item-icon" style="margin-left: 1em;"><i data-feather="x"></i></div> -->
