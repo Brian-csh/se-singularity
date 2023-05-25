@@ -474,8 +474,8 @@ function make_request($conn,$initiator,$participant = null,$asset_ids,$request_t
                         $initiator_name = mysqli_fetch_array($conn->query("SELECT name FROM user WHERE id = '$initiator'"))['name'];
                         $feishu_message = 'Request (MOVE) for asset \"' . $asset_name . '\" has been made by ' . $initiator_name . '. Please handle the request(' .$formattedTime.')' ;
                         sendFeishuMessage($conn,$row['feishu_id'],$feishu_message);
-                        requestFeishuApproval($conn, $department_id,$instance_id,$asset_name,$initiator, $manager_row['id'], $time*1000,3);
-                    } 
+                        requestFeishuApproval($conn, $department_id,$instance_id,$asset_name,$initiator, $manager_row['id'], $time*1000,4);
+                    }
 
                     $sql = "UPDATE asset SET status = 9 WHERE id = '$asset_id'";
                     $conn->query($sql);

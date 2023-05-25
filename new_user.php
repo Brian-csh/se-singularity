@@ -45,7 +45,6 @@ if (isset($_POST['submit_changes'])) {
     if ($password_confirmed) {
         $sql = "INSERT INTO user (date_created, name, password, entity, department, entity_super, role) 
         VALUES ('$date_created', '$name', '$hashed_password', $entity_id_,$department_id_, '$entity_head', '$role_id')";
-    var_dump($sql);
         if ($conn->query($sql)) {
             if($department_id == -1){
                 header('Location: users.php');
