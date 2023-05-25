@@ -298,7 +298,7 @@ if (isset($_POST['submit_asset'])) {
 
                                     <div class="col-md-4">
                                         <label class="small mb-1" for="inputExpiration">Expiration Date</label>
-                                        <input class="form-control" id="inputExpiration" type="date" value="" name="expiration" required>
+                                        <input class="form-control" id="inputExpiration" type="date" value="" name="expiration">
                                     </div>
                                 </div>
                                 <div class="row gx-3 mb-3">
