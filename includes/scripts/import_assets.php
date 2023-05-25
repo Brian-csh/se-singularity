@@ -7,6 +7,8 @@ if ($conn->connect_errno) {
     echo "Failed to connect to MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
 }
 
+$error = "";
+
 if (isset($_FILES['csvFile'])) {
     $csvFile = $_FILES['csvFile']['tmp_name'];
     $timestamp = time();
@@ -35,8 +37,7 @@ if (isset($_FILES['csvFile'])) {
             try {
                 $conn->query($sql);
             } catch (Exception $e) {
-                header("Location: ../../assets.php?error=".$row_number);
-                exit;
+                $error = "?error=".$row_number;
             }
         }
 
@@ -47,4 +48,4 @@ if (isset($_FILES['csvFile'])) {
 }
 
 $conn->close();
-header("Location: ../../assets.php");
+header("Location: ../../assets.php".$error);
