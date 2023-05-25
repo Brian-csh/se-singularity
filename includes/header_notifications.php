@@ -45,8 +45,8 @@ class Notification
         $this->asset_id = $asset_id;
         $this->asset_name = $asset_name;
         $this->link = $link;
-        $this->time = $time;
-        $this->type = $type;
+        $date = DateTime::createFromFormat('Ymd', $time);
+        $this->time = $date->format('Y-m-d');
         $this->viewed = false;
 
         switch ($type) {
