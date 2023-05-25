@@ -31,7 +31,11 @@ if ($result_asset && mysqli_num_rows($result_asset) > 0) {
         $asset_price = $asset_data['price'];
         $asset_description = $asset_data['description'];
         $asset_position = $asset_data['position'];
-        $asset_expire = date(strtotime($asset_data['expire']));
+        $asset_expire = $asset_data['expire'];
+        if(isset($asset_expire)){
+            $date = DateTime::createFromFormat('Ymd', $asset_expire);
+            $asset_expire = $date->format('Y-m-d');
+        }
         $asset_status_id = $asset_data['status'];
         $asset_brand = $asset_data['brand'];
         $asset_model = $asset_data['model'];
