@@ -1,6 +1,6 @@
 # Singularity EAM
 
-Singularity EAM is an Enterprise Asset Management System designed to manage information for different organizations, departments, and users.
+Singularity EAM is an Enterprise Asset Management System designed to manage information for different organizations, departments, and users. The full documentation can be found [here](https://byrvr.notion.site/Singularity-EAM-Documentation-655d01e58fbe4d06b846b497d018f8d5).
 
 ## Features
 
